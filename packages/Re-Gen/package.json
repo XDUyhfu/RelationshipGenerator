@@ -1,0 +1,46 @@
+{
+  "name": "@yhfu/re-gen",
+  "private": false,
+  "version": "0.1.4-alpha",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "author": {
+    "name": "yhfu",
+    "email": "yhfu@stu.xidian.edu.cn"
+  },
+  "keywords": [
+    "rxjs",
+    "relationship generator",
+    "state"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "./dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "stub": "unbuild --stub"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/ramda": "^0.28.20",
+    "typescript": "^4.9.3",
+    "unbuild": "^1.1.1"
+  },
+  "dependencies": {
+    "ramda": "^0.28.0",
+    "rxjs": "^7.8.0"
+  },
+  "repository": {
+    "url": "https://github.com/XDUyhfu/RelationshipGenerator"
+  }
+}

@@ -2,23 +2,63 @@ import { ReGen } from "@yhfu/re-gen";
 import { RelationConfig } from "./config";
 import { Button, Select } from "antd";
 import { useAtoms } from "@yhfu/re-gen-hooks";
+import { useEventCallback, useObservable } from "rxjs-hooks";
+import { map } from "rxjs";
 
 function App () {
 
-  const AtomInOut = ReGen( "ca", RelationConfig );
+  const AtomInOut = ReGen( "CACHE_KEY", RelationConfig );
 
-  const {
-    areaValue,
-    regionValue,
-    showRegionValue,
-    RegionListValue,
-    areaIn$,
-    regionIn$,
-    testMoreDependValue,
-    testMoreDependIn$,
-    testMoreMoreDependValue,
-    testMoreMoreDependIn$
-  } = useAtoms( AtomInOut, RelationConfig );
+  const { areaIn$, areaOut$ } = AtomInOut( "area" );
+  const areaValue = useObservable( () => areaOut$ );
+  const [areaCallback] = useEventCallback( ( event$ ) => event$.pipe(
+    map( ( val ) => areaIn$.next( val ) )
+  ) );
+
+  const { regionIn$, regionOut$ } = AtomInOut( "region" );
+  const regionValue = useObservable( () => regionOut$ );
+  const [regionCallback] = useEventCallback( ( event$ ) => event$.pipe(
+    map( ( val ) => regionIn$.next( val ) )
+  ) );
+
+  const { showRegionOut$ } = AtomInOut( "showRegion" );
+  const showRegionValue = useObservable( () => showRegionOut$ );
+
+  const { RegionListIn$, RegionListOut$ } = AtomInOut( "RegionList" );
+  const RegionListValue = useObservable( () => RegionListOut$ );
+
+  const { testMoreDependIn$, testMoreDependOut$ } = AtomInOut( "testMoreDepend" );
+  const testMoreDependValue = useObservable( () => testMoreDependOut$ );
+  const [testMoreDependCallback] = useEventCallback( ( event$ ) => event$.pipe(
+    map( ( val ) => testMoreDependIn$.next( val ) )
+  ) );
+
+  const { testMoreMoreDependIn$, testMoreMoreDependOut$ } = AtomInOut( "testMoreMoreDepend" );
+  const testMoreMoreDependValue = useObservable( () => testMoreMoreDependOut$ );
+  const [testMoreMoreDependCallback] = useEventCallback( ( event$ ) => event$.pipe(
+    map( ( val ) => testMoreMoreDependIn$.next( "out" ) )
+  ) );
+
+  // const { areaIn$, areaOut$ } = AtomInOut( "area" );
+  // const areaValue = useObservable( () => areaOut$ );
+  // const [callback] = useEventCallback( ( event$ ) => event$.pipe(
+  //   map( ( val ) => areaIn$.next( val ) )
+  // ) );
+
+  // const {
+  // areaValue,
+  // regionValue,
+  // showRegionValue,
+  // RegionListValue,
+  // areaIn$,
+  // regionIn$,
+  // testMoreDependValue,
+  // testMoreDependIn$,
+  // testMoreMoreDependValue,
+  // testMoreMoreDependIn$
+  // } = useAtoms( AtomInOut as any, RelationConfig );
+
+
 
   return (
     <div >
@@ -38,9 +78,9 @@ function App () {
 
 
       <Select
-        // value={ areaValue?.[0] }
+        // value={ areaValue as any }
         style={ { width: 120 } }
-        onChange={ ( val ) => { areaIn$.next( val ); } }
+        onChange={ areaCallback }
         placeholder={ "please enter sth." }
         options={ [
           {
@@ -62,7 +102,7 @@ function App () {
           mode="multiple"
           style={ { width: 120 } }
           value={ regionValue }
-          onChange={ ( val ) => { regionIn$.next( val ); } }
+          onChange={ regionCallback }
           options={ [
             {
               value: "HN",
@@ -83,8 +123,8 @@ function App () {
           ] }
         /> : null
       }
-      <Button type='primary' onClick={ () => testMoreDependIn$.next( "true4" ) }>change More Depend State</Button>
-      <Button type='primary' onClick={ () => testMoreMoreDependIn$.next( "out" ) }>change More More Depend State</Button>
+      <Button type='primary' onClick={ testMoreDependCallback }>change More Depend State</Button>
+      <Button type='primary' onClick={ testMoreMoreDependCallback }>change More More Depend State</Button>
     </div>
   );
 }

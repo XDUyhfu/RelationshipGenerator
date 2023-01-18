@@ -1,5 +1,7 @@
 # 基于rxjs的依赖关系生成器
 
+**NPM地址** [@yhfu/re-gen](https://www.npmjs.com/package/@yhfu/re-gen)  [@yhfu/re-gen-hooks](https://www.npmjs.com/package/@yhfu/re-gen-hooks)
+
 > 初期开发阶段，API不稳定，谨(不)慎(用)使(也)用(行)！
 
 > 此库不定时更新

@@ -2,11 +2,10 @@ import {
 	concatMap,
 	identity,
 	of,
-	map as rxMap,
+	map,
 	combineLatestWith
 } from "rxjs";
 import { AtomInOut, AtomState, GlobalStore } from "./Atom";
-import { path, map, compose, defaultTo, } from "ramda";
 import { handleFunctionResult } from "./utils";
 
 
@@ -22,18 +21,8 @@ interface IConfigItem {
 
 type IParam = [cacheKey: string, RelationConfig: IConfigItem[]]
 
-// const saveAtom: ( name: string, value: AtomState ) => void = ( name, value ) => {
-// 	if ( !AtomStore.has( name ) ) {
-// 		AtomStore.set(
-// 			name,
-// 			value
-// 		);
-// 	}
-// };
-
 // 因为配置项的顺序可能在依赖项的前边，所以先将所有的单状态进行存储，然后再处理依赖关系
 const FromConfigToAtomStore = ( [cacheKey, RelationConfig]:IParam ) => {
-	
 	const AtomStore = GlobalStore.get( cacheKey )!;
 	RelationConfig.forEach( item => {
 		
@@ -52,9 +41,9 @@ const FromConfigToAtomStore = ( [cacheKey, RelationConfig]:IParam ) => {
 };
 
 const getAtom: ( cacheKey: string, name: string ) => AtomState = ( cacheKey, name ) => GlobalStore.get(cacheKey)!.get( name )!;
-const getDependNames: ( ConfigItem: IConfigItem ) => string[] = path( ["depend", "names"] ) as any ?? [];
+const getDependNames: ( ConfigItem: IConfigItem ) => string[] = ( item ) => item.depend?.names || [];
 const getDependAtoms: ( cacheKey: string, ConfigItem: IConfigItem ) => AtomState[] =
-	( cacheKey, ConfigItem ) => getDependNames( ConfigItem ).map( name => getAtom(cacheKey, name));
+	( cacheKey, ConfigItem ) => getDependNames( ConfigItem )?.map( name => getAtom(cacheKey, name));
 
 // 处理依赖关系 根据已有的 AtomState 生成新的 AtomState
 const AtomHandle = ( [cacheKey, RelationConfig]: IParam) => {
@@ -62,7 +51,7 @@ const AtomHandle = ( [cacheKey, RelationConfig]: IParam) => {
 		const atom = getAtom( cacheKey, ConfigItem.name );
 
 		atom.out$ = atom.in$.pipe( 
-				rxMap( ConfigItem?.handle || identity ),
+				map( ConfigItem?.handle || identity ),
 				concatMap( handleFunctionResult ),
 			);
 	} );
@@ -80,7 +69,7 @@ const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 		const dependAtomsInList = dependNames?.map( name => {
 			const configIndex = RelationConfig.findIndex( config => config.name === name );
 			return getAtom( cacheKey, name ).out$.pipe(
-				rxMap( RelationConfig[configIndex].handle || identity ),
+				map( RelationConfig[configIndex].handle || identity ),
 				concatMap( handleFunctionResult ),
 			);
 		} );
@@ -88,7 +77,7 @@ const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 		if ( dependAtoms.length ) {
 			atom.out$ = atom.out$.pipe(
 				combineLatestWith( ...dependAtomsInList ),
-				rxMap( ConfigItem.depend?.handle || identity ),
+				map( ConfigItem.depend?.handle || identity ),
 				concatMap( handleFunctionResult ),
 			);
 		} else {
@@ -113,5 +102,5 @@ const BuilderRelation = ( cacheKey: string, RelationConfig: IConfigItem[] ) =>
 export const ReGen = ( cacheKey: string, RelationConfig: IConfigItem[] ) => {
 	GlobalStore.set(cacheKey, new Map<string, AtomState>());
 	BuilderRelation( cacheKey, RelationConfig ).subscribe();
-	return AtomInOut;
+	return AtomInOut(cacheKey);
 };

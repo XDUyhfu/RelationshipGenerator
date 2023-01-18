@@ -5,7 +5,7 @@ import { useAtoms } from "@yhfu/re-gen-hooks";
 
 function App () {
 
-  const AtomInOut = ReGen( RelationConfig );
+  const AtomInOut = ReGen( "ca", RelationConfig );
 
   const {
     areaValue,

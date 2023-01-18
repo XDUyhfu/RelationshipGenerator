@@ -17,7 +17,7 @@ export class AtomState<T = unknown> {
     }/*  */
 }
 
-export const AtomStore = new Map<string, AtomState>();
+export const GlobalStore = new Map<string, Map<string, AtomState>>();
 export const AtomInOut = <T = unknown>( valueName: string ) => {
     const atom = AtomStore?.get( valueName );
     if (!atom) { throw new Error("The key value is not included in the configuration list for building.(用于构建的配置列表中不包含该key值)"); }

@@ -27,6 +27,7 @@ module.exports = {
         "object-curly-newline": [ "error", { "multiline": true } ],
         "block-spacing": "error",
         "arrow-body-style": "error",
-        "react/react-in-jsx-scope": "off"
+        "react/react-in-jsx-scope": "off",
+        "@typescript-eslint/no-non-null-assertion": "off"
     }
 };

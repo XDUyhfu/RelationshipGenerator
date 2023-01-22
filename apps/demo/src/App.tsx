@@ -9,31 +9,31 @@ function App () {
 
   const AtomInOut = ReGen( "CACHE_KEY", RelationConfig );
 
-  const { areaIn$, areaOut$ } = AtomInOut( "area" );
+  const { areaIn$, areaOut$ } = AtomInOut<string>( "area" );
   const areaValue = useObservable( () => areaOut$ );
   const [areaCallback] = useEventCallback( ( event$ ) => event$.pipe(
     map( ( val ) => areaIn$.next( val ) )
   ) );
 
-  const { regionIn$, regionOut$ } = AtomInOut( "region" );
+  const { regionIn$, regionOut$ } = AtomInOut<string>( "region" );
   const regionValue = useObservable( () => regionOut$ );
   const [regionCallback] = useEventCallback( ( event$ ) => event$.pipe(
     map( ( val ) => regionIn$.next( val ) )
   ) );
 
-  const { showRegionOut$ } = AtomInOut( "showRegion" );
+  const { showRegionOut$ } = AtomInOut<boolean>( "showRegion" );
   const showRegionValue = useObservable( () => showRegionOut$ );
 
-  const { RegionListIn$, RegionListOut$ } = AtomInOut( "RegionList" );
+  const { RegionListIn$, RegionListOut$ } = AtomInOut<string[]>( "RegionList" );
   const RegionListValue = useObservable( () => RegionListOut$ );
 
-  const { testMoreDependIn$, testMoreDependOut$ } = AtomInOut( "testMoreDepend" );
+  const { testMoreDependIn$, testMoreDependOut$ } = AtomInOut<string>( "testMoreDepend" );
   const testMoreDependValue = useObservable( () => testMoreDependOut$ );
   const [testMoreDependCallback] = useEventCallback( ( event$ ) => event$.pipe(
     map( ( val ) => testMoreDependIn$.next( val ) )
   ) );
 
-  const { testMoreMoreDependIn$, testMoreMoreDependOut$ } = AtomInOut( "testMoreMoreDepend" );
+  const { testMoreMoreDependIn$, testMoreMoreDependOut$ } = AtomInOut<string>( "testMoreMoreDepend" );
   const testMoreMoreDependValue = useObservable( () => testMoreMoreDependOut$ );
   const [testMoreMoreDependCallback] = useEventCallback( ( event$ ) => event$.pipe(
     map( ( val ) => testMoreMoreDependIn$.next( "out" ) )

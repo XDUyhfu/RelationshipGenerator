@@ -20,7 +20,7 @@ export class AtomState<T = unknown> {
 }
 
 export const GlobalStore = new Map<string, Map<string, AtomState>>();
-export const AtomInOut = <T = unknown>(cacheKey:string) => ( name: string ) => {
+export const AtomInOut = (cacheKey: string) => <T = unknown>( name: string ) => {
     const atom = GlobalStore.get( cacheKey )!.get( name )!;
     if ( !atom ) { throw new Error("The key value is not included in the configuration list for building.(用于构建的配置列表中不包含该key值)"); }
     return {
@@ -28,7 +28,7 @@ export const AtomInOut = <T = unknown>(cacheKey:string) => ( name: string ) => {
         [`${ name }Out$`]: atom.out$
     } as {
         [x: `${ string }In$`]: BehaviorSubject<T>,
-        [x: `${string}Out$`]: BehaviorSubject<T>
+        [x: `${ string }Out$`]: BehaviorSubject<T>
     };
 };
 

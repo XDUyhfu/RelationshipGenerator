@@ -49,7 +49,6 @@ const AtomHandle = ( [cacheKey, RelationConfig]: IParam) => {
 		atom.in$.pipe( 
 			map( item.handle || identity ),
 			concatMap( handlePromiseResult ),
-				distinctUntilChanged()
 		).subscribe( atom.mid$ );
 	} );
 

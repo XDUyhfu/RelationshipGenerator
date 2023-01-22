@@ -1,7 +1,7 @@
 import { ReGen } from "@yhfu/re-gen";
 import { RelationConfig } from "./config";
 import { Button, Select } from "antd";
-import { useAtoms } from "@yhfu/re-gen-hooks";
+// import { useAtoms } from "@yhfu/re-gen-hooks";
 import { useEventCallback, useObservable } from "rxjs-hooks";
 import { map } from "rxjs";
 

@@ -11,13 +11,14 @@ export interface IConfigItem {
 	};
 }
 
+
 export const RelationConfig: IConfigItem[] = [
 	{
 		name: "area",
 		handle ( val ) {
 			return val;
-	}
-},
+		}
+	},
 	{
 		name: "region",
 		init: [],
@@ -48,21 +49,21 @@ export const RelationConfig: IConfigItem[] = [
 		depend: {
 			names: ["area", "region"],
 			handle: async ( [list, area, region]: [list: string[], area: string, region: string[]] ) => {
-				if ( area === "CN"  ) {
+				if ( area === "CN" ) {
 					if ( region?.length ) {
-						return region?.filter(Boolean)?.map( item => ( {
-						name: item,
-						region: item
-					} ));
-					} else if (area) {
-						
-							return  [{area}];
-						
+						return region?.filter( Boolean )?.map( item => ( {
+							name: item,
+							region: item
+						} ) );
+					} else if ( area ) {
+
+						return [{ area }];
+
 					}
 					return [];
 				} else {
 					if ( area ) {
-						return [{area}];
+						return [{ area }];
 					}
 					return [];
 				}
@@ -83,7 +84,7 @@ export const RelationConfig: IConfigItem[] = [
 		depend: {
 			names: ["testMoreDepend"],
 			handle: async ( [testMoreMoreDepend, testMoreDepend]: [testMoreMoreDepend: string, testMoreDepend: string] ) => {
-				if ( testMoreDepend === "true4" &&  testMoreMoreDepend !== "out") {
+				if ( testMoreDepend === "true4" && testMoreMoreDepend !== "out" ) {
 					return "full";
 				} else {
 					if ( testMoreMoreDepend === "out" ) {

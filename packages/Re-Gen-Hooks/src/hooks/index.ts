@@ -27,13 +27,14 @@ export const useAtoms = (AtomInOut:IAtomInOut, RelationConfig: IConfigItem[] ) =
     
     const Atoms: IResultAtoms = names.reduce( ( pre, name ) => {
         
-        const inout$ = AtomInOut( name );        
-
+        const inout$ = AtomInOut( name );
+        
         return {
             ...pre,
             [`${ name }In$`]: inout$[`${ name }In$`],
-            [`${name}Value`]: useObservable(() => inout$[`${ name }Out$`], getConfigItem(name).init)
+            [`${name}Value`]: useObservable(() => inout$[`${ name }Out$`], getConfigItem(name).init || null)
         };
+
     }, {} as IResultAtoms );
 
     return Atoms;

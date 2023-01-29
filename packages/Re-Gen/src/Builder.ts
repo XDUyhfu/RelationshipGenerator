@@ -87,7 +87,7 @@ const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 				distinctUntilChanged()
 			).subscribe(atom.out$);
 		} else {
-			atom.mid$.subscribe(atom.out$);
+			atom.mid$.pipe(distinctUntilChanged()).subscribe(atom.out$);
 		}
 	} );
 	

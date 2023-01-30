@@ -7,9 +7,9 @@ import { Area } from "./components/Area";
 import { Region } from "./components/Region";
 import { IP } from "./components/IP";
 import styled from "styled-components";
-import { Space } from "antd";
+import { Space, Tabs } from "antd";
 import { ReGen } from "@yhfu/re-gen";
-import { CacheKey, RelationConfig } from "./config";
+import { CacheKey, RelationConfig, TabItems } from "./config";
 import { useAtoms } from "@yhfu/re-gen-hooks";
 import { useCallback } from "react";
 
@@ -41,7 +41,10 @@ function App () {
     regionValue,
     regionShowValue,
     RegionListValue,
-    SelectableTimeRangeValue
+    SelectableTimeRangeValue,
+    tabValue,
+    tabIn$,
+    areaShowValue
   } = useAtoms( AtomInOut, RelationConfig );
 
   const domainChange = useCallback( ( domain: string[] ) => { domainIn$.next( domain ); }, [] );
@@ -53,17 +56,18 @@ function App () {
   const areaChange = useCallback( ( area: string ) => { areaIn$.next( area ); }, [] );
   const regionChange = useCallback( ( regions: string[] ) => { regionIn$.next( regions ); }, [] );
   const aggregationChange = useCallback( ( aggregation: string ) => { aggregationIn$.next( aggregation ); }, [] );
-
+  const tabChange = useCallback( ( tab: string ) => { tabIn$.next( tab ); }, [] );
   return (
     <>
+      <Tabs activeKey={ tabValue as string } items={ TabItems } onChange={ tabChange } />
       <Wrapper >
         <Domain value={ domainValue as string[] } change={ domainChange } />
         <Shortcut value={ shortcutValue as string } change={ shortcutChange } />
         <Time value={ timeValue as string[] } change={ timeChange } range={ SelectableTimeRangeValue as string[] } />
         <Aggregation value={ aggregationValue as string } change={ aggregationChange } />
-        <Area value={ areaValue as string } change={ areaChange } />
+        { areaShowValue ? <Area value={ areaValue as string } change={ areaChange } /> : null }
         { regionShowValue ? <Region value={ regionValue as string[] } change={ regionChange } /> : null }
-        {/* <IP value={ domainValue as string } change={ domainChange } /> */ }
+        <IP value={ domainValue as string } change={ domainChange } />
       </Wrapper>
       <br />
       <br />

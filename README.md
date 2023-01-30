@@ -1,4 +1,4 @@
-# 基于rxjs的依赖关系生成器
+# 基于rxjs的状态生成器
 
 **NPM地址** [@yhfu/re-gen](https://www.npmjs.com/package/@yhfu/re-gen)  [@yhfu/re-gen-hooks](https://www.npmjs.com/package/@yhfu/re-gen-hooks)
 
@@ -62,7 +62,7 @@ const AtomInOut = ReGen( CacheKey, RelationConfig );
 
 ### 接下来可以使用常规方法或者是hook进行操作
 
-#### hook方式
+#### hook方法
 - 通过使用 `@yhfu/ge-ren-hooks` 包导出的 `useAtoms` 方法，分别传入 `AtomInOut` 以及 `RelationConfig` 参数，hook会返回一个对象，通过解构对象，从而获取 `${name}Value` 以及 `${name}In$`。其中 `${name}` 会被替换为 `RelationConfig` 中的name值。
 
 ```typescript

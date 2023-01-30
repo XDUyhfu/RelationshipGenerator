@@ -1,8 +1,6 @@
 // 这是一个测试的配置文件，主要用来测试生成的代码
 // 主要用来制定数据之间的关系
 
-// import dayjs from "dayjs";
-
 export interface IConfigItem {
 	name: string;
 	init?: any;
@@ -16,13 +14,20 @@ export interface IConfigItem {
 export const RelationConfig: IConfigItem[] = [
 	{
 		name: "area",
-		init: "",
+		init:"CN",
 		handle ( val ) {
 			return val;
-	}
-},
+		}
+	},
 	{
 		name: "region",
+		init: [],
+		depend: {
+			names: ["area"],
+			handle ( [region, area] ) {
+				return region;
+			}
+		},
 		handle: async ( val: string[] = [] ) => val?.filter( Boolean )
 	},
 	{
@@ -31,7 +36,7 @@ export const RelationConfig: IConfigItem[] = [
 		depend: {
 			names: ["area"],
 			handle ( [show, area]: [show: boolean, area: string] ) {
-				if ( area=== "CN" ) {
+				if ( area === "CN" ) {
 					return true;
 				}
 				return false;
@@ -43,22 +48,22 @@ export const RelationConfig: IConfigItem[] = [
 		init: [],
 		depend: {
 			names: ["area", "region"],
-			handle:async ( [list, area, region]: [list: string[], area: string, region: string[]] )=> {
-				if ( area === "CN"  ) {
+			handle: async ( [list, area, region]: [list: string[], area: string, region: string[]] ) => {
+				if ( area === "CN" ) {
 					if ( region?.length ) {
-						return region?.filter(Boolean)?.map( item => ( {
-						name: item,
-						region: item
-					} ));
-					} else if (area) {
-						
-							return  [{area}];
-						
+						return region?.filter( Boolean )?.map( item => ( {
+							name: item,
+							region: item
+						} ) );
+					} else if ( area ) {
+
+						return [{ area }];
+
 					}
 					return [];
 				} else {
 					if ( area ) {
-						return [{area}];
+						return [{ area }];
 					}
 					return [];
 				}
@@ -70,7 +75,7 @@ export const RelationConfig: IConfigItem[] = [
 		init: "",
 		depend: {
 			names: ["showRegion", "RegionList"],
-			handle: async ( [testMoreDepend, showRegion, RegionList]: [testMoreDepend: string[], showRegion: boolean, RegionList: string[]] ) => testMoreDepend ?testMoreDepend: JSON.stringify( showRegion ) + JSON.stringify( RegionList?.length )
+			handle: async ( [testMoreDepend, showRegion, RegionList]: [testMoreDepend: string[], showRegion: boolean, RegionList: string[]] ) => JSON.stringify( showRegion ) + JSON.stringify( RegionList?.length )
 		}
 	},
 	{
@@ -79,12 +84,10 @@ export const RelationConfig: IConfigItem[] = [
 		depend: {
 			names: ["testMoreDepend"],
 			handle: async ( [testMoreMoreDepend, testMoreDepend]: [testMoreMoreDepend: string, testMoreDepend: string] ) => {
-				console.log(testMoreMoreDepend);
-				if ( testMoreDepend === "true4" &&  testMoreMoreDepend !== "out") {
+				if ( testMoreDepend === "true4" && testMoreMoreDepend !== "out" ) {
 					return "full";
 				} else {
 					if ( testMoreMoreDepend === "out" ) {
-						console.log("return out");
 						return "out";
 					}
 					return "unfull";
@@ -94,54 +97,3 @@ export const RelationConfig: IConfigItem[] = [
 	}
 ];
 
-// export const RelationConfig: IConfigItem[] = [{
-// 	name: "time",
-// 	init: [dayjs().subtract(
-// 		600,
-// 		"seconds"
-// 	).format( "YYYY-MM-DD HH:mm" ), dayjs().format( "YYYY-MM-DD HH:mm" )],
-// 	handle ( val ) {
-// 		return val;
-// 	},
-// 	depend: {
-// 		names: ["shortcut"],
-// 		handle ( [_, shortcut] ) {
-// 			return [dayjs().subtract(
-// 				parseInt( shortcut ),
-// 				"seconds"
-// 			).format( "YYYY-MM-DD HH:mm" ), dayjs().format( "YYYY-MM-DD HH:mm" )];
-// 		}
-// 	},
-// }, {
-// 	name: "shortcut",
-// 	init: 600,
-// 	handle ( val ) {
-// 		return val / 10 || 0;
-// 	},
-// 	depend: {
-// 		names: ["time"],
-// 		handle ( [shortcut] ) {
-// 			return shortcut;
-// 		}
-// 	}
-// },
-// {
-// 	name: "aggregation",
-// 	init: 60,
-// 	handle ( value ) {
-// 		return value;
-// 	}
-// 	}, {
-// 	name: "regionShowState",
-// 	init: false,
-// 	depend: {
-// 		names: ["shortcut", "time", "aggregation"],
-// 		handle ([state, shortcut, time, aggregation]) {
-// 			console.log( state, shortcut, time, aggregation );
-// 			if ( JSON.stringify(shortcut) === "90" ) {
-// 				return false;
-// 			}
-// 			return true;
-// 		}
-// 	}
-// }];

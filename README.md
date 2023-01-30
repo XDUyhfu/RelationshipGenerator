@@ -60,7 +60,7 @@ const AtomInOut = ReGen( CacheKey, RelationConfig );
 // 该工具通过 CacheKey 进行区分存储的状态，相同的 CacheKey 会获取相同的状态。
 ```
 
-### 接下来可以使用常规方法或者是hook进行操作
+<!-- ### 接下来可以使用常规方法或者是hook进行操作
 
 #### hook方式
 - 通过使用 `@yhfu/ge-ren-hooks` 包导出的 `useAtoms` 方法，分别传入 `AtomInOut` 以及 `RelationConfig` 参数，hook会返回一个对象，通过解构对象，从而获取 `${name}Value` 以及 `${name}In$`。其中 `${name}` 会被替换为 `RelationConfig` 中的name值。
@@ -72,7 +72,13 @@ const {
 	areaValue,
 	areaIn$,
 } = useAtoms( AtomInOut, RelationConfig );
-```
+
+const { areaIn$, areaOut$ } = AtomInOut( "area" );
+  const areaValue = useObservable( () => areaOut$ );
+  const [areaCallback] = useEventCallback( ( event$ ) => event$.pipe(
+    map( ( val ) => areaIn$.next( val ) )
+  ) );
+``` -->
 
 
 #### 常规方法
@@ -82,7 +88,11 @@ const {
 const { areaIn$, areaOut$ } = AtomInOut( "area" );
 
 // areaOut$ 为 Observable<T> 类型的对象，可以通过 rxjs-hooks 中的 useObservable hook 进行订阅
-const area = useObservable( () => areaOut$ );
+const areaValue = useObservable( () => areaOut$ );	
+// useEventCallback 为 rxjs-hooks 导出的方法
+const [areaCallback] = useEventCallback( ( event$ ) => event$.pipe(
+	map( ( val ) => areaIn$.next( val ) )	
+) );
 // 返回的值可以直接在 DOM 中进行展示
 // <div>
 // 	{ JSON.stringify( area ) }

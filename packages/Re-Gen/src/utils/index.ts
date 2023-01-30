@@ -8,7 +8,7 @@ export function handlePromise<T> ( promise: Promise<T> ) {
   return from( promise );
 }
 
-export function handleFunctionResult ( result: any ) {
+export function handlePromiseResult ( result: any ) {
   // return from(result);
   if ( isPromise( result ) ) {
     return handlePromise(result);

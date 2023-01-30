@@ -1,3 +1,4 @@
+import { TabsProps } from "antd";
 import dayjs from "dayjs";
 
 export interface IConfigItem {
@@ -53,9 +54,9 @@ export const RelationConfig: IConfigItem[] = [
 		name: "regionShow",
 		init: false,
 		depend: {
-			names: ["area"],
-			handle: ([regionShow, area]) => {
-				if ( area === "CN" ) {
+			names: ["area", "tab"],
+			handle: ([regionShow, area, tab]) => {
+				if ( area === "CN" || tab === "3" ) {
 					return true;
 				}
 				return false;
@@ -65,24 +66,34 @@ export const RelationConfig: IConfigItem[] = [
 	{
 		name: "RegionList",
 		depend: {
-			names: ["area", "region"],
-			handle: async ( [list, area, region]: [list: string[], area: string, region: string[]] ) => {
-				if ( area === "CN" ) {
+			names: ["area", "region", "tab"],
+			handle: async ( [list, area, region, tab]: [list: string[], area: string, region: string[], tab: string] ) => {
+				if ( tab !== "3" ) {
+					if ( area === "CN" ) {
+						if ( region?.length ) {
+							return region?.filter( Boolean )?.map( item => ( {
+								name: item,
+								region: item
+							} ) );
+						} else if ( area ) {
+							return [{ area }];
+						}
+						return [];
+					} else {
+						if ( area ) {
+							return [{ area }];
+						}
+						return [];
+					}
+				} else {
 					if ( region?.length ) {
 						return region?.filter( Boolean )?.map( item => ( {
 							name: item,
 							region: item
 						} ) );
-					} else if ( area ) {
-						return [{ area }];
 					}
-					return [];
-				} else {
-					if ( area ) {
-						return [{ area }];
-					}
-					return [];
 				}
+				return [];
 			}
 		}
 	},
@@ -102,8 +113,37 @@ export const RelationConfig: IConfigItem[] = [
 				return [];
 			}
 		}
+	},
+	{ name: "tab", init: "1" },
+	{
+		name: "areaShow",
+		init: true,
+		depend: {
+			names: ["tab"],
+			handle: ( [areaShow, tab] ) => { 
+				if ( tab === "3" ) {
+					return false;
+				}
+				return true;
+			}
+		}
 	}
 ];
 
 export const CacheKey = "FORM_FILTER";
+
+export const TabItems: TabsProps["items"] = [
+  {
+    key: "1",
+    label: "Tab 1",
+  },
+  {
+    key: "2",
+    label: "Tab 2",
+  },
+  {
+    key: "3",
+    label: "Tab 3",
+  },
+];
 

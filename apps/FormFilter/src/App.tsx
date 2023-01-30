@@ -54,8 +54,6 @@ function App () {
   const regionChange = useCallback( ( regions: string[] ) => { regionIn$.next( regions ); }, [] );
   const aggregationChange = useCallback( ( aggregation: string ) => { aggregationIn$.next( aggregation ); }, [] );
 
-  console.log( RegionListValue );
-
   return (
     <>
       <Wrapper >

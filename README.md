@@ -60,25 +60,23 @@ const AtomInOut = ReGen( CacheKey, RelationConfig );
 // 该工具通过 CacheKey 进行区分存储的状态，相同的 CacheKey 会获取相同的状态。
 ```
 
-<!-- ### 接下来可以使用常规方法或者是hook进行操作
+### 接下来可以使用常规方法或者是hook进行操作
 
 #### hook方式
 - 通过使用 `@yhfu/ge-ren-hooks` 包导出的 `useAtoms` 方法，分别传入 `AtomInOut` 以及 `RelationConfig` 参数，hook会返回一个对象，通过解构对象，从而获取 `${name}Value` 以及 `${name}In$`。其中 `${name}` 会被替换为 `RelationConfig` 中的name值。
 
 ```typescript
-const AtomInOut = ReGen( RelationConfig );
+const AtomInOut = ReGen( CacheKey, RelationConfig );
 
 const {
 	areaValue,
 	areaIn$,
 } = useAtoms( AtomInOut, RelationConfig );
 
-const { areaIn$, areaOut$ } = AtomInOut( "area" );
-  const areaValue = useObservable( () => areaOut$ );
-  const [areaCallback] = useEventCallback( ( event$ ) => event$.pipe(
-    map( ( val ) => areaIn$.next( val ) )
-  ) );
-``` -->
+// 需要使用 useCallback (react导出的hook) 包装
+const areaChangeCallback = useCallback((val: any)=>{areaIn$.next(val)}, [])
+  
+```
 
 
 #### 常规方法
@@ -102,7 +100,7 @@ const [areaCallback] = useEventCallback( ( event$ ) => event$.pipe(
 <Select
 	value={ area?.[0] }
 	style={ { width: 120 } }
-	onChange={ ( val ) => { areaIn$.next( val ); } }
+	onChange={ areaCallback }
 	placeholder={ "please enter sth." }
 	options={ [
 		{

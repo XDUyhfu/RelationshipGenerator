@@ -11,10 +11,10 @@ export interface IConfigItem {
 	};
 }
 
-
 export const RelationConfig: IConfigItem[] = [
 	{
 		name: "area",
+		init:"CN",
 		handle ( val ) {
 			return val;
 		}

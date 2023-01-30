@@ -107,6 +107,8 @@ const BuilderRelation = ( cacheKey: string, RelationConfig: IConfigItem[] ) =>
 
 export const ReGen = ( cacheKey: string, RelationConfig: IConfigItem[] ) => {
 	
+	if (GlobalStore.has(cacheKey)) { return AtomInOut( cacheKey ); }
+
 	GlobalStore.set( cacheKey, new Map<string, AtomState>() );
 
 	BuilderRelation( cacheKey, RelationConfig ).subscribe();

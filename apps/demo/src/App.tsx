@@ -1,6 +1,6 @@
 import { ReGen } from "@yhfu/re-gen";
 import { RelationConfig } from "./config";
-import { Button, Select } from "antd";
+import { Select } from "antd";
 import { useAtoms } from "@yhfu/re-gen-hooks";
 import { useCallback } from "react";
 
@@ -13,9 +13,7 @@ function App () {
     areaValue,
     regionIn$,
     regionValue,
-    showRegionIn$,
     showRegionValue,
-    RegionListIn$,
     RegionListValue,
     testMoreDependIn$,
     testMoreDependValue,

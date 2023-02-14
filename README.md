@@ -60,7 +60,7 @@ const AtomInOut = ReGen( CacheKey, RelationConfig );
 // 该工具通过 CacheKey 进行区分存储的状态，相同的 CacheKey 会获取相同的状态。
 ```
 
-### 接下来可以使用常规方法或者是hook进行操作
+### 接下来可以使用hook进行操作
 
 #### hook方法
 - 通过使用 `@yhfu/ge-ren-hooks` 包导出的 `useAtomsValue` 以及 `useAtomsCallback` 方法，分别传入 `AtomInOut` 以及 `RelationConfig` 参数，hook会返回一个对象，通过解构对象，从而获取 `${name}` 以及 `${name}Callback`。其中 `${name}` 会被替换为 `RelationConfig` 中的name值。

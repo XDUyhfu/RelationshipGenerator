@@ -63,56 +63,12 @@ const AtomInOut = ReGen( CacheKey, RelationConfig );
 ### 接下来可以使用常规方法或者是hook进行操作
 
 #### hook方法
-- 通过使用 `@yhfu/ge-ren-hooks` 包导出的 `useAtoms` 方法，分别传入 `AtomInOut` 以及 `RelationConfig` 参数，hook会返回一个对象，通过解构对象，从而获取 `${name}Value` 以及 `${name}In$`。其中 `${name}` 会被替换为 `RelationConfig` 中的name值。
+- 通过使用 `@yhfu/ge-ren-hooks` 包导出的 `useAtomsValue` 以及 `useAtomsCallback` 方法，分别传入 `AtomInOut` 以及 `RelationConfig` 参数，hook会返回一个对象，通过解构对象，从而获取 `${name}` 以及 `${name}Callback`。其中 `${name}` 会被替换为 `RelationConfig` 中的name值。
 
 ```typescript
 const AtomInOut = ReGen( CacheKey, RelationConfig );
 
-const {
-	areaValue,
-	areaIn$,
-} = useAtoms( AtomInOut, RelationConfig );
-
-// 需要使用 useCallback (react导出的hook) 包装
-const areaChangeCallback = useCallback((val: any)=>{areaIn$.next(val)}, [])
+const { area, region } = useAtomsValue( AtomInOut, RelationConfig );
+const { areaCallback, regionCallback } = useAtomsCallback( AtomInOut, RelationConfig );
   
 ```
-
-
-#### 常规方法
-
-- 通过 AtomInOut 方法获取操作数据的对象(In$, Out$)
-```typescript
-const { areaIn$, areaOut$ } = AtomInOut( "area" );
-
-// areaOut$ 为 Observable<T> 类型的对象，可以通过 rxjs-hooks 中的 useObservable hook 进行订阅
-const areaValue = useObservable( () => areaOut$ );	
-// useEventCallback 为 rxjs-hooks 导出的方法
-const [areaCallback] = useEventCallback( ( event$ ) => event$.pipe(
-	map( ( val ) => areaIn$.next( val ) )	
-) );
-// 返回的值可以直接在 DOM 中进行展示
-// <div>
-// 	{ JSON.stringify( area ) }
-// </div>
-
-// areaIn$ 为 Subject<T> 类型的对象，可以通过自身的 next 方法发送值
-<Select
-	value={ area?.[0] }
-	style={ { width: 120 } }
-	onChange={ areaCallback }
-	placeholder={ "please enter sth." }
-	options={ [
-		{
-			value: "JP",
-			label: "日本",
-		},
-		{
-			value: "CN",
-			label: "中国",
-		}
-		] }
-	/>
-```
-
-

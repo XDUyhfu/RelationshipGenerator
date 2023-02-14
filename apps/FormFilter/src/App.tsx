@@ -10,8 +10,7 @@ import styled from "styled-components";
 import { Space, Tabs } from "antd";
 import { ReGen } from "@yhfu/re-gen";
 import { CacheKey, RelationConfig, TabItems } from "./config";
-import { useAtoms } from "@yhfu/re-gen-hooks";
-import { useCallback } from "react";
+import { useAtomsValue, useAtomsCallback } from "@yhfu/re-gen-hooks";
 
 const Wrapper = styled( Space )`
   display: flex;
@@ -27,51 +26,39 @@ function App () {
   const AtomInOut = ReGen( CacheKey, RelationConfig );
 
   const {
-    domainIn$,
-    domainValue,
-    timeIn$,
-    timeValue,
-    shortcutIn$,
-    shortcutValue,
-    aggregationIn$,
-    aggregationValue,
-    areaIn$,
-    areaValue,
-    regionIn$,
-    regionValue,
-    regionShowValue,
-    RegionListValue,
-    SelectableTimeRangeValue,
-    tabValue,
-    tabIn$,
-    areaShowValue
-  } = useAtoms( AtomInOut, RelationConfig );
+    domain,
+    time,
+    shortcut,
+    aggregation,
+    area,
+    region,
+    regionShow,
+    RegionList,
+    SelectableTimeRange,
+    tab,
+    areaShow
+  } = useAtomsValue( AtomInOut, RelationConfig );
 
-  const domainChange = useCallback( ( domain: string[] ) => { domainIn$.next( domain ); }, [] );
-  const timeChange = useCallback( ( _: any, time: string[] ) => {
-    timeIn$.next( time );
-    shortcutIn$.next( 0 );
-  }, [] );
-  const shortcutChange = useCallback( ( shortcut: any ) => { shortcutIn$.next( shortcut.target.value ); }, [] );
-  const areaChange = useCallback( ( area: string ) => { areaIn$.next( area ); }, [] );
-  const regionChange = useCallback( ( regions: string[] ) => { regionIn$.next( regions ); }, [] );
-  const aggregationChange = useCallback( ( aggregation: string ) => { aggregationIn$.next( aggregation ); }, [] );
-  const tabChange = useCallback( ( tab: string ) => { tabIn$.next( tab ); }, [] );
+  const { domainCallback, timeCallback, shortcutCallback, areaCallback, regionCallback, aggregationCallback, tabCallback } = useAtomsCallback( AtomInOut, RelationConfig );
+
   return (
     <>
-      <Tabs activeKey={ tabValue as string } items={ TabItems } onChange={ tabChange } />
+      <Tabs activeKey={ tab as string } items={ TabItems } onChange={ tabCallback } />
       <Wrapper >
-        <Domain value={ domainValue as string[] } change={ domainChange } />
-        <Shortcut value={ shortcutValue as string } change={ shortcutChange } />
-        <Time value={ timeValue as string[] } change={ timeChange } range={ SelectableTimeRangeValue as string[] } />
-        <Aggregation value={ aggregationValue as string } change={ aggregationChange } />
-        { areaShowValue ? <Area value={ areaValue as string } change={ areaChange } /> : null }
-        { regionShowValue ? <Region value={ regionValue as string[] } change={ regionChange } /> : null }
-        <IP value={ domainValue as string } change={ domainChange } />
+        <Domain value={ domain as string[] } change={ domainCallback } />
+        <Shortcut value={ shortcut as string } change={ ( shortcut ) => { shortcutCallback( shortcut.target.value ); } } />
+        <Time value={ time as string[] } change={ ( _, time: string[] ) => {
+          timeCallback( time );
+          shortcutCallback( 0 );
+        } } range={ SelectableTimeRange as string[] } />
+        <Aggregation value={ aggregation as string } change={ aggregationCallback } />
+        { areaShow ? <Area value={ area as string } change={ areaCallback } /> : null }
+        { regionShow ? <Region value={ region as string[] } change={ regionCallback } /> : null }
+        <IP value={ domain as string } change={ domainCallback } />
       </Wrapper>
       <br />
       <br />
-      <div>RegionListValue: { JSON.stringify( RegionListValue ) }</div>
+      <div>RegionListValue: { JSON.stringify( RegionList ) }</div>
     </>
   );
 }

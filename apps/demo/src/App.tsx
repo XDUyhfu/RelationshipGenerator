@@ -1,37 +1,23 @@
 import { ReGen } from "@yhfu/re-gen";
 import { RelationConfig } from "./config";
 import { Select } from "antd";
-import { useAtoms } from "@yhfu/re-gen-hooks";
-import { useCallback } from "react";
+import { useAtomsCallback, useAtomsValue } from "@yhfu/re-gen-hooks";
 
 function App () {
 
   const AtomInOut = ReGen( "CACHE_KEY", RelationConfig );
 
-  const {
-    areaIn$,
-    areaValue,
-    regionIn$,
-    regionValue,
-    showRegionValue,
-    RegionListValue,
-    testMoreDependIn$,
-    testMoreDependValue,
-    testMoreMoreDependIn$,
-    testMoreMoreDependValue
-  } = useAtoms( AtomInOut, RelationConfig );
-
-  const areaCallback = useCallback( ( area: string ) => { areaIn$.next( area ); }, [] );
-  const regionCallback = useCallback( ( regions: string[] ) => { regionIn$.next( regions ); }, [] );
+  const { area, region, showRegion, RegionList, testMoreDepend, testMoreMoreDepend } = useAtomsValue( AtomInOut, RelationConfig );
+  const { areaCallback, regionCallback } = useAtomsCallback( AtomInOut, RelationConfig );
 
   return (
     <div >
-      <div>areaValue: { JSON.stringify( areaValue ) }</div>
-      <div>regionValue: { JSON.stringify( regionValue ) }</div>
-      <div>showRegionValue: { JSON.stringify( showRegionValue ) }</div>
-      <div>RegionListValue: { JSON.stringify( RegionListValue ) }</div>
-      <div>testMoreDependValue: { JSON.stringify( testMoreDependValue ) }</div>
-      <div>testMoreMoreDependValue: { JSON.stringify( testMoreMoreDependValue ) }</div>
+      <div>areaValue: { JSON.stringify( area ) }</div>
+      <div>regionValue: { JSON.stringify( region ) }</div>
+      <div>showRegionValue: { JSON.stringify( showRegion ) }</div>
+      <div>RegionListValue: { JSON.stringify( RegionList ) }</div>
+      <div>testMoreDependValue: { JSON.stringify( testMoreDepend ) }</div>
+      <div>testMoreMoreDependValue: { JSON.stringify( testMoreMoreDepend ) }</div>
 
       <br />
 
@@ -49,7 +35,7 @@ function App () {
       <br />
 
       {
-        showRegionValue ? <Select
+        showRegion ? <Select
           mode="multiple"
           allowClear
           style={ { width: 120 } }

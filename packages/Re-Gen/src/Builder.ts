@@ -4,10 +4,11 @@ import {
 	of,
 	map,
 	combineLatestWith,
-	distinctUntilChanged
+	distinctUntilChanged,
+	switchMap
 } from "rxjs";
 import { AtomInOut, AtomState, GlobalStore } from "./Atom";
-import { handlePromiseResult } from "./utils";
+import { handleResult } from "./utils";
 
 
 interface IConfigItem {
@@ -48,7 +49,7 @@ const AtomHandle = ( [cacheKey, RelationConfig]: IParam) => {
 		
 		atom.in$.pipe( 
 			map( item.handle || identity ),
-			concatMap( handlePromiseResult ),
+			switchMap( handleResult ),
 		).subscribe( atom.mid$ );
 	} );
 
@@ -83,7 +84,7 @@ const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 			atom.mid$.pipe(
 				combineLatestWith( ...dependAtomsIn$ ),
 				map( item.depend?.handle || identity ),
-				concatMap( handlePromiseResult ),
+				switchMap( handleResult ),
 				distinctUntilChanged()
 			).subscribe(atom.out$);
 		} else {

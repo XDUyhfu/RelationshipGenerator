@@ -1,6 +1,8 @@
 // 这是一个测试的配置文件，主要用来测试生成的代码
 // 主要用来制定数据之间的关系
 
+import { filter, from, map, of, toArray } from "rxjs";
+
 export interface IConfigItem {
 	name: string;
 	init?: any;
@@ -16,7 +18,7 @@ export const RelationConfig: IConfigItem[] = [
 		name: "area",
 		init:"CN",
 		handle ( val ) {
-			return val;
+			return of(val);
 		}
 	},
 	{
@@ -28,7 +30,14 @@ export const RelationConfig: IConfigItem[] = [
 				return region;
 			}
 		},
-		handle: async ( val: string[] = [] ) => val?.filter( Boolean )
+		handle: ( val: string[] = [] ) => 
+			// val?.filter( Boolean )
+			from( val ).pipe(
+				filter( Boolean ),
+				map( item => item?.toLocaleUpperCase() ),
+				toArray()
+			)
+		
 	},
 	{
 		name: "showRegion",
@@ -49,16 +58,15 @@ export const RelationConfig: IConfigItem[] = [
 		depend: {
 			names: ["area", "region"],
 			handle: async ( [list, area, region]: [list: string[], area: string, region: string[]] ) => {
+				console.log(region);
 				if ( area === "CN" ) {
-					if ( region?.length ) {
+					if ( Array.isArray(region) && region.length ) {
 						return region?.filter( Boolean )?.map( item => ( {
 							name: item,
 							region: item
 						} ) );
 					} else if ( area ) {
-
 						return [{ area }];
-
 					}
 					return [];
 				} else {

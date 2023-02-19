@@ -21,9 +21,8 @@ const Wrapper = styled( Space )`
   }
 `;
 
+const AtomInOut = ReGen( CacheKey, RelationConfig );
 function App () {
-
-  const AtomInOut = ReGen( CacheKey, RelationConfig );
 
   const {
     domain,
@@ -39,7 +38,15 @@ function App () {
     areaShow
   } = useAtomsValue( AtomInOut, RelationConfig );
 
-  const { domainCallback, timeCallback, shortcutCallback, areaCallback, regionCallback, aggregationCallback, tabCallback } = useAtomsCallback( AtomInOut, RelationConfig );
+  const {
+    domainCallback,
+    timeCallback,
+    shortcutCallback,
+    areaCallback,
+    regionCallback,
+    aggregationCallback,
+    tabCallback 
+  } = useAtomsCallback( AtomInOut, RelationConfig );
 
   return (
     <>

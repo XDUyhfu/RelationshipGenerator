@@ -24,19 +24,19 @@ export const RelationConfig: IConfigItem[] = [
 	{
 		name: "region",
 		init: [],
-		depend: {
-			names: ["area"],
-			handle ( [region, area] ) {
-				return region;
-			}
-		},
 		handle: ( val: string[] = [] ) => 
 			// val?.filter( Boolean )
 			from( val ).pipe(
 				filter( Boolean ),
 				map( item => item?.toLocaleUpperCase() ),
 				toArray()
-			)
+			),
+		// depend: {
+		// 	names: ["area"],
+		// 	handle ( [region, area] ) {
+		// 		return region;
+		// 	}
+		// },
 		
 	},
 	{
@@ -58,7 +58,6 @@ export const RelationConfig: IConfigItem[] = [
 		depend: {
 			names: ["area", "region"],
 			handle: async ( [list, area, region]: [list: string[], area: string, region: string[]] ) => {
-				console.log(region);
 				if ( area === "CN" ) {
 					if ( Array.isArray(region) && region.length ) {
 						return region?.filter( Boolean )?.map( item => ( {

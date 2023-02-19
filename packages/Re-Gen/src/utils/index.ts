@@ -1,19 +1,16 @@
-import { from, of, isObservable } from "rxjs";
+import { isObservable, of } from "rxjs";
+import { PlainResult, ReturnResult } from "../type";
 
-export function isPromise(p: any): p is Promise<any>  {
-  return (p && Object.prototype.toString.call(p) === "[object Promise]") as boolean;
-}
-export function handlePromise<T> ( promise: Promise<T> ) {
-  return from( promise );
+export function isPlainResult ( result: ReturnResult ): result is PlainResult {
+  return ["number", "boolean", "string", "undefined"].includes( typeof result ) || Object.prototype.toString.call( result ) === "[object Object]" || Array.isArray( result ) || result === null;
 }
 
-export function handleResult ( result: any ) {
-  // return from(result);
-  if ( isPromise( result ) ) {
-    return handlePromise(result);
+export function handleResult ( result: ReturnResult ) {
+  if ( isPlainResult( result ) ) {
+    if ( isObservable( result ) ) {
+      return result;
+    }
+    return of( result );
   }
-  if ( isObservable( result ) ) {
-    return result;
-  }
-  return of(result);
+  return result;
 }

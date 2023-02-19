@@ -3,10 +3,9 @@ import { RelationConfig } from "./config";
 import { Select } from "antd";
 import { useAtomsCallback, useAtomsValue } from "@yhfu/re-gen-hooks";
 
+const AtomInOut = ReGen( "CACHE_KEY", RelationConfig );
 function App () {
-
-  const AtomInOut = ReGen( "CACHE_KEY", RelationConfig );
-
+  
   const { area, region, showRegion, RegionList, testMoreDepend, testMoreMoreDepend } = useAtomsValue( AtomInOut, RelationConfig );
   const { areaCallback, regionCallback } = useAtomsCallback( AtomInOut, RelationConfig );
 

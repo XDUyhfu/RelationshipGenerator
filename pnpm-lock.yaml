@@ -118,6 +118,7 @@ importers:
       '@types/react': ^18.0.26
       '@types/react-dom': ^18.0.9
       '@vitejs/plugin-react-swc': ^3.0.0
+      '@yhfu/re-gen': workspace:^0.1.1
       react: ^18.2.0
       react-dom: ^18.2.0
       rxjs: ^7.8.0
@@ -126,6 +127,7 @@ importers:
       unbuild: ^1.1.1
       vite: ^4.0.0
     dependencies:
+      '@yhfu/re-gen': link:../Re-Gen
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       rxjs: 7.8.0

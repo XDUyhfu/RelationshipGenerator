@@ -3,7 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "re-gen:publish": "pnpm -F @yhfu/re-gen publish --no-git-checks",
+    "re-gen-hooks:publish": "pnpm -F @yhfu/re-gen-hooks publish --no-git-checks"
+  },
   "devDependencies": {
     "@commitlint/cli": "^17.4.2",
     "@commitlint/config-conventional": "^17.4.2",

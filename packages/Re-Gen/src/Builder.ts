@@ -9,7 +9,7 @@ import {
 	scan,
 } from "rxjs";
 import { AtomInOut, AtomState, GlobalStore } from "./Atom";
-import { handlePromise, handleResult } from "./utils";
+import { handlePromise, handleResult, handleUndefined } from "./utils";
 import { IConfigItem, IParam } from "./type";
 
 const getDependNames = ( item: IConfigItem ) => item.depend?.names || [];
@@ -71,6 +71,7 @@ const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 				scan( item.depend?.reduce || defaultReduce, item.init ),
 
 				switchMap( handleResult ),
+				handleUndefined(),
 				distinctUntilChanged(),
 				catchError( () => {
 					console.error( `捕获到 ${ item.name } depend.handle 中报错` );
@@ -79,6 +80,7 @@ const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 			).subscribe( atom.out$ );
 		} else {
 			atom.mid$.pipe(
+				handleUndefined(),
 				distinctUntilChanged(),
 				catchError( () => of( undefined ) ),
 			).subscribe( atom.out$ );

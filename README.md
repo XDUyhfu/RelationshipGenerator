@@ -24,7 +24,7 @@
 > 很多东西在造出来之后，都会有一系列的哲学思考。这个工具践行的是 组件UI和逻辑 分析的思想，类似于 headless UI，使逻辑更容易的维护以及复用。
 
 ## demo
-> 提供了两个demo，一个用于测试（apps/demo），一个是实际场景的案例（apps/FormFilter）。
+> 提供了3个demo，一个用于测试（apps/demo），一个是实际场景的案例（apps/FormFilter），一个用于自更新的场景（app/Form）。
 
 如果使用该工具，需要提供一组配置项，单个配置项的格式如下所示，具体使用方式可以参照 apps/demo/src/config.ts 的配置文件。
 

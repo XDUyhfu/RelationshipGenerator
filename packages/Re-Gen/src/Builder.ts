@@ -7,6 +7,7 @@ import {
 	switchMap,
 	catchError,
 	scan,
+	distinct,
 } from "rxjs";
 import { AtomInOut, AtomState, GlobalStore } from "./Atom";
 import { handlePromise, handleResult, handleUndefined } from "./utils";
@@ -68,13 +69,16 @@ const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 			atom.mid$.pipe(
 				combineLatestWith( ...dependAtomsIn$ ),
 				map( item.depend?.handle || identity ),
+				catchError( () => {
+					console.error( `捕获到 ${ item.name } depend.handle 中报错` );
+					return of( undefined );
+				} ),
 				scan( item.depend?.reduce || defaultReduce, item.init ),
-
 				switchMap( handleResult ),
 				handleUndefined(),
 				distinctUntilChanged(),
 				catchError( () => {
-					console.error( `捕获到 ${ item.name } depend.handle 中报错` );
+					console.error( `捕获到 ${ item.name } depend.scan 中报错` );
 					return of( undefined );
 				} ),
 			).subscribe( atom.out$ );

@@ -9,10 +9,10 @@ const AtomInOut = ReGen( "FORM_CACHE_KEY", ConfigItems );
 
 const App: React.FC = () => {
   const { Items, ItemNames } = useAtomsValue( AtomInOut, ConfigItems );
-  const { addItemCallback } = useAtomsCallback( AtomInOut, ConfigItems );
+  const { addItemCallback, nameCallback } = useAtomsCallback( AtomInOut, ConfigItems );
 
   return <div>
-
+    
     { JSON.stringify( Items ) }
     <br />
     { JSON.stringify( ItemNames ) }
@@ -23,7 +23,11 @@ const App: React.FC = () => {
     <br /><br />
     {
       Items?.filter((val: any)=> val).map( (item:IItem) => <Space style={{marginTop: 10}} key={item?.id}>
-        <Input style={ { width: 160 } } value={ item?.name } placeholder="name" />
+        <Input style={ { width: 160 } }
+          onChange={ ( value ) => {
+            nameCallback( {value: value.target.value, id: item.id} );
+          } }
+          value={ item?.name } placeholder="name" />
         <Input style={ { width: 160 } } placeholder="init" />
         <Input style={ { width: 160 } } placeholder="function" />
         <Select

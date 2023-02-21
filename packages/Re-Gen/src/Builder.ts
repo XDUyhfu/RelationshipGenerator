@@ -8,7 +8,7 @@ import {
 	catchError,
 } from "rxjs";
 import { AtomInOut, AtomState, GlobalStore } from "./Atom";
-import { handleResult } from "./utils";
+import { handlePromise, handleResult } from "./utils";
 import { IConfigItem, IParam } from "./type";
 
 const getDependNames = ( item: IConfigItem ) => item.depend?.names || [];
@@ -35,7 +35,7 @@ const AtomHandle = ( [cacheKey, RelationConfig]: IParam ) => {
 	RelationConfig.forEach( item => {
 		const atom = GlobalStore.get( cacheKey )!.get( item.name )!;
 		atom.in$.pipe(
-
+			handlePromise(),
 			// 执行 handle
 			map( item.handle || identity ),
 

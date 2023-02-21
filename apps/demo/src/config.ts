@@ -16,15 +16,15 @@ export interface IConfigItem {
 export const RelationConfig: IConfigItem[] = [
 	{
 		name: "area",
-		init:"CN",
+		init: Promise.resolve( "CN" ),
 		handle ( val ) {
-			return of(val);
+			return of( val );
 		}
 	},
 	{
 		name: "region",
 		init: [],
-		handle: ( val: string[] = [] ) => 
+		handle: ( val: string[] = [] ) =>
 			// val?.filter( Boolean )
 			from( val ).pipe(
 				filter( Boolean ),
@@ -37,7 +37,7 @@ export const RelationConfig: IConfigItem[] = [
 		// 		return region;
 		// 	}
 		// },
-		
+
 	},
 	{
 		name: "showRegion",
@@ -59,7 +59,7 @@ export const RelationConfig: IConfigItem[] = [
 			names: ["area", "region"],
 			handle: async ( [list, area, region]: [list: string[], area: string, region: string[]] ) => {
 				if ( area === "CN" ) {
-					if ( Array.isArray(region) && region.length ) {
+					if ( Array.isArray( region ) && region.length ) {
 						return region?.filter( Boolean )?.map( item => ( {
 							name: item,
 							region: item

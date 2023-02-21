@@ -1,6 +1,6 @@
 import { IConfigItem } from "@yhfu/re-gen";
 
-interface IItem {
+export interface IItem {
     id: string;
     name: string;
     init?: any;
@@ -31,13 +31,13 @@ export const ConfigItems: IConfigItem[] = [
             return { id: Date.now().toString(), name: Date.now().toString() };
         }
     },
-    // {
-    //     name: "ItemNames",
-    //     init: [],
-    //     depend: {
-    //         names: ["Items"],
-    //         handle: ( [ItemNames, Items]: [ItemName: string[], Items: IItem[]] ) => Items.map( item => item.name )
-    //     }
-    // },
+    {
+        name: "ItemNames",
+        init: [],
+        depend: {
+            names: ["Items"],
+            handle: ( [ItemNames, Items]: [ItemName: string[], Items: IItem[]] ) => Items.filter( item => item ).map( item => item.name )
+        }
+    },
 
 ];  

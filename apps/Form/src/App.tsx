@@ -1,8 +1,8 @@
 import { ReGen } from "@yhfu/re-gen";
 import React from "react";
-import { ConfigItems } from "./config";
-import { useAtomsValue ,useAtomsCallback } from "@yhfu/re-gen-hooks";
-import { Button } from "antd";
+import { ConfigItems, IItem } from "./config";
+import { useAtomsValue, useAtomsCallback } from "@yhfu/re-gen-hooks";
+import { Button, Input, Select, Space } from "antd";
 
 
 const AtomInOut = ReGen( "FORM_CACHE_KEY", ConfigItems );
@@ -19,7 +19,24 @@ const App: React.FC = () => {
     <br />
 
 
-    <Button onClick={addItemCallback}>添加</Button>
+    <Button onClick={ addItemCallback }>添加</Button>
+    <br /><br />
+    {
+      Items?.filter((val: any)=> val).map( (item:IItem) => <Space style={{marginTop: 10}} key={item?.id}>
+        <Input style={ { width: 160 } } value={ item?.name } placeholder="name" />
+        <Input style={ { width: 160 } } placeholder="init" />
+        <Input style={ { width: 160 } } placeholder="function" />
+        <Select
+          mode="multiple"
+          style={ { width: 160 } }
+          maxTagCount={1}
+          options={ ItemNames?.filter((inner: string) => item?.name !== inner)?.map((inner: string) => ({label: inner, value: inner})) }
+        />
+        <Input style={ { width: 160 } } placeholder="function" />
+    </Space>)
+    }
+
+
 
   </div>;
 };

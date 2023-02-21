@@ -53,7 +53,7 @@ const AtomHandle = ( [cacheKey, RelationConfig]: IParam ) => {
 	return [cacheKey, RelationConfig] as IParam;
 };
 
-const defaultReduce = ( pre: any, val: any ) => val;
+const defaultReduce = ( _: any, val: any ) => val;
 
 const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 	RelationConfig.forEach( item => {

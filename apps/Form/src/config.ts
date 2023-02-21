@@ -13,16 +13,15 @@ interface IItem {
 export const ConfigItems: IConfigItem[] = [
     {
         name: "Items",
-        init: [],
+        // init: [],
         depend: {
             names: ["addItem"],
-            handle: ( [Items, addItem] ): IItem[] => {
-                console.log( "Items", Items );
-                console.log( "addItem", addItem );
-                return [
-                    ...Items,
-                    addItem
-                ];
+            handle: ( [Items, addItem] ): IItem[] => addItem,
+            reduce: ( pre: IItem[], val: IItem ) => {
+                if ( !pre ) {
+                    return [val];
+                }
+                return [...pre, val];
             }
         }
     },
@@ -32,13 +31,13 @@ export const ConfigItems: IConfigItem[] = [
             return { id: Date.now().toString(), name: Date.now().toString() };
         }
     },
-    {
-        name: "ItemNames",
-        init: [],
-        depend: {
-            names: ["Items"],
-            handle: ( [ItemNames, Items]: [ItemName: string[], Items: IItem[]] ) => Items.map( item => item.name )
-        }
-    },
+    // {
+    //     name: "ItemNames",
+    //     init: [],
+    //     depend: {
+    //         names: ["Items"],
+    //         handle: ( [ItemNames, Items]: [ItemName: string[], Items: IItem[]] ) => Items.map( item => item.name )
+    //     }
+    // },
 
 ];  

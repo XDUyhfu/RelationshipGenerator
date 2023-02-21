@@ -14,5 +14,6 @@ export interface IConfigItem {
 	depend?: {
 		names: string[];
 		handle: ( args: any ) => ReturnResult;
+		reduce?: ( pre: any, val: any ) => any;
 	};
 }

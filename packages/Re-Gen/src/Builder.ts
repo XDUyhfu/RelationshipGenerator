@@ -6,6 +6,7 @@ import {
 	distinctUntilChanged,
 	switchMap,
 	catchError,
+	scan,
 } from "rxjs";
 import { AtomInOut, AtomState, GlobalStore } from "./Atom";
 import { handlePromise, handleResult } from "./utils";
@@ -52,6 +53,8 @@ const AtomHandle = ( [cacheKey, RelationConfig]: IParam ) => {
 	return [cacheKey, RelationConfig] as IParam;
 };
 
+const defaultReduce = ( pre: any, val: any ) => val;
+
 const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 	RelationConfig.forEach( item => {
 		const atom = GlobalStore.get( cacheKey )!.get( item.name )!;
@@ -65,6 +68,8 @@ const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 			atom.mid$.pipe(
 				combineLatestWith( ...dependAtomsIn$ ),
 				map( item.depend?.handle || identity ),
+				scan( item.depend?.reduce || defaultReduce, item.init ),
+
 				switchMap( handleResult ),
 				distinctUntilChanged(),
 				catchError( () => {

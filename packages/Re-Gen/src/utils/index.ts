@@ -35,3 +35,4 @@ export function handlePromise<T> (): ( source: Observable<T> ) => Observable<T> 
     } );
   } );
 }
+

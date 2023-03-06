@@ -12,13 +12,13 @@ import {
 
 export const getDependNames = ( item: IConfigItem ) => item.depend?.names || [];
 
-export const defaultReduce = ( _: unknown, val: unknown ) => val;
+export const defaultReduce = ( _: any, val: any ) => val;
 
-function isObject( value: unknown ) {
+function isObject( value: any ) {
 	return Object.prototype.toString.call( value ) === "[object Object]";
 }
 
-function removeUndefinedValue( value: unknown ) {
+function removeUndefinedValue( value: any ) {
 	return JSON.parse( JSON.stringify( value ) );
 }
 
@@ -58,8 +58,8 @@ export function handlePromise<T>(): ( source: Observable<T> ) => Observable<T> {
 }
 
 
-export function handleUndefined(): ( source: Observable<unknown> ) => Observable<unknown> {
-	return ( source: Observable<unknown> ): Observable<unknown> => new Observable( ( observer ) => {
+export function handleUndefined(): ( source: Observable<any> ) => Observable<any> {
+	return ( source: Observable<any> ): Observable<any> => new Observable( ( observer ) => {
 		source.subscribe( {
 			next: ( value ) => {
 				// 如果 value 是 Promise 对象，则转换成 Observable 并订阅

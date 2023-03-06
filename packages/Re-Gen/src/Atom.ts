@@ -10,7 +10,7 @@ import {
  * 可以监听 out$ 得到变换后的数据
  */
 
-export class AtomState<T = unknown> {
+export class AtomState<T = any> {
 	in$: BehaviorSubject<T>;
 	mid$: BehaviorSubject<T>;
 	out$: BehaviorSubject<T>;
@@ -23,7 +23,7 @@ export class AtomState<T = unknown> {
 }
 
 export const GlobalStore = new Map<string, Map<string, AtomState>>();
-export const AtomInOut = ( cacheKey: string ) => <T = unknown>( name: string ) => {
+export const AtomInOut = ( cacheKey: string ) => <T = any>( name: string ) => {
 	const atom = GlobalStore.get( cacheKey )!.get( name )!;
 	if ( !atom ) {
 		throw new Error( "The key value is not included in the configuration list for building.(用于构建的配置列表中不包含该key值)" );

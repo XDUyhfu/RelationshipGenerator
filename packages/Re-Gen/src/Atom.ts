@@ -1,4 +1,7 @@
-import { BehaviorSubject, EMPTY, Observable } from "rxjs";
+import {
+	BehaviorSubject,
+	Observable
+} from "rxjs";
 
 /**
  * 一个配置项会生成一个AtomState
@@ -7,29 +10,30 @@ import { BehaviorSubject, EMPTY, Observable } from "rxjs";
  * 可以监听 out$ 得到变换后的数据
  */
 
-export class AtomState<T = any> {
-    in$: BehaviorSubject<T>;
-    mid$: BehaviorSubject<T>;
-    out$: BehaviorSubject<T>;
+export class AtomState<T = unknown> {
+	in$: BehaviorSubject<T>;
+	mid$: BehaviorSubject<T>;
+	out$: BehaviorSubject<T>;
 
-    constructor( init: T ) {
-        this.in$ = new BehaviorSubject( init );
-        this.out$ = new BehaviorSubject( init );
-        this.mid$ = new BehaviorSubject( init );
-    }
+	constructor( init: T ) {
+		this.in$ = new BehaviorSubject( init );
+		this.out$ = new BehaviorSubject( init );
+		this.mid$ = new BehaviorSubject( init );
+	}
 }
 
 export const GlobalStore = new Map<string, Map<string, AtomState>>();
-export const AtomInOut = ( cacheKey: string ) => <T = unknown> ( name: string ) => {
-    const atom = GlobalStore.get( cacheKey )!.get( name )!;
-    if ( !atom ) { throw new Error( "The key value is not included in the configuration list for building.(用于构建的配置列表中不包含该key值)" ); }
-    return {
-        [`${ name }In$`]: atom.in$,
-        [`${ name }Out$`]: atom.out$
-    } as {
-        [x: `${ string }In$`]: BehaviorSubject<T>,
-        [x: `${ string }Out$`]: Observable<T>;
-    };
+export const AtomInOut = ( cacheKey: string ) => <T = unknown>( name: string ) => {
+	const atom = GlobalStore.get( cacheKey )!.get( name )!;
+	if ( !atom ) {
+		throw new Error( "The key value is not included in the configuration list for building.(用于构建的配置列表中不包含该key值)" );
+	}
+	return {
+		[`${ name }In$`]: atom.in$,
+		[`${ name }Out$`]: atom.out$
+	} as {
+		[x: `${ string }In$`]: BehaviorSubject<T>, [x: `${ string }Out$`]: Observable<T>;
+	};
 };
 
 

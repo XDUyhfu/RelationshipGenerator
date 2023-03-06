@@ -1,9 +1,9 @@
-import { IConfigItem } from "../../../../packages/Re-Gen/src/index";
+import type { IConfigItem } from "@yhfu/re-gen";
 
 export const ConfigList: IConfigItem[] = [{
-	name: "keyCode",
-	init: "", // handle: ( val: any ) => `${ val } ${ Date.now() }`
-	distinct: false
+	distinct: false,
+	init: "",
+	name: "keyCode"
 }, { name: "inputValue" }, {
 	name: "list",
 	init: [],

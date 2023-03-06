@@ -2,10 +2,13 @@ import {
 	Observable,
 	from,
 	isObservable,
-	of
+	of,
+	distinctUntilChanged,
+	identity
 } from "rxjs";
 import {
 	IConfigItem,
+	IDistinct,
 	PlainResult,
 	ReturnResult
 } from "../type";
@@ -75,5 +78,16 @@ export function handleUndefined(): ( source: Observable<any> ) => Observable<any
 			complete: () => observer.complete(),
 		} );
 	} );
+}
+
+export function handleDistinct( param: IDistinct<any, any> ): ( source: Observable<any> ) => Observable<any> {
+	console.log( param );
+	return ( source: Observable<any> ): Observable<any> => {
+		if ( typeof param === "boolean" ) {
+			return param ? source.pipe( distinctUntilChanged() ) : source;
+		} else {
+			return source.pipe( distinctUntilChanged( param.comparator, param.keySelector || identity ) );
+		}
+	};
 }
 

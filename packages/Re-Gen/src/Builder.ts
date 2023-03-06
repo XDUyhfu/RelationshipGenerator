@@ -3,7 +3,6 @@ import {
 	of,
 	map,
 	combineLatestWith,
-	distinctUntilChanged,
 	switchMap,
 	catchError,
 	scan,
@@ -17,6 +16,7 @@ import {
 import {
 	defaultReduce,
 	getDependNames,
+	handleDistinct,
 	handlePromise,
 	handleResult,
 	handleUndefined
@@ -67,12 +67,12 @@ const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 			atom.mid$.pipe( combineLatestWith( ...dependAtomsIn$ ), map( item.depend?.handle || identity ), catchError( () => {
 				console.error( `捕获到 ${ item.name } depend.handle 中报错` );
 				return EMPTY;
-			} ), scan( item.depend?.reduce || defaultReduce, item.init ), switchMap( handleResult ), handleUndefined(), distinctUntilChanged(), catchError( () => {
+			} ), scan( item.depend?.reduce || defaultReduce, item.init ), switchMap( handleResult ), handleUndefined(), handleDistinct( item.distinct ?? true ), catchError( () => {
 				console.error( `捕获到 ${ item.name } depend.scan 中报错` );
 				return EMPTY;
 			} ), ).subscribe( atom.out$ );
 		} else {
-			atom.mid$.pipe( handleUndefined(), distinctUntilChanged(), catchError( () => EMPTY ), ).subscribe( atom.out$ );
+			atom.mid$.pipe( handleUndefined(), handleDistinct( item.distinct ?? true ), catchError( () => EMPTY ), ).subscribe( atom.out$ );
 		}
 
 	} );

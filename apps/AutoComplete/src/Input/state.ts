@@ -1,26 +1,22 @@
-import { IConfigItem } from "@yhfu/re-gen";
+import { IConfigItem } from "../../../../packages/Re-Gen/src/index";
 
 export const ConfigList: IConfigItem[] = [{
 	name: "keyCode",
-	init: "",
-	handle: ( val: any ) => {
-		console.log( val );
-		return `${ val } ${ Date.now() }`;
-	}
+	init: "", // handle: ( val: any ) => `${ val } ${ Date.now() }`
+	distinct: false
 }, { name: "inputValue" }, {
 	name: "list",
 	init: [],
 	depend: {
-		names: ["keyCode", "inputValue"],
-		handle: ( [list, keyCode, inputValue] ) => [{ value: inputValue }, { value: 1 }, { value: 2 }, { value: 3 }]
+		names: ["inputValue"],
+		handle: ( [list, inputValue] ) => [{ value: inputValue }, { value: 1 }, { value: 2 }, { value: 3 }]
 	}
 }, {
 	name: "hightIndex",
 	init: -1,
 	depend: {
-		names: ["keyCode", "list"],
-		handle: ( [hightIndex, keyCode, list]: [index: number, keyCode: string, list: any[]] ) => {
-			console.log( keyCode );
+		names: ["keyCode"],
+		handle: ( [hightIndex, keyCode]: [index: number, keyCode: string, list: any[]] ) => {
 			if ( keyCode.startsWith( "ArrowDown" ) ) {
 				return 1;
 			} else if ( keyCode.startsWith( "ArrowUp" ) ) {
@@ -29,7 +25,6 @@ export const ConfigList: IConfigItem[] = [{
 			return 0;
 		},
 		reduce: ( pre, cur ) => // console.log( "cur cur ", cur );
-			pre + cur
-
+			(pre + cur)
 	}
 }];

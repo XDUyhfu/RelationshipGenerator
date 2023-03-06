@@ -1,5 +1,6 @@
 import Input from "./input";
-import { ReGen } from "@yhfu/re-gen";
+// import { ReGen } from "@yhfu/re-gen";
+import { ReGen } from "../../../../packages/Re-Gen/src/index";
 import {
 	useAtomsValue,
 	useAtomsCallback
@@ -17,7 +18,8 @@ const AutoComplete: React.FC<AutoCompleteProps> = ( {} ) => {
 
 	const {
 		inputValue,
-		list
+		list,
+		hightIndex
 	} = useAtomsValue( AtomInOut, ConfigList );
 	const {
 		keyCodeCallback,
@@ -25,6 +27,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ( {} ) => {
 	} = useAtomsCallback( AtomInOut, ConfigList );
 
 	return <div>
+		{ JSON.stringify( hightIndex % list.length ) }
 		<Input value={ inputValue } onChange={ ( value ) => {
 			inputValueCallback( value );
 			keyCodeCallback( "" );

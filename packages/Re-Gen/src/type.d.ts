@@ -21,12 +21,16 @@ export type IDistinct<T, K> =
 	comparator: ( previous: K, current: K ) => boolean, keySelector?: ( value: T ) => K
 }
 
+export type CombineType =
+	"self"
+	| "any"
+
 export interface IConfigItem {
 	name: string;
 	init?: any;
 	handle?: ( arg: any ) => ReturnResult;
 	distinct?: IDistinct;
 	depend?: {
-		names: string[]; handle: ( args: any ) => ReturnResult; reduce?: ( pre: any, val: any ) => any;
+		names: string[]; handle: ( args: any ) => ReturnResult; reduce?: ( pre: any, val: any ) => any; combineType?: CombineType
 	};
 }

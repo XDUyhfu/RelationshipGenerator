@@ -4,15 +4,18 @@ import {
 	isObservable,
 	of,
 	distinctUntilChanged,
-	identity
+	identity,
+	BehaviorSubject,
+	combineLatestWith,
+	withLatestFrom
 } from "rxjs";
 import {
+	CombineType,
 	IConfigItem,
 	IDistinct,
 	PlainResult,
 	ReturnResult
 } from "../type";
-import {GlobalStore} from "../Atom";
 
 export const getDependNames = ( item: IConfigItem ) => item.depend?.names || [];
 
@@ -22,7 +25,7 @@ function isObject( value: any ) {
 	return Object.prototype.toString.call( value ) === "[object Object]";
 }
 
-function removeUndefinedValue( value: any ) {
+function removeObjectUndefinedValue( value: any ) {
 	return JSON.parse( JSON.stringify( value ) );
 }
 
@@ -68,9 +71,9 @@ export function handleUndefined(): ( source: Observable<any> ) => Observable<any
 			next: ( value ) => {
 				// 如果 value 是 Promise 对象，则转换成 Observable 并订阅
 				if ( isObject( value ) ) {
-					observer.next( removeUndefinedValue( value ) );
+					observer.next( removeObjectUndefinedValue( value ) );
 				} else if ( Array.isArray( value ) ) {
-					observer.next( value.filter( val => !!val ).map( item => isObject( value ) ? removeUndefinedValue( item ) : item ) );
+					observer.next( value.filter( val => !!val ).map( item => isObject( value ) ? removeObjectUndefinedValue( item ) : item ) );
 				} else {
 					observer.next( value );
 				}
@@ -82,7 +85,6 @@ export function handleUndefined(): ( source: Observable<any> ) => Observable<any
 }
 
 export function handleDistinct( param: IDistinct<any, any> ): ( source: Observable<any> ) => Observable<any> {
-	console.log( param );
 	return ( source: Observable<any> ): Observable<any> => {
 		if ( typeof param === "boolean" ) {
 			return param ? source.pipe( distinctUntilChanged() ) : source;
@@ -90,4 +92,8 @@ export function handleDistinct( param: IDistinct<any, any> ): ( source: Observab
 			return source.pipe( distinctUntilChanged( param.comparator, param.keySelector || identity ) );
 		}
 	};
+}
+
+export function hanldeCombine( type: CombineType, depends: BehaviorSubject<any>[] ): ( source: Observable<any> ) => Observable<any> {
+	return ( source: Observable<any> ): Observable<any> => type === "self" ? source.pipe( withLatestFrom( ...depends ) ) : source.pipe( combineLatestWith( ...depends ) );
 }

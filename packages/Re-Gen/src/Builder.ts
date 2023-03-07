@@ -2,7 +2,6 @@ import {
 	identity,
 	of,
 	map,
-	combineLatestWith,
 	switchMap,
 	catchError,
 	scan,
@@ -20,6 +19,7 @@ import {
 	handlePromise,
 	handleResult,
 	handleUndefined,
+	hanldeCombine,
 } from "./utils";
 import {
 	IConfigItem,
@@ -64,7 +64,7 @@ const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 		const dependAtomsIn$ = dependNames.map( name => GlobalStore.get( cacheKey )!.get( name )!.out$ );
 
 		if ( dependNames.length > 0 ) {
-			atom.mid$.pipe( combineLatestWith( ...dependAtomsIn$ ), map( item.depend?.handle || identity ), catchError( () => {
+			atom.mid$.pipe( hanldeCombine( item.depend?.combineType || "any", dependAtomsIn$ ), map( item.depend?.handle || identity ), catchError( () => {
 				console.error( `捕获到 ${ item.name } depend.handle 中报错` );
 				return EMPTY;
 			} ), scan( item.depend?.reduce || defaultReduce, item.init ), switchMap( handleResult ), handleUndefined(), handleDistinct( item.distinct ?? true ), catchError( () => {

@@ -1,6 +1,5 @@
 import {
 	Observable,
-	from,
 	isObservable,
 	of,
 	distinctUntilChanged,
@@ -49,11 +48,9 @@ export function handlePromise<T>(): ( source: Observable<T> ) => Observable<T> {
 			next: ( value ) => {
 				// 如果 value 是 Promise 对象，则转换成 Observable 并订阅
 				if ( value instanceof Promise ) {
-					from( value ).subscribe( {
-						next: ( val ) => observer.next( val ),
-						error: ( err ) => observer.error( err ),
-						complete: () => observer.complete(),
-					} );
+					value.then( ( val ) => { observer.next(value); } ).catch( ( err ) => {
+						throw new Error("init value Promise error");
+					});
 				} else {
 					observer.next( value );
 				}

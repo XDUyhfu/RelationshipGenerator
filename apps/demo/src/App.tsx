@@ -1,4 +1,4 @@
-import { ReGen } from "@yhfu/re-gen";
+import { ReGen } from "../../../packages/Re-Gen/src/index";
 import { RelationConfig } from "./config";
 import { Select } from "antd";
 import { useAtomsCallback, useAtomsValue } from "@yhfu/re-gen-hooks";

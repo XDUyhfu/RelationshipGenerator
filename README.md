@@ -41,34 +41,38 @@ change click 等进行驱动，这也是RxJS能适用的原因之一。
 如果使用该工具，需要提供一组配置项，单个配置项的格式如下所示，具体使用方式可以参照 apps/demo/src/config.ts 的配置文件。
 
 ```typescript
-export interface IConfigItem {
+interface IConfigItem {
 	name: string;
 	init?: any;
 	handle?: ( arg: any ) => ReturnResult;
 	distinct?: IDistinct;
 	depend?: {
-		names: string[]; handle: ( args: any ) => ReturnResult; reduce?: ( pre: any, val: any ) => any;
+		names: string[]; handle: ( args: any ) => ReturnResult; reduce?: ( pre: any, val: any ) => any; combineType?: CombineType
 	};
 }
 
-export type PlainResult =
+type PlainResult =
 	Record<string, any>
 	| number
 	| string
 	| boolean
 	| undefined
 	| null;
-export type RxResult = ObservableInput<any>;
+type RxResult = ObservableInput<any>;
 
-export type ReturnResult =
+type ReturnResult =
 	PlainResult
 	| RxResult;
 
-export type IDistinct<T, K> =
+type IDistinct<T, K> =
 	boolean
 	| {
 	comparator: ( previous: K, current: K ) => boolean, keySelector?: ( value: T ) => K
 }
+
+type CombineType =
+	"self"
+	| "any"
 ```
 
 ### 具体使用方法

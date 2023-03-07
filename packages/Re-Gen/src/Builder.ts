@@ -19,7 +19,10 @@ import {
 	handleDistinct,
 	handlePromise,
 	handleResult,
-	handleUndefined
+	handleUndefined,
+	globalStoreSet,
+	globalStoreHas,
+	globalStoreGet
 } from "./utils";
 import {
 	IConfigItem,
@@ -29,8 +32,8 @@ import {
 // 因为配置项的顺序可能在依赖项的前边，所以先将所有的单状态进行存储，然后再处理依赖关系
 const ConfigToAtomStore = ( [cacheKey, RelationConfig]: IParam ) => {
 	RelationConfig.forEach( item => {
-		if ( !GlobalStore.get( cacheKey )!.has( item.name ) ) {
-			GlobalStore.get( cacheKey )!.set( item.name, new AtomState( item.init ) );
+		if ( !globalStoreHas( cacheKey, item.name ) ) {
+			globalStoreSet( cacheKey, item.name, new AtomState( item.init ) );
 		} else {
 			// 如果有重复的 key 直接就报错了
 			throw Error( "配置项中 name 字段重复" );
@@ -43,7 +46,7 @@ const ConfigToAtomStore = ( [cacheKey, RelationConfig]: IParam ) => {
 // 处理自身的 handler
 const AtomHandle = ( [cacheKey, RelationConfig]: IParam ) => {
 	RelationConfig.forEach( item => {
-		const atom = GlobalStore.get( cacheKey )!.get( item.name )!;
+		const atom = globalStoreGet( cacheKey, item.name );
 		atom.in$.pipe( // 执行 handle
 			handlePromise(), map( item.handle || identity ), // 处理 result 为 ObservableInput
 			// 使用 switchMap 的原因是因为一个 Observable 中可能会产生多个值，此时需要将之前的取消并切换为新值
@@ -59,9 +62,9 @@ const AtomHandle = ( [cacheKey, RelationConfig]: IParam ) => {
 
 const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 	RelationConfig.forEach( item => {
-		const atom = GlobalStore.get( cacheKey )!.get( item.name )!;
+		const atom = globalStoreGet( cacheKey, item.name );
 		const dependNames = getDependNames( item );
-		const dependAtomsIn$ = dependNames.map( name => GlobalStore.get( cacheKey )!.get( name )!.out$ );
+		const dependAtomsIn$ = dependNames.map( name => globalStoreGet( cacheKey, name ).out$ );
 
 		if ( dependNames.length > 0 ) {
 			atom.mid$.pipe( combineLatestWith( ...dependAtomsIn$ ), map( item.depend?.handle || identity ), catchError( () => {

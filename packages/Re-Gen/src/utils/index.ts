@@ -48,7 +48,7 @@ export function handlePromise<T>(): ( source: Observable<T> ) => Observable<T> {
 			next: ( value ) => {
 				// 如果 value 是 Promise 对象，则转换成 Observable 并订阅
 				if ( value instanceof Promise ) {
-					value.then( ( val ) => { observer.next(value); } ).catch( ( err ) => {
+					value.then( ( val ) => { observer.next(val); } ).catch( ( err ) => {
 						throw new Error("init value Promise error");
 					});
 				} else {

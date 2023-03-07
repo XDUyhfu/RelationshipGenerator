@@ -22,7 +22,9 @@ function App () {
 
       <Select
         style={ { width: 120 } }
-        onChange={ areaCallback }
+        onChange={ ( val ) => {
+          areaCallback(Promise.resolve(val));
+        } }
         placeholder="area"
         options={ [
           { value: "AP1", label: "亚太1区" },

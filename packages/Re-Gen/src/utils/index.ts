@@ -91,9 +91,3 @@ export function handleDistinct( param: IDistinct<any, any> ): ( source: Observab
 		}
 	};
 }
-
-export const globalStoreGet = ( cacheKey: string, name: string ) => GlobalStore.get( cacheKey )!.get( name )!;
-export const globalStoreSet = ( cacheKey: string, name: string, value: any ) => {
-	GlobalStore.get( cacheKey )!.set( name, value );
-};
-export const globalStoreHas = ( cacheKey: string, name: string ) => !GlobalStore.get( cacheKey )!.has( name );

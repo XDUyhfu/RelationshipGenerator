@@ -8,10 +8,12 @@ export const DayFormat = "YYYY-MM-DD";
 export const RelationConfig: IConfigItem[] = [{
 	name: "domain",
 	init: []
-}, {
+},
+	{
 	name: "shortcut",
 	init: "600"
-}, {
+	},
+	{
 	name: "time",
 	init: [dayjs().subtract( 600, "s" ).format( DateFormat ), dayjs( Date.now() ).format( DateFormat )],
 	depend: {

@@ -12,9 +12,9 @@ import {
 
 export const RelationConfig: IConfigItem[] = [{
 	name: "area",
-	init: Promise.resolve( "CN" ),
-	handle ( val ) {
-		return of(val);
+	init: of( "CN" ),
+	handle( val ) {
+		return of( val );
 	}
 }, {
 	name: "region",

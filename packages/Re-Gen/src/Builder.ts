@@ -16,6 +16,7 @@ import {
 	defaultReduce,
 	getDependNames,
 	handleDistinct,
+	handleObservable,
 	handlePromise,
 	handleResult,
 	handleUndefined,
@@ -45,8 +46,7 @@ const AtomHandle = ( [cacheKey, RelationConfig]: IParam ) => {
 	RelationConfig.forEach( item => {
 		const atom = GlobalStore.get( cacheKey )!.get( item.name )!;
 		atom.in$.pipe( // 执行 handle
-			handlePromise(),
-			map( item.handle || identity ), // 处理 result 为 ObservableInput
+			handlePromise(), handleObservable(), map( item.handle || identity ), // 处理 result 为 ObservableInput
 			// 使用 switchMap 的原因是因为一个 Observable 中可能会产生多个值，此时需要将之前的取消并切换为新值
 			switchMap( handleResult ), catchError( () => {
 				console.error( `捕获到 ${ item.name } handle 中报错` );
@@ -73,7 +73,10 @@ const HandDepend = ( [cacheKey, RelationConfig]: IParam ) => {
 				return EMPTY;
 			} ), ).subscribe( atom.out$ );
 		} else {
-			atom.mid$.pipe( handleUndefined(), handleDistinct( item.distinct ?? true ), catchError( () => EMPTY ), ).subscribe( atom.out$ );
+			atom.mid$.pipe( handleUndefined(), handleDistinct( item.distinct ?? true ), catchError( () => {
+				console.error( "error" );
+				return EMPTY;
+			} ), ).subscribe( atom.out$ );
 		}
 
 	} );

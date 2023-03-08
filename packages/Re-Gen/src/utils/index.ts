@@ -42,15 +42,36 @@ export function handleResult( result: ReturnResult ) {
 	return result;
 }
 
+export function handleObservable(): ( source: Observable<any> ) => Observable<any> {
+	return ( source: Observable<any> ): Observable<any> => new Observable( ( observer ) => {
+		source.subscribe( {
+			next: ( value ) => {
+				// 如果 value 是 Promise 对象，则转换成 Observable 并订阅
+				if ( isObservable( value ) ) {
+					value.subscribe( ( val ) => {
+						observer.next( val );
+					} );
+				} else {
+					observer.next( value );
+				}
+			},
+			error: ( err ) => observer.error( err ),
+			complete: () => observer.complete(),
+		} );
+	} );
+}
+
 export function handlePromise<T>(): ( source: Observable<T> ) => Observable<T> {
 	return ( source: Observable<T> ): Observable<T> => new Observable( ( observer ) => {
 		source.subscribe( {
 			next: ( value ) => {
 				// 如果 value 是 Promise 对象，则转换成 Observable 并订阅
 				if ( value instanceof Promise ) {
-					value.then( ( val ) => { observer.next(val); } ).catch( ( err ) => {
-						throw new Error("init value Promise error");
-					});
+					value.then( ( val ) => {
+						observer.next( val );
+					} ).catch( ( err ) => {
+						throw new Error( "init value Promise error", err );
+					} );
 				} else {
 					observer.next( value );
 				}

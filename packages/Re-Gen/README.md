@@ -3,6 +3,8 @@
 **NPM地址
 ** [@yhfu/re-gen](https://www.npmjs.com/package/@yhfu/re-gen)  [@yhfu/re-gen-hooks](https://www.npmjs.com/package/@yhfu/re-gen-hooks)
 
+> demo地址: https://stackblitz.com/edit/react-ts-wv4a9d?file=App.tsx,config.ts,index.html
+
 > 初期开发阶段，API不稳定，谨(不)慎(用)使(也)用(行)！
 
 > 此库不定时更新
@@ -11,20 +13,23 @@
 
 ## 为什么会有该库
 
-> 有个简单的想法，就是将状态处理和组件UI分开进行管理。为了实现这个想法，目前就是将状态和其处理的函数通过对象数组的方式进行声明 (符合SOLID原则) 。有了对象数组之后，就需要有一个程序能够解析并运行它们。为此，通过使用 RxJS 并通过组合操作符的形式进行开发，因此就诞生了这个小工具。
+>
+有个简单的想法，就是将状态处理和组件UI分开进行管理。为了实现这个想法，目前就是将状态和其处理的函数通过对象数组的方式进行声明 (
+符合SOLID原则) 。有了对象数组之后，就需要有一个程序能够解析并运行它们。为此，通过使用 RxJS 并通过组合操作符的形式进行开发，因此就诞生了这个小工具。
 
 ## 什么场景适合使用？
 
 > 它可以应用到平时开发中的任何场景，只是不同场景的接入成本不同。
 
 说明：配置对象中的一些专有的配置项（reduce，distinct）是针对专门的场景使用的，场景大致可以分为如下几类：
-- 每个 state 对应 UI 中的一个组件，此时就可以将其做成一个受控组件 
+
+- 每个 state 对应 UI 中的一个组件，此时就可以将其做成一个受控组件
 - 当前 state 是通过其他的 state 生成的，也就是不使用 change 回调函数对其进行状态更改，该类状态又可以分为两种情况
 
-   (1) 计算结果和上一次计算结果没有关系，此时直接返回计算结果即可
+  (1) 计算结果和上一次计算结果没有关系，此时直接返回计算结果即可
 
-   (2) 计算结果和上一次计算结果需要进行 reduce ，此时就需要配置 reduce 选项
-   
+  (2) 计算结果和上一次计算结果需要进行 reduce ，此时就需要配置 reduce 选项
+
 - 相邻两次 state 相同，是否需要过滤，默认进行过滤，也可以配置 distinct 为 false 不进行过滤
 
 ### apps/FormFilter
@@ -34,7 +39,9 @@ change click 等进行驱动，这也是RxJS能适用的原因之一。
 
 ### app/Form
 
-这是一个非常规的demo，主要展示的是一个数据是通过其他数据源驱动更新自身（reduce）的一个场景。因为 RxJS 自身的原因，并不能很好的区分到底是哪个依赖产生了变化，所以需要写一些功能性（例如去重）之类的代码，或者是引入新的变量来标识具体是哪个变量发生了变化（类似于 redux 派发 action ）。
+这是一个非常规的demo，主要展示的是一个数据是通过其他数据源驱动更新自身（reduce）的一个场景。因为 RxJS
+自身的原因，并不能很好的区分到底是哪个依赖产生了变化，所以需要写一些功能性（例如去重）之类的代码，或者是引入新的变量来标识具体是哪个变量发生了变化（类似于
+redux 派发 action ）。
 
 ### 接入方式
 
@@ -83,16 +90,15 @@ type CombineType =
 
 ```typescript
 export const RelationConfig: IConfigItem[] = [{
-		name: "area",
-		handle( val ) {
-			return [val];
-		}
-	}, 
-	{
-		name: "region",
-		handle async ( val: string[] ) => {
-			return val?.filter( Boolean );
-		}
+	name: "area",
+	handle( val ) {
+		return [val];
+	}
+}, {
+	name: "region",
+	handle async ( val: string[] ) => {
+		return val?.filter( Boolean );
+	}
 }];
 // 处理函数支持 async/await 以及返回 Observable 的形式
 // 如果你熟悉 RxJS 的话，那将会有很好的体验

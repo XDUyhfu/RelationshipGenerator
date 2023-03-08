@@ -48,12 +48,8 @@ export function handleObservable(): ( source: Observable<any> ) => Observable<an
 			next: ( value ) => {
 				// 如果 value 是 Promise 对象，则转换成 Observable 并订阅
 				if ( isObservable( value ) ) {
-					value.subscribe( {
-						next: ( val ) => {
-							observer.next( val );
-						},
-						complete: () => observer.complete(),
-						error: ( err ) => observer.error( err )
+					value.subscribe( ( val ) => {
+						observer.next( val );
 					} );
 				} else {
 					observer.next( value );

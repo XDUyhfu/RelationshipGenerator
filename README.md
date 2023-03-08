@@ -5,8 +5,6 @@
 
 > demo地址: https://stackblitz.com/edit/react-ts-wv4a9d?file=App.tsx,config.ts,index.html
 
-> 初期开发阶段，API不稳定，谨(不)慎(用)使(也)用(行)！
-
 > 此库不定时更新
 
 ✨🌟✨🌟✨🌟 ***依然存在很多问题，但是会尽快解决他们*** 🌟✨🌟✨🌟✨
@@ -48,9 +46,9 @@ redux 派发 action ）。
 如果使用该工具，需要提供一组配置项，单个配置项的格式如下所示，具体使用方式可以参照 apps/demo/src/config.ts 的配置文件。
 
 ```typescript
-interface IConfigItem {
+export interface IConfigItem {
 	name: string;
-	init?: any;
+	init?: Promise | Observable | PlainResult;
 	handle?: ( arg: any ) => ReturnResult;
 	distinct?: IDistinct;
 	depend?: {

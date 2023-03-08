@@ -1,4 +1,4 @@
-import { ObservableInput } from "rxjs";
+import { Observable, ObservableInput } from "rxjs";
 
 export type IParam = [cacheKey: string, RelationConfig: IConfigItem[]];
 
@@ -27,7 +27,7 @@ export type CombineType =
 
 export interface IConfigItem {
 	name: string;
-	init?: any;
+	init?: Promise | Observable | PlainResult;
 	handle?: ( arg: any ) => ReturnResult;
 	distinct?: IDistinct;
 	depend?: {

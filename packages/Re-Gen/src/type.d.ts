@@ -1,7 +1,5 @@
 import { BehaviorSubject, Observable, ObservableInput } from "rxjs";
 
-export type IParam = [cacheKey: string, RelationConfig: IConfigItem[]];
-
 export type PlainResult =
     | Record<string, any>
     | number

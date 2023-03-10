@@ -8,44 +8,30 @@ import {
     combineLatestWith,
     withLatestFrom,
 } from "rxjs";
-import {
-    CombineType,
-    IConfigItem,
-    IDistinct,
-    PlainResult,
-    ReturnResult,
-} from "../type";
+import { IConfigItem, IDistinct, PlainResult, ReturnResult } from "../type";
+import { filter, isNil, not, compose } from "ramda";
+import { CombineEnum } from "../config";
 
 export const getDependNames = (item: IConfigItem) => item.depend?.names || [];
+export const defaultReduceFunction = (_: any, val: any) => val;
 
-export const defaultReduce = (_: any, val: any) => val;
+const removeObjectOrListUndefinedValue = filter(compose(not, isNil));
 
-function isObject(value: any) {
-    return Object.prototype.toString.call(value) === "[object Object]";
-}
+const isPromise = (value: any): value is Promise<any> =>
+    value instanceof Promise;
 
-function removeObjectUndefinedValue(value: any) {
-    return JSON.parse(JSON.stringify(value));
-}
+const isArray = (value: any): value is Array<any> => Array.isArray(value);
+const isObject = (value: any) =>
+    Object.prototype.toString.call(value) === "[object Object]" &&
+    !isObservable(value); // Observable 也是一个 Object 类型
+const isPlainResult = (result: ReturnResult): result is PlainResult =>
+    ["number", "boolean", "string", "undefined"].includes(typeof result) ||
+    isObject(result) ||
+    Array.isArray(result) ||
+    result === null;
 
-export function isPlainResult(result: ReturnResult): result is PlainResult {
-    return (
-        ["number", "boolean", "string", "undefined"].includes(typeof result) ||
-        isObject(result) ||
-        Array.isArray(result) ||
-        result === null
-    );
-}
-
-export function handleResult(result: ReturnResult) {
-    if (isPlainResult(result)) {
-        if (isObservable(result)) {
-            return result;
-        }
-        return of(result);
-    }
-    return result;
-}
+export const handleResult = (result: ReturnResult) =>
+    isPlainResult(result) ? of(result) : result;
 
 export function handleObservable(): (
     source: Observable<any>
@@ -54,7 +40,6 @@ export function handleObservable(): (
         new Observable((observer) => {
             source.subscribe({
                 next: (value) => {
-                    // 如果 value 是 Promise 对象，则转换成 Observable 并订阅
                     if (isObservable(value)) {
                         value.subscribe((val) => {
                             observer.next(val);
@@ -75,7 +60,7 @@ export function handlePromise<T>(): (source: Observable<T>) => Observable<T> {
             source.subscribe({
                 next: (value) => {
                     // 如果 value 是 Promise 对象，则转换成 Observable 并订阅
-                    if (value instanceof Promise) {
+                    if (isPromise(value)) {
                         value
                             .then((val) => {
                                 observer.next(val);
@@ -96,6 +81,7 @@ export function handlePromise<T>(): (source: Observable<T>) => Observable<T> {
         });
 }
 
+// 该 operator 的前置 operator 需要将值处理为 普通类型
 export function handleUndefined(): (
     source: Observable<any>
 ) => Observable<any> {
@@ -103,21 +89,12 @@ export function handleUndefined(): (
         new Observable((observer) => {
             source.subscribe({
                 next: (value) => {
-                    // 如果 value 是 Promise 对象，则转换成 Observable 并订阅
-                    if (isObject(value)) {
-                        observer.next(removeObjectUndefinedValue(value));
-                    } else if (Array.isArray(value)) {
-                        observer.next(
-                            value
-                                .filter((val) => !!val)
-                                .map((item) =>
-                                    isObject(value)
-                                        ? removeObjectUndefinedValue(item)
-                                        : item
-                                )
-                        );
+                    if (isObject(value) || isArray(value)) {
+                        observer.next(removeObjectOrListUndefinedValue(value));
                     } else {
-                        observer.next(value);
+                        if (!isNil(value)) {
+                            observer.next(value);
+                        }
                     }
                 },
                 error: (err) => observer.error(err),
@@ -143,12 +120,12 @@ export function handleDistinct(
     };
 }
 
-export function hanldeCombine(
-    type: CombineType,
+export function handleCombine(
+    type: CombineEnum,
     depends: BehaviorSubject<any>[]
 ): (source: Observable<any>) => Observable<any> {
     return (source: Observable<any>): Observable<any> =>
-        type === "self"
+        type === CombineEnum.SELF
             ? source.pipe(withLatestFrom(...depends))
             : source.pipe(combineLatestWith(...depends));
 }

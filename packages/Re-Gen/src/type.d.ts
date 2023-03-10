@@ -20,8 +20,6 @@ export type IDistinct<T, K> =
           keySelector?: (value: T) => K;
       };
 
-export type CombineType = "self" | "any";
-
 export interface IConfigItem {
     name: string;
     init?: Promise | Observable | PlainResult;
@@ -31,6 +29,6 @@ export interface IConfigItem {
         names: string[];
         handle: (args: any) => ReturnResult;
         reduce?: (pre: any, val: any) => any;
-        combineType?: CombineType;
+        combineType?: CombineEnum;
     };
 }

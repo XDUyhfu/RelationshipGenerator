@@ -32,13 +32,13 @@
 
 ### apps/FormFilter
 
-这是一个实际的demo，你会发现在这种场景下工具使用起来会非常的丝滑，因为这个工具的诞生就是为了这种场景的需求。它主要以多个不同的field之间进行联动，其次就是比较关键的地方在于它们的数据源都来自于组件，包括
+这是一个实际的demo，你会发现在这种场景下工具使用起来会非常的丝滑，因为这个工具的诞生就是为了这种场景的需求。它主要以多个不同的field之间进行联动，其次就是比较关键的地方在于它们的数据源都来自组件，包括
 change click 等进行驱动，这也是RxJS能适用的原因之一。
 
 ### app/Form
 
 这是一个非常规的demo，主要展示的是一个数据是通过其他数据源驱动更新自身（reduce）的一个场景。因为 RxJS
-自身的原因，并不能很好的区分到底是哪个依赖产生了变化，所以需要写一些功能性（例如去重）之类的代码，或者是引入新的变量来标识具体是哪个变量发生了变化（类似于
+自身的原因，并不能很好地区分到底是哪个依赖产生了变化，所以需要写一些功能性（例如去重）之类的代码，或者是引入新的变量来标识具体是哪个变量发生了变化（类似于
 redux 派发 action ）。
 
 ### 接入方式
@@ -52,7 +52,7 @@ export interface IConfigItem {
 	handle?: ( arg: any ) => ReturnResult;
 	distinct?: IDistinct;
 	depend?: {
-		names: string[]; handle: ( args: any ) => ReturnResult; reduce?: ( pre: any, val: any ) => any; combineType?: CombineType
+		names: string[]; handle: ( args: any ) => ReturnResult; reduce?: ( pre: any, val: any ) => any; combineType?: CombineEnum;
 	};
 }
 
@@ -75,14 +75,14 @@ type IDistinct<T, K> =
 	comparator: ( previous: K, current: K ) => boolean, keySelector?: ( value: T ) => K
 }
 
-type CombineType =
-	"self"
-	| "any"
+enum CombineEnum {
+	SELF = "self", ANY = "any",
+}
 ```
 
 ### 具体使用方法
 
-> 详细代码可参考 apps/demo 项目
+> 详细代码可参考 apps/demo 项目  https://stackblitz.com/edit/react-ts-wv4a9d?file=App.tsx,config.ts,index.html
 
 - 创建配置项列表
 
@@ -94,7 +94,7 @@ export const RelationConfig: IConfigItem[] = [{
 	}
 }, {
 	name: "region",
-	handle async ( val: string[] ) => {
+	handle: async ( val: string[] ) => {
 		return val?.filter( Boolean );
 	}
 }];

@@ -1,16 +1,17 @@
 import { identity, of, map, switchMap, catchError, scan, EMPTY } from "rxjs";
 import { AtomInOut, AtomState, GlobalStore } from "./Atom";
 import {
-    defaultReduce,
+    defaultReduceFunction,
     getDependNames,
     handleDistinct,
     handleObservable,
     handlePromise,
     handleResult,
     handleUndefined,
-    hanldeCombine,
+    handleCombine,
 } from "./utils";
-import { IConfigItem, IParam } from "./type";
+import type { IConfigItem, IParam } from "./type";
+import { CombineEnum } from "./config";
 
 // 因为配置项的顺序可能在依赖项的前边，所以先将所有的单状态进行存储，然后再处理依赖关系
 const ConfigToAtomStore = ([cacheKey, RelationConfig]: IParam) => {
@@ -38,6 +39,7 @@ const AtomHandle = ([cacheKey, RelationConfig]: IParam) => {
                 map(item.handle || identity), // 处理 result 为 ObservableInput
                 // 使用 switchMap 的原因是因为一个 Observable 中可能会产生多个值，此时需要将之前的取消并切换为新值
                 switchMap(handleResult),
+                handleUndefined(),
                 catchError(() => {
                     console.error(`捕获到 ${item.name} handle 中报错`);
                     return EMPTY;
@@ -60,8 +62,8 @@ const HandDepend = ([cacheKey, RelationConfig]: IParam) => {
         if (dependNames.length > 0) {
             atom.mid$
                 .pipe(
-                    hanldeCombine(
-                        item.depend?.combineType || "any",
+                    handleCombine(
+                        item.depend?.combineType || CombineEnum.ANY,
                         dependAtomsIn$
                     ),
                     map(item.depend?.handle || identity),
@@ -71,7 +73,10 @@ const HandDepend = ([cacheKey, RelationConfig]: IParam) => {
                         );
                         return EMPTY;
                     }),
-                    scan(item.depend?.reduce || defaultReduce, item.init),
+                    scan(
+                        item.depend?.reduce || defaultReduceFunction,
+                        item.init
+                    ),
                     switchMap(handleResult),
                     handleUndefined(),
                     handleDistinct(item.distinct ?? true),

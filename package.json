@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "re-gen:build": "pnpm -F @yhfu/re-gen build",
+    "re-gen-hooks:build": "pnpm -F @yhfu/re-gen-hooks build:hooks",
     "re-gen:publish": "pnpm -F @yhfu/re-gen publish --no-git-checks",
     "re-gen-hooks:publish": "pnpm -F @yhfu/re-gen-hooks publish --no-git-checks"
   },

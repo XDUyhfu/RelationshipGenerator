@@ -7,10 +7,11 @@ import { Region } from "./components/Region";
 import { IP } from "./components/IP";
 import styled from "styled-components";
 import {
+	Button,
 	Space,
 	Tabs
 } from "antd";
-import { ReGen } from "@yhfu/re-gen";
+import { ReGen } from "../../../packages/Re-Gen/src/index";
 import {
 	CacheKey,
 	RelationConfig,
@@ -34,7 +35,6 @@ const Wrapper = styled( Space )`
 const AtomInOut = ReGen( CacheKey, RelationConfig );
 
 function App() {
-
 	const {
 		domain,
 		time,
@@ -46,7 +46,8 @@ function App() {
 		RegionList,
 		SelectableTimeRange,
 		tab,
-		areaShow
+		areaShow,
+		confirm,
 	} = useAtomsValue( AtomInOut, RelationConfig );
 
 	const {
@@ -56,29 +57,54 @@ function App() {
 		areaCallback,
 		regionCallback,
 		aggregationCallback,
-		tabCallback
+		tabCallback,
+		confirmCallback,
 	} = useAtomsCallback( AtomInOut, RelationConfig );
 
 	return (<>
-		<Tabs activeKey={ tab as string } items={ TabItems } onChange={ tabCallback }/>
-		<Wrapper>
-			<Domain value={ domain as string[] } change={ domainCallback }/>
-			<Shortcut value={ shortcut as string } change={ ( shortcut ) => {
-				shortcutCallback( shortcut.target.value );
-			} }/>
-			<Time value={ time as string[] } change={ ( _, time: string[] ) => {
-				timeCallback( time );
-				shortcutCallback( 0 );
-			} } range={ SelectableTimeRange as string[] }/>
-			<Aggregation value={ aggregation as string } change={ aggregationCallback }/>
-			{ areaShow ? <Area value={ area as string } change={ areaCallback }/> : null }
-			{ regionShow ? <Region value={ region as string[] } change={ regionCallback }/> : null }
-			<IP value={ domain as string } change={ domainCallback }/>
-		</Wrapper>
-		<br/>
-		<br/>
-		<div>RegionListValue: { JSON.stringify( RegionList ) }</div>
-	</>);
+			<Tabs
+				activeKey={ tab as string }
+				items={ TabItems }
+				onChange={ tabCallback }
+			/>
+			<Wrapper>
+				<Domain value={ domain as string[] } change={ domainCallback }/>
+				<Shortcut
+					value={ shortcut as string }
+					change={ ( shortcut ) => {
+						shortcutCallback( shortcut.target.value );
+					} }
+				/>
+				<Time
+					value={ time as string[] }
+					change={ ( _, time: string[] ) => {
+						timeCallback( time );
+						shortcutCallback( 0 );
+					} }
+					range={ SelectableTimeRange as string[] }
+				/>
+				<Aggregation
+					value={ aggregation as string }
+					change={ aggregationCallback }
+				/>
+				{ areaShow ? (<Area value={ area as string } change={ areaCallback }/>) : null }
+				{ regionShow ? (<Region
+						value={ region as string[] }
+						change={ regionCallback }
+					/>) : null }
+				<IP value={ domain as string } change={ domainCallback }/>
+				<Button type="primary" onClick={ confirmCallback }>
+					确认
+				</Button>
+			</Wrapper>
+			<br/>
+			<br/>
+			<div>RegionListValue: { JSON.stringify( RegionList ) }</div>
+
+			<br/>
+			<br/>
+			<div>{ JSON.stringify( confirm ) }</div>
+		</>);
 }
 
 export default App;

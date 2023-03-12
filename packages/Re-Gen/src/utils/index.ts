@@ -14,13 +14,13 @@ import {
     AnyBehaviorSubject,
     AnyObservable,
     AnyPromise,
+    CombineType,
     IConfigItem,
     IDistinct,
     PlainResult,
     ReturnResult,
 } from "../type";
 import { filter, isNil, not, compose } from "ramda";
-import { CombineEnum } from "../config";
 
 export const getDependNames = (item: IConfigItem) => item.depend?.names || [];
 export const defaultReduceFunction = (_: any, val: any) => val;
@@ -127,11 +127,11 @@ export const handleDistinct =
 
 export const handleCombine =
     (
-        type: CombineEnum,
+        type: CombineType,
         depends: AnyBehaviorSubject[]
     ): ((source: AnyObservable) => AnyObservable) =>
     (source) =>
-        type === CombineEnum.SELF
+        type === "self"
             ? source.pipe(withLatestFrom(...depends))
             : source.pipe(combineLatestWith(...depends));
 

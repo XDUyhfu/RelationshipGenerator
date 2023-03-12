@@ -12,7 +12,6 @@ import {
     handleError,
 } from "./utils";
 import type { IConfigItem } from "./type";
-import { CombineEnum } from "./config";
 import { lt, cond, equals, forEach } from "ramda";
 
 // 因为配置项的顺序可能在依赖项的前边，所以先将所有的单状态进行存储，然后再处理依赖关系
@@ -69,7 +68,7 @@ const HandDepend = (cacheKey: string) => (RelationConfig: IConfigItem[]) =>
                     atom.mid$
                         .pipe(
                             handleCombine(
-                                item.depend?.combineType || CombineEnum.ANY,
+                                item.depend?.combineType || "any",
                                 dependAtomsIn$
                             ),
                             map(item.depend?.handle || identity),

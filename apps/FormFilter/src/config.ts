@@ -1,6 +1,6 @@
 import { TabsProps } from "antd";
 import dayjs from "dayjs";
-import type { IConfigItem } from "@yhfu/re-gen";
+import type { IConfigItem } from "../../../packages/Re-Gen/src/index";
 
 export const DateFormat = "YYYY-MM-DD HH:mm:ss";
 export const DayFormat = "YYYY-MM-DD";
@@ -48,12 +48,18 @@ export const RelationConfig: IConfigItem[] = [
         name: "aggregation",
         init: "300",
     },
-    { name: "area" },
+    {
+        name: "area",
+        init: "",
+    },
     {
         name: "region",
         init: [],
     },
-    { name: "ip" },
+    {
+        name: "ip",
+        init: [],
+    },
     {
         name: "regionShow",
         init: false,
@@ -69,6 +75,7 @@ export const RelationConfig: IConfigItem[] = [
     },
     {
         name: "RegionList",
+        init: [],
         depend: {
             names: ["area", "region", "tab"],
             handle: async ([list, area, region, tab]: [
@@ -162,6 +169,7 @@ export const RelationConfig: IConfigItem[] = [
     },
     {
         name: "confirm",
+        init: {},
         depend: {
             combineType: "self",
             names: ["domain", "time", "aggregation", "RegionList"],

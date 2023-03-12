@@ -1,5 +1,5 @@
 import Input from "./input";
-import { ReGen } from "@yhfu/re-gen";
+import { ReGen } from "../../../../packages/Re-Gen/src/index";
 import { useAtomsValue, useAtomsCallback } from "@yhfu/re-gen-hooks";
 import { ConfigList } from "./state";
 

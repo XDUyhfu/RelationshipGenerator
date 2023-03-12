@@ -11,10 +11,6 @@ export const RelationConfig: IConfigItem[] = [
         handle(val) {
             return of(val);
         },
-        reduce: (pre, val) => ({
-            ...pre,
-            [Date.now()]: val,
-        }),
     },
     {
         name: "region",

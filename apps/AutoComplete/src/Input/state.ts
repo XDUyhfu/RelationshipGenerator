@@ -1,16 +1,19 @@
-import type { IConfigItem } from "@yhfu/re-gen";
+import type { IConfigItem } from "../../../../packages/Re-Gen/src/index";
 
 export const ConfigList: IConfigItem[] = [{
 	distinct: false,
 	init: "",
-	name: "keyCode"
-}, { name: "inputValue" }, {
+	name: "keyCode",
+}, {
+	name: "inputValue",
+	init: "",
+}, {
 	name: "list",
 	init: [],
 	depend: {
 		names: ["inputValue"],
-		handle: ( [list, inputValue] ) => [{ value: inputValue }, { value: 1 }, { value: 2 }, { value: 3 }]
-	}
+		handle: ( [list, inputValue] ) => [{ value: inputValue }, { value: 1 }, { value: 2 }, { value: 3 },],
+	},
 }, {
 	name: "hightIndex",
 	init: -1,
@@ -24,7 +27,8 @@ export const ConfigList: IConfigItem[] = [{
 			}
 			return 0;
 		},
-		reduce: ( pre, cur ) => // console.log( "cur cur ", cur );
-			(pre + cur)
-	}
-}];
+
+	},
+	reduce: ( pre, cur // console.log( "cur cur ", cur );
+	) => pre + cur,
+},];

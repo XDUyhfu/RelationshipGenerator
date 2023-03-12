@@ -48,13 +48,15 @@ redux 派发 action ）。
 ```typescript
 export interface IConfigItem {
 	name: string;
-	init?: Promise | Observable | PlainResult;
+	init: Promise | Observable | PlainResult;
 	handle?: ( arg: any ) => ReturnResult;
 	distinct?: IDistinct;
+	reduce?: ( pre: any, val: any ) => any;
 	depend?: {
-		names: string[]; handle: ( args: any ) => ReturnResult; reduce?: ( pre: any, val: any ) => any; combineType?: CombineEnum;
+		names: string[]; handle: ( args: any ) => ReturnResult; combineType?: CombineType;
 	};
 }
+
 
 type PlainResult =
 	Record<string, any>
@@ -75,9 +77,10 @@ type IDistinct<T, K> =
 	comparator: ( previous: K, current: K ) => boolean, keySelector?: ( value: T ) => K
 }
 
-enum CombineEnum {
-	SELF = "self", ANY = "any",
-}
+export type CombineType =
+	"self"
+	| "any"
+	| "every";
 ```
 
 ### 具体使用方法

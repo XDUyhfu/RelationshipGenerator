@@ -1,10 +1,7 @@
 import { ReGen } from "../../../packages/Re-Gen/src/index";
 import { RelationConfig } from "./config";
 import { Select } from "antd";
-import {
-    useAtomsCallback,
-    useAtomsValue,
-} from "../../../packages/re-gen-hooks/src/hooks/index";
+import { useAtomsCallback, useAtomsValue } from "@yhfu/re-gen-hooks";
 
 const AtomInOut = ReGen("CACHE_KEY", RelationConfig);
 

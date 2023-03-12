@@ -8,6 +8,7 @@ import {
     withLatestFrom,
     catchError,
     EMPTY,
+    zipWith,
 } from "rxjs";
 import {
     AnyArray,
@@ -133,6 +134,8 @@ export const handleCombine =
     (source) =>
         type === "self"
             ? source.pipe(withLatestFrom(...depends))
+            : type === "every"
+            ? source.pipe(zipWith(...depends))
             : source.pipe(combineLatestWith(...depends));
 
 export const handleError =

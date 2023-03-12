@@ -100,4 +100,16 @@ export const RelationConfig: IConfigItem[] = [
             },
         },
     },
+    {
+        name: "confirm",
+        init: "click",
+        depend: {
+            names: ["area", "region"],
+            combineType: "every",
+            handle: ([_, area, region]) => ({
+                area,
+                region,
+            }),
+        },
+    },
 ];

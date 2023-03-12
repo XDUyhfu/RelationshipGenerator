@@ -11,6 +11,10 @@ export const RelationConfig: IConfigItem[] = [
         handle(val) {
             return of(val);
         },
+        reduce: (pre, val) => ({
+            ...pre,
+            [Date.now()]: val,
+        }),
     },
     {
         name: "region",
@@ -99,17 +103,16 @@ export const RelationConfig: IConfigItem[] = [
                 }
             },
         },
-    },
-    {
-        name: "confirm",
-        init: "click",
-        depend: {
-            names: ["area", "region"],
-            combineType: "every",
-            handle: ([_, area, region]) => ({
-                area,
-                region,
-            }),
-        },
-    },
+    }, // {
+    //     name: "confirm",
+    //     init: "click",
+    //     depend: {
+    //         names: ["area", "region"],
+    //         combineType: "every",
+    //         handle: ([_, area, region]) => ({
+    //             area,
+    //             region,
+    //         }),
+    //     },
+    // },
 ];

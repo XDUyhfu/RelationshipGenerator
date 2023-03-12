@@ -25,10 +25,10 @@ export interface IConfigItem {
     init: Promise | Observable | PlainResult;
     handle?: (arg: any) => ReturnResult;
     distinct?: IDistinct;
+    reduce?: (pre: any, val: any) => any;
     depend?: {
         names: string[];
         handle: (args: any) => ReturnResult;
-        reduce?: (pre: any, val: any) => any;
         combineType?: CombineType;
     };
 }

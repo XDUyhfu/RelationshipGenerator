@@ -82,8 +82,7 @@ const HandDepend =
                                     `捕获到 ${item.name} depend.handle 中报错`
                                 ),
                                 scan(
-                                    item.depend?.reduce ||
-                                        defaultReduceFunction,
+                                    item?.reduce || defaultReduceFunction,
                                     item.init
                                 ),
                                 switchMap(handleResult),
@@ -99,6 +98,10 @@ const HandDepend =
                     () =>
                         atom.mid$
                             .pipe(
+                                scan(
+                                    item?.reduce || defaultReduceFunction,
+                                    item.init
+                                ),
                                 handleUndefined(),
                                 handleDistinct(item.distinct ?? true),
                                 handleError("error")

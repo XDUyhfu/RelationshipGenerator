@@ -13,9 +13,8 @@ function App() {
         RegionList,
         testMoreDepend,
         testMoreMoreDepend,
-        confirm,
     } = useAtomsValue(AtomInOut, RelationConfig);
-    const { areaCallback, regionCallback, confirmCallback } = useAtomsCallback(
+    const { areaCallback, regionCallback } = useAtomsCallback(
         AtomInOut,
         RelationConfig
     );
@@ -96,12 +95,12 @@ function App() {
                 获取最新值
             </Button>
 
-            <br />
-            <br />
-            <div>{JSON.stringify(confirm)}</div>
-            <Button type="primary" onClick={confirmCallback}>
-                confirm
-            </Button>
+            {/*<br />*/}
+            {/*<br />*/}
+            {/*<div>{JSON.stringify(confirm)}</div>*/}
+            {/*<Button type="primary" onClick={confirmCallback}>*/}
+            {/*    confirm*/}
+            {/*</Button>*/}
         </div>
     );
 }

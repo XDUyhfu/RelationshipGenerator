@@ -1,4 +1,5 @@
 import { BehaviorSubject, Observable } from "rxjs";
+import { AnyBehaviorSubject } from "./type";
 
 /**
  * 一个配置项会生成一个AtomState
@@ -35,3 +36,24 @@ export const AtomInOut =
             [x: `${string}Out$`]: Observable<T>;
         };
     };
+
+export const GetAtomValues = (cacheKey: string): Record<string, any> => {
+    const observables = GetAtomObservables(cacheKey);
+    const result = {} as Record<string, any>;
+    Object.keys(observables).forEach((key) => {
+        result[key] = observables[key].getValue();
+    });
+    return result;
+};
+export const GetAtomObservables = (
+    cacheKey: string
+): Record<string, AnyBehaviorSubject> => {
+    const result = {} as Record<string, AnyBehaviorSubject>;
+    if (GlobalStore.has(cacheKey)) {
+        const entries = GlobalStore.get(cacheKey)!.entries();
+        for (const [key, value] of entries) {
+            result[key] = value.out$;
+        }
+    }
+    return result;
+};

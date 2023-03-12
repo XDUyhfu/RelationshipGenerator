@@ -1,12 +1,13 @@
 // 这是一个测试的配置文件，主要用来测试生成的代码
 // 主要用来制定数据之间的关系
 
-import { IConfigItem } from "@yhfu/re-gen";
+import { IConfigItem, GetAtomValues } from "../../../packages/Re-Gen/src/index";
 import { filter, from, map, of, toArray } from "rxjs";
 
 export const RelationConfig: IConfigItem[] = [
     {
-        name: "area", // init: of( "CN" ),
+        name: "area",
+        init: of("CN"),
         handle(val) {
             return of(val);
         },
@@ -14,19 +15,12 @@ export const RelationConfig: IConfigItem[] = [
     {
         name: "region",
         init: [],
-        handle: (
-            val: string[] = [] // val?.filter( Boolean )
-        ) =>
+        handle: (val: string[] = []) =>
             from(val).pipe(
                 filter(Boolean),
                 map((item) => item?.toLocaleUpperCase()),
                 toArray()
-            ), // depend: {
-        // 	names: ["area"],
-        // 	handle ( [region, area] ) {
-        // 		return region;
-        // 	}
-        // },
+            ),
     },
     {
         name: "showRegion",

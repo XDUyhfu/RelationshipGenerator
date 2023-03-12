@@ -1,6 +1,6 @@
-import { ReGen } from "../../../packages/Re-Gen/src/index";
+import { GetAtomValues, ReGen } from "../../../packages/Re-Gen/src/index";
 import { RelationConfig } from "./config";
-import { Select } from "antd";
+import { Button, Select } from "antd";
 import { useAtomsCallback, useAtomsValue } from "@yhfu/re-gen-hooks";
 
 const AtomInOut = ReGen("CACHE_KEY", RelationConfig);
@@ -83,6 +83,17 @@ function App() {
                     ]}
                 />
             ) : null}
+
+            <br />
+            <br />
+            <Button
+                type="primary"
+                onClick={() => {
+                    console.log(GetAtomValues("CACHE_KEY"));
+                }}
+            >
+                获取最新值
+            </Button>
         </div>
     );
 }

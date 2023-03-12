@@ -22,7 +22,7 @@ export type CombineType = "self" | "any" | "every";
 
 export interface IConfigItem {
     name: string;
-    init?: Promise | Observable | PlainResult;
+    init: Promise | Observable | PlainResult;
     handle?: (arg: any) => ReturnResult;
     distinct?: IDistinct;
     depend?: {
@@ -37,3 +37,10 @@ export type AnyObservable = Observable<any>;
 export type AnyBehaviorSubject = BehaviorSubject<any>;
 export type AnyArray = Array<any>;
 export type AnyPromise = Promise<any>;
+
+export interface ReGenOptions {
+    // 是否开启logger
+    logger?: boolen;
+    //
+    filterNil?: boolean;
+}

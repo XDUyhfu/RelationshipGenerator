@@ -171,11 +171,13 @@ importers:
       '@types/ramda': ^0.28.20
       ramda: ^0.28.0
       rxjs: ^7.8.0
+      rxjs-watcher: ^1.2.1
       typescript: ^4.9.3
       unbuild: ^1.1.1
     dependencies:
       ramda: 0.28.0
       rxjs: 7.8.0
+      rxjs-watcher: 1.2.1
     devDependencies:
       '@types/ramda': 0.28.20
       typescript: 4.9.4
@@ -207,6 +209,19 @@ importers:
       typescript: 4.9.4
       unbuild: 1.1.1
       vite: 4.0.4
+
+  test/logger:
+    specifiers:
+      rxjs: ^7.8.0
+      rxjs-watcher: ^1.2.1
+      typescript: ^4.9.3
+      vite: ^4.1.0
+    dependencies:
+      rxjs: 7.8.0
+      rxjs-watcher: 1.2.1
+    devDependencies:
+      typescript: 4.9.4
+      vite: 4.1.4
 
 packages:
 
@@ -5176,6 +5191,12 @@ packages:
       tslib: 2.4.1
       use-constant: 1.1.1_react@18.2.0
       use-sync-external-store: 1.2.0_react@18.2.0
+    dev: false
+
+  /rxjs-watcher/1.2.1:
+    resolution: {integrity: sha512-TP8cxplLHAYP7DEoyPxzIFH6jqDcqegLyeewiXMVhn5XM/S+uhxVD/1NA8fyyB29TEOauM7/d7AWhF5wnZ53Jw==}
+    dependencies:
+      rxjs: 7.8.0
     dev: false
 
   /rxjs/7.8.0:

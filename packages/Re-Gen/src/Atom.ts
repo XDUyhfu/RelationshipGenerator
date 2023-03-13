@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, OperatorFunction } from "rxjs";
 import { AnyBehaviorSubject } from "./type";
 
 /**
@@ -21,6 +21,13 @@ export class AtomState<T = any> {
 }
 
 export const GlobalStore = new Map<string, Map<string, AtomState>>();
+export const GlobalLoggerWatcher = new Map<
+    string,
+    <T>(
+        marbleName: string,
+        selector?: ((value: T) => any) | undefined
+    ) => OperatorFunction<T, T>
+>();
 export const AtomInOut =
     (cacheKey: string) =>
     <T = any>(name: string) => {

@@ -3,7 +3,7 @@ import { RelationConfig } from "./config";
 import { Button, Select } from "antd";
 import { useAtomsCallback, useAtomsValue } from "@yhfu/re-gen-hooks";
 
-const AtomInOut = ReGen("CACHE_KEY", RelationConfig);
+const AtomInOut = ReGen("CACHE_KEY", RelationConfig, { logger: true });
 
 function App() {
     const {

@@ -122,7 +122,7 @@ const AtomInOut = ReGen( CacheKey, RelationConfig );
   会被替换为 `RelationConfig` 中的name值。
 
 ```typescript
-const AtomInOut = ReGen( CacheKey, RelationConfig ); // 可以写到组件外边，也可以写到组件内部，实际通过 CacheKey 做了缓存的处理
+const AtomInOut = ReGen( CacheKey, RelationConfig, { logger: { duration: 300 } } ); // 可以写到组件外边，也可以写到组件内部，实际通过 CacheKey 做了缓存的处理
 
 const {
 	area,

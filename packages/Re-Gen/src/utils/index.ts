@@ -18,10 +18,12 @@ import {
     CombineType,
     IConfigItem,
     IDistinct,
+    LoggerOption,
     PlainResult,
     ReturnResult,
 } from "../type";
 import { filter, isNil, not, compose } from "ramda";
+import { GlobalLoggerWatcher } from "../Atom";
 
 export const getDependNames = (item: IConfigItem) => item.depend?.names || [];
 export const defaultReduceFunction = (_: any, val: any) => val;
@@ -147,3 +149,10 @@ export const handleError =
                 return EMPTY;
             })
         );
+
+export const handleLogger = (
+    cacheKey: string,
+    name: string,
+    open?: LoggerOption
+): ((source: AnyObservable) => AnyObservable) =>
+    open ? GlobalLoggerWatcher.get(cacheKey)!(`${name}`) : identity;

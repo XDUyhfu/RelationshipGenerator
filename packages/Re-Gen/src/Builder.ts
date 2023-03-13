@@ -1,5 +1,5 @@
 import { identity, of, map, switchMap, scan } from "rxjs";
-import { AtomInOut, AtomState, GlobalStore } from "./Atom";
+import { AtomInOut, AtomState, GlobalStore, GlobalLoggerWatcher } from "./Atom";
 import {
     defaultReduceFunction,
     getDependNames,
@@ -10,10 +10,12 @@ import {
     handleCombine,
     handleUndefined,
     handleError,
+    handleLogger,
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { lt, cond, equals, forEach } from "ramda";
 import { ReGenOptions } from "./type";
+import { getGroup } from "rxjs-watcher";
 
 // 因为配置项的顺序可能在依赖项的前边，所以先将所有的单状态进行存储，然后再处理依赖关系
 const ConfigToAtomStore =
@@ -23,11 +25,26 @@ const ConfigToAtomStore =
             cond([
                 [
                     equals(false),
-                    () =>
+                    () => {
                         GlobalStore.get(cacheKey)!.set(
                             item.name,
                             new AtomState(item.init)
-                        ),
+                        );
+                        if (
+                            !GlobalLoggerWatcher.has(cacheKey) &&
+                            !!_options?.logger
+                        ) {
+                            GlobalLoggerWatcher.set(
+                                cacheKey,
+                                getGroup(
+                                    `${cacheKey} watcher group`,
+                                    typeof _options?.logger === "boolean"
+                                        ? 180
+                                        : _options.logger?.duration
+                                )
+                            );
+                        }
+                    },
                 ],
                 [
                     equals(true),
@@ -89,6 +106,11 @@ const HandDepend =
                                 handleDistinct(item.distinct ?? true),
                                 handleError(
                                     `捕获到 ${item.name} depend.scan 中报错`
+                                ),
+                                handleLogger(
+                                    cacheKey,
+                                    item.name,
+                                    _options?.logger
                                 )
                             )
                             .subscribe(atom.out$),
@@ -104,7 +126,12 @@ const HandDepend =
                                 ),
                                 handleUndefined(),
                                 handleDistinct(item.distinct ?? true),
-                                handleError("error")
+                                handleError("error"),
+                                handleLogger(
+                                    cacheKey,
+                                    item.name,
+                                    _options?.logger
+                                )
                             )
                             .subscribe(atom.out$),
                 ],

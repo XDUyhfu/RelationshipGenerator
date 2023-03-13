@@ -40,7 +40,7 @@ export type AnyPromise = Promise<any>;
 
 export interface ReGenOptions {
     // 是否开启logger
-    logger?: boolen;
-    //
-    filterNil?: boolean;
+    logger?: LoggerOption;
 }
+
+export type LoggerOption = boolean | { duration?: number };

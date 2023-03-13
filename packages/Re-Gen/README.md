@@ -122,7 +122,7 @@ const AtomInOut = ReGen( CacheKey, RelationConfig );
   会被替换为 `RelationConfig` 中的name值。
 
 ```typescript
-const AtomInOut = ReGen( CacheKey, RelationConfig ); // 可以写到组件外边，也可以写到组件内部，实际通过 CacheKey 做了缓存的处理
+const AtomInOut = ReGen( CacheKey, RelationConfig, { logger: { duration: 300 } } ); // 可以写到组件外边，也可以写到组件内部，实际通过 CacheKey 做了缓存的处理
 
 const {
 	area,
@@ -134,5 +134,21 @@ const {
 } = useAtomsCallback( AtomInOut, RelationConfig );
 
 ```
+
+### 可选配置项
+
+#### 开启日志
+
+日志服务使用的是 `rxjs-watcher` 的库。开启方法是传入第三项配置项 `logger: { duration?:number } | boolean`，其中 `duration`
+为可观察的持续时间。如需看到每个 Observable 的具体情况，请安装 `rxjs-watcher` 相关浏览器插件即可。
+
+```typescript
+ReGen( CacheKey, RelationConfig, { logger: { duration: 180 } } );
+```
+
+
+
+
+
 
 

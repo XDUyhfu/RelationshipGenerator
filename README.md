@@ -1,5 +1,7 @@
 # 基于rxjs的状态生成器
 
+![img.png](img.png)
+
 **NPM地址
 ** [@yhfu/re-gen](https://www.npmjs.com/package/@yhfu/re-gen)  [@yhfu/re-gen-hooks](https://www.npmjs.com/package/@yhfu/re-gen-hooks)
 

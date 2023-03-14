@@ -15,8 +15,8 @@ export class AtomState<T = any> {
 
     constructor(init: T) {
         this.in$ = new BehaviorSubject(init);
-        this.out$ = new BehaviorSubject(init);
         this.mid$ = new BehaviorSubject(init);
+        this.out$ = new BehaviorSubject(init);
     }
 }
 

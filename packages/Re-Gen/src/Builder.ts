@@ -8,7 +8,6 @@ import {
     handlePromise,
     handleResult,
     handleCombine,
-    handleUndefined,
     handleError,
     handleLogger,
 } from "./utils";
@@ -77,7 +76,7 @@ const HandDepend =
         forEach((item: IConfigItem) => {
             const atom = GlobalStore.get(cacheKey)!.get(item.name)!;
             const dependNames = getDependNames(item);
-            const dependAtomsIn$ = dependNames.map((name) => {
+            const dependAtomsOut$ = dependNames.map((name) => {
                 if (
                     GlobalStore.get(cacheKey)!.has(name) &&
                     item.name !== name
@@ -97,21 +96,25 @@ const HandDepend =
                     () =>
                         atom.mid$
                             .pipe(
+                                switchMap(handleResult),
                                 handleCombine(
                                     item.depend?.combineType || "any",
-                                    dependAtomsIn$
+                                    dependAtomsOut$
                                 ),
                                 map(item.depend?.handle || identity),
+                                switchMap(handleResult),
                                 handleError(
                                     `捕获到 ${item.name} depend.handle 中报错`
                                 ),
                                 scan(
-                                    item?.reduce || defaultReduceFunction,
-                                    item.init
+                                    item?.reduce?.handle ||
+                                        defaultReduceFunction,
+                                    item.reduce?.init
                                 ),
                                 switchMap(handleResult),
-                                handleDistinct(item.distinct ?? true),
                                 handleError(`捕获到 ${item.name} scan 中报错`),
+                                handleDistinct(item.distinct ?? true),
+
                                 handleLogger(
                                     cacheKey,
                                     item.name,
@@ -125,12 +128,13 @@ const HandDepend =
                     () =>
                         atom.mid$
                             .pipe(
-                                handleUndefined(),
-
+                                switchMap(handleResult),
                                 scan(
-                                    item?.reduce || defaultReduceFunction,
-                                    item.init
+                                    item?.reduce?.handle ||
+                                        defaultReduceFunction,
+                                    item.reduce?.init
                                 ),
+                                switchMap(handleResult),
                                 handleDistinct(item.distinct ?? true),
                                 handleError(`捕获到 ${item.name} scan 中报错`),
                                 handleLogger(
@@ -144,6 +148,14 @@ const HandDepend =
             ])(dependNames.length);
         })(RelationConfig);
 
+const HandleInitValue = (cacheKey: string) => (RelationConfig: IConfigItem[]) =>
+    forEach((item: IConfigItem) => {
+        if (item.init) {
+            const atom = GlobalStore.get(cacheKey)!.get(item.name)!;
+            atom.in$.next(item.init);
+        }
+    })(RelationConfig);
+
 const BuilderRelation = (
     cacheKey: string,
     RelationConfig: IConfigItem[],
@@ -152,7 +164,8 @@ const BuilderRelation = (
     of<IConfigItem[]>(RelationConfig).pipe(
         map(ConfigToAtomStore(cacheKey, options)),
         map(AtomHandle(cacheKey, options)),
-        map(HandDepend(cacheKey, options))
+        map(HandDepend(cacheKey, options)),
+        map(HandleInitValue(cacheKey))
     );
 
 export const ReGen = (

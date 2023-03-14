@@ -22,10 +22,13 @@ export type CombineType = "self" | "any" | "every";
 
 export interface IConfigItem {
     name: string;
-    init: Promise | Observable | PlainResult;
+    init?: Promise | Observable | PlainResult;
     handle?: (arg: any) => ReturnResult;
     distinct?: IDistinct;
-    reduce?: (pre: any, val: any) => any;
+    reduce?: {
+        handle: (pre: any, val: any) => any;
+        init: any;
+    };
     depend?: {
         names: string[];
         handle: (args: any) => ReturnResult;

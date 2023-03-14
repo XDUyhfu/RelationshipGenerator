@@ -48,11 +48,7 @@ export const removeUndefined = (value: any) =>
         : value;
 
 export const handleResult = (result: ReturnResult) =>
-    isPlainResult(result)
-        ? removeUndefined(result)
-            ? of(removeUndefined(result))
-            : EMPTY
-        : result;
+    isPlainResult(result) ? of(removeUndefined(result)) : result;
 
 export const handleObservable: () => (source: AnyObservable) => AnyObservable =
     () => (source) =>
@@ -98,7 +94,6 @@ export const handlePromise: () => (source: AnyObservable) => AnyObservable =
             });
         });
 
-// 该 operator 的前置 operator 需要将值处理为 普通类型
 export const handleUndefined: () => (source: AnyObservable) => AnyObservable =
     () => (source) =>
         new Observable((observer) => {

@@ -11,36 +11,27 @@ import {
     zipWith,
 } from "rxjs";
 import {
-    AnyArray,
     AnyBehaviorSubject,
     AnyObservable,
-    AnyPromise,
     CombineType,
     IConfigItem,
     IDistinct,
     LoggerOption,
-    PlainResult,
     ReturnResult,
 } from "../type";
 import { filter, isNil, not, compose } from "ramda";
 import { GlobalLoggerWatcher } from "../Atom";
+import {
+    isArray,
+    isObject,
+    isPlainResult,
+    isPromise,
+} from "@yhfu/re-gen-utils";
 
 export const getDependNames = (item: IConfigItem) => item.depend?.names || [];
 export const defaultReduceFunction = (_: any, val: any) => val;
 
 const removeObjectOrListUndefinedValue = filter(compose(not, isNil));
-
-const isPromise = (value: any): value is AnyPromise => value instanceof Promise;
-
-const isArray = (value: any): value is AnyArray => Array.isArray(value);
-const isObject = (value: any) =>
-    Object.prototype.toString.call(value) === "[object Object]" &&
-    !isObservable(value); // Observable 也是一个 Object 类型
-const isPlainResult = (result: ReturnResult): result is PlainResult =>
-    ["number", "boolean", "string", "undefined"].includes(typeof result) ||
-    isObject(result) ||
-    Array.isArray(result) ||
-    result === null;
 
 export const removeUndefined = (value: any) =>
     isObject(value) || isArray(value)

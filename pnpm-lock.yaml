@@ -79,8 +79,8 @@ importers:
       '@types/react': ^18.0.26
       '@types/react-dom': ^18.0.9
       '@vitejs/plugin-react-swc': ^3.0.0
-      '@yhfu/re-gen': workspace:^0.1.2
-      '@yhfu/re-gen-hooks': workspace:^0.1.2
+      '@yhfu/re-gen': workspace:*
+      '@yhfu/re-gen-hooks': workspace:*
       antd: ^5.1.5
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -209,12 +209,14 @@ importers:
   packages/Re-Gen:
     specifiers:
       '@types/ramda': ^0.28.20
+      '@yhfu/re-gen-utils': workspace:^0.2.0
       ramda: ^0.28.0
       rxjs: ^7.8.0
       rxjs-watcher: ^1.2.1
       typescript: ^4.9.3
       unbuild: ^1.1.1
     dependencies:
+      '@yhfu/re-gen-utils': link:../Re-Gen-Utils
       ramda: 0.28.0
       rxjs: 7.8.0
       rxjs-watcher: 1.2.1
@@ -228,7 +230,8 @@ importers:
       '@types/react': ^18.0.26
       '@types/react-dom': ^18.0.9
       '@vitejs/plugin-react-swc': ^3.0.0
-      '@yhfu/re-gen': workspace:^0.1.1
+      '@yhfu/re-gen': workspace:*
+      '@yhfu/re-gen-utils': workspace:^0.2.0
       react: ^18.2.0
       react-dom: ^18.2.0
       rxjs: ^7.8.0
@@ -238,6 +241,7 @@ importers:
       vite: ^4.0.0
     dependencies:
       '@yhfu/re-gen': link:../Re-Gen
+      '@yhfu/re-gen-utils': link:../Re-Gen-Utils
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       rxjs: 7.8.0
@@ -249,6 +253,21 @@ importers:
       typescript: 4.9.4
       unbuild: 1.1.1
       vite: 4.0.4
+
+  packages/Re-Gen-Utils:
+    specifiers:
+      '@yhfu/re-gen': workspace:*
+      rxjs: ^7.8.0
+      typescript: ^4.9.3
+      unbuild: ^1.1.1
+      vite: ^4.1.0
+    dependencies:
+      '@yhfu/re-gen': link:../Re-Gen
+      rxjs: 7.8.0
+    devDependencies:
+      typescript: 4.9.4
+      unbuild: 1.1.1
+      vite: 4.1.4
 
 packages:
 

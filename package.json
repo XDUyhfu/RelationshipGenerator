@@ -6,8 +6,10 @@
   "scripts": {
     "re-gen:build": "pnpm -F @yhfu/re-gen build",
     "re-gen-hooks:build": "pnpm -F @yhfu/re-gen-hooks build:hooks",
+    "re-gen-utils:build": "pnpm -F @yhfu/re-gen-utils build:utils",
     "re-gen:publish": "pnpm -F @yhfu/re-gen publish --no-git-checks",
-    "re-gen-hooks:publish": "pnpm -F @yhfu/re-gen-hooks publish --no-git-checks"
+    "re-gen-hooks:publish": "pnpm -F @yhfu/re-gen-hooks publish --no-git-checks",
+    "re-gen-utils:publish": "pnpm -F @yhfu/re-gen-utils publish --no-git-checks"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.2",

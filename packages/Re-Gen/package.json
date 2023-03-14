@@ -1,7 +1,7 @@
 {
   "name": "@yhfu/re-gen",
   "private": false,
-  "version": "0.1.9",
+  "version": "0.2.0",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -37,6 +37,7 @@
     "unbuild": "^1.1.1"
   },
   "dependencies": {
+    "@yhfu/re-gen-utils": "workspace:*",
     "ramda": "^0.28.0",
     "rxjs": "^7.8.0",
     "rxjs-watcher": "^1.2.1"

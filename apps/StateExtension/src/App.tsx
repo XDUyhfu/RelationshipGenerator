@@ -10,17 +10,17 @@ const key = "CACHE_KEY_STATE_EXTENSION";
 const AtomInOut = ReGen(key, Config, { logger: true });
 
 function App() {
-    const { result } = useAtomsValue(AtomInOut, Config as any);
+    const { result } = useAtomsValue(AtomInOut, Config);
     const { inputValueCallback, addCallback } = useAtomsCallback(
         AtomInOut,
-        Config as any
+        Config
     );
 
     return (
         <div>
             <div>{JSON.stringify(result)}</div>
             <div>{JSON.stringify(Array.isArray(result))}</div>
-            {result.map(
+            {result?.map(
                 (item: { value: string; id: string }, index: number) => (
                     <div key={item.id}>
                         <Input

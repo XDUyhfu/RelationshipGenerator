@@ -19,52 +19,52 @@ function uniqueFunc(arr: any, uniId: string) {
 export const ConfigItems: IConfigItem[] = [
     {
         name: "Items",
-        init: [],
         depend: {
             names: ["addItem", "name"],
-            handle: ([Items, addItem, name]): object => ({
-                item: addItem,
-                updateName: name,
-            }),
+            handle: ([Items, addItem, name]) => 
+                // if (name) {
+                 ({
+                    item: addItem,
+                    updateName: name,
+                })
+                // }
+            ,
         },
-        reduce: (
-            pre: IItem[],
-            val: { item: IItem; updateName: { id: string; value: string } }
-        ) => {
-            if (!pre) {
-                return val.item ? [val.item] : [];
-            }
-            if (val.updateName) {
-                const index = pre.findIndex(
-                    (item) => item.id === val.updateName.id
-                );
-                if (index >= 0) {
-                    pre[index].name = val?.updateName?.value;
+        reduce: {
+            handle: (
+                pre: IItem[],
+                val: { item: IItem; updateName: { id: string; value: string } }
+            ) => {
+                if (!pre) {
+                    return val.item ? [val.item] : [];
                 }
-            }
-            return uniqueFunc(
-                [...pre, val.item].filter((item) => item),
-                "id"
-            );
+                if (val.updateName) {
+                    const index = pre.findIndex(
+                        (item) => item.id === val.updateName.id
+                    );
+                    if (index >= 0) {
+                        pre[index].name = val?.updateName?.value;
+                    }
+                }
+                return uniqueFunc(
+                    [...pre, val.item].filter((item) => item),
+                    "id"
+                );
+            },
+            init: [],
         },
     },
     {
         name: "addItem",
-        init: {},
         handle(e) {
-            return e
-                ? {
-                      id:
-                          Date.now().toString() +
-                          Math.random().toString().slice(4),
-                      name: "",
-                  }
-                : undefined;
+            return {
+                id: Date.now().toString() + Math.random().toString().slice(4),
+                name: "",
+            };
         },
     },
     {
         name: "ItemNames",
-        init: [],
         depend: {
             names: ["Items"],
             handle: ([ItemNames, Items]: [
@@ -73,8 +73,5 @@ export const ConfigItems: IConfigItem[] = [
             ]) => Items.filter((item) => item).map((item) => item.name),
         },
     },
-    {
-        name: "name",
-        init: {},
-    },
+    { name: "name" },
 ];

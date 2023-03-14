@@ -4,12 +4,11 @@ import {
     defaultReduceFunction,
     getDependNames,
     handleDistinct,
-    handleObservable,
-    handlePromise,
     handleResult,
     handleCombine,
     handleError,
     handleLogger,
+    handleUndefined,
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { lt, cond, equals, forEach } from "ramda";
@@ -61,8 +60,8 @@ const AtomHandle =
             const atom = GlobalStore.get(cacheKey)!.get(item.name)!;
             atom.in$
                 .pipe(
-                    handlePromise(),
-                    handleObservable(),
+                    switchMap(handleResult),
+                    handleUndefined(),
                     map(item.handle || identity),
                     switchMap(handleResult),
                     handleError(`捕获到 ${item.name} handle 中报错`)
@@ -114,7 +113,6 @@ const HandDepend =
                                 switchMap(handleResult),
                                 handleError(`捕获到 ${item.name} scan 中报错`),
                                 handleDistinct(item.distinct ?? true),
-
                                 handleLogger(
                                     cacheKey,
                                     item.name,

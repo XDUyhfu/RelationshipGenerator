@@ -5,7 +5,7 @@ import { ConfigItems, IItem } from "./config";
 import { useAtomsValue, useAtomsCallback } from "@yhfu/re-gen-hooks";
 import { Button, Input, Select, Space } from "antd";
 
-const AtomInOut = ReGen("FORM_CACHE_KEY", ConfigItems);
+const AtomInOut = ReGen("FORM_CACHE_KEY", ConfigItems, { logger: true });
 
 const App: React.FC = () => {
     const { Items, ItemNames } = useAtomsValue(AtomInOut, ConfigItems);

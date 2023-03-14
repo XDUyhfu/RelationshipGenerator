@@ -30,7 +30,7 @@ export const Config: IConfigItem[] = [
     },
     {
         name: "result",
-        init: [],
+        init: of([{ key: 123 }]),
         depend: {
             names: ["add"],
             handle([result, add, inputValue]: [

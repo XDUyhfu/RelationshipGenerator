@@ -37,6 +37,7 @@ function App() {
                 onChange={(val) => {
                     areaCallback(Promise.resolve(val));
                 }}
+                value={area}
                 placeholder="area"
                 options={[
                     {

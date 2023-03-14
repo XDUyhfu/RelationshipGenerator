@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { Subject, Observable } from "rxjs";
 import { useObservable } from "rxjs-hooks";
 import type { IConfigItem } from "@yhfu/re-gen";
+import { isPlainResult } from "./utils";
 
 type IAtomInOut = <T = any>(
     valueName: string
@@ -31,7 +32,9 @@ export const useAtomsValue = (
             ...pre,
             [`${name}`]: useObservable(
                 () => inout$[`${name}Out$`],
-                getConfigItem(name)?.init
+                isPlainResult(getConfigItem(name)?.init)
+                    ? getConfigItem(name)?.init
+                    : null
             ),
         };
     }, {} as IResultAtomsValue);

@@ -48,7 +48,11 @@ export const removeUndefined = (value: any) =>
         : value;
 
 export const handleResult = (result: ReturnResult) =>
-    isPlainResult(result) ? of(removeUndefined(result)) : result;
+    isPlainResult(result)
+        ? removeUndefined(result)
+            ? of(removeUndefined(result))
+            : EMPTY
+        : result;
 
 export const handleObservable: () => (source: AnyObservable) => AnyObservable =
     () => (source) =>

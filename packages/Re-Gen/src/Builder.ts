@@ -17,7 +17,6 @@ import { lt, cond, equals, forEach } from "ramda";
 import { ReGenOptions } from "./type";
 import { getGroup } from "rxjs-watcher";
 
-// 因为配置项的顺序可能在依赖项的前边，所以先将所有的单状态进行存储，然后再处理依赖关系
 const ConfigToAtomStore =
     (cacheKey: string, _options?: ReGenOptions) =>
     (RelationConfig: IConfigItem[]) =>
@@ -63,11 +62,9 @@ const AtomHandle =
             const atom = GlobalStore.get(cacheKey)!.get(item.name)!;
             atom.in$
                 .pipe(
-                    // 执行 handle
                     handlePromise(),
                     handleObservable(),
-                    map(item.handle || identity), // 处理 result 为 ObservableInput
-                    // 使用 switchMap 的原因是因为一个 Observable 中可能会产生多个值，此时需要将之前的取消并切换为新值
+                    map(item.handle || identity),
                     switchMap(handleResult),
                     handleError(`捕获到 ${item.name} handle 中报错`)
                 )
@@ -80,9 +77,19 @@ const HandDepend =
         forEach((item: IConfigItem) => {
             const atom = GlobalStore.get(cacheKey)!.get(item.name)!;
             const dependNames = getDependNames(item);
-            const dependAtomsIn$ = dependNames.map(
-                (name) => GlobalStore.get(cacheKey)!.get(name)!.out$
-            );
+            const dependAtomsIn$ = dependNames.map((name) => {
+                if (
+                    GlobalStore.get(cacheKey)!.has(name) &&
+                    item.name !== name
+                ) {
+                    return GlobalStore.get(cacheKey)!.get(name)!.out$;
+                } else {
+                    if (item.name === name) {
+                        throw Error(`${item.name} 依赖了自己`);
+                    }
+                    throw Error(`${item.name} 的依赖项 ${name} 不存在`);
+                }
+            });
 
             cond([
                 [
@@ -104,9 +111,7 @@ const HandDepend =
                                 ),
                                 switchMap(handleResult),
                                 handleDistinct(item.distinct ?? true),
-                                handleError(
-                                    `捕获到 ${item.name} depend.scan 中报错`
-                                ),
+                                handleError(`捕获到 ${item.name} scan 中报错`),
                                 handleLogger(
                                     cacheKey,
                                     item.name,
@@ -120,13 +125,14 @@ const HandDepend =
                     () =>
                         atom.mid$
                             .pipe(
+                                handleUndefined(),
+
                                 scan(
                                     item?.reduce || defaultReduceFunction,
                                     item.init
                                 ),
-                                handleUndefined(),
                                 handleDistinct(item.distinct ?? true),
-                                handleError("error"),
+                                handleError(`捕获到 ${item.name} scan 中报错`),
                                 handleLogger(
                                     cacheKey,
                                     item.name,

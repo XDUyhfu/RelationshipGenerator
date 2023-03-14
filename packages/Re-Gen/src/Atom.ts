@@ -28,6 +28,7 @@ export const GlobalLoggerWatcher = new Map<
         selector?: ((value: T) => any) | undefined
     ) => OperatorFunction<T, T>
 >();
+
 export const AtomInOut =
     (cacheKey: string) =>
     <T = any>(name: string) => {

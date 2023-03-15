@@ -7,7 +7,10 @@ import {
 import { Config } from "./config";
 
 const key = "CACHE_KEY_STATE_EXTENSION";
-const AtomInOut = ReGen(key, Config, { logger: true });
+const AtomInOut = ReGen(key, Config, {
+    logger: true,
+    nil: true,
+});
 
 function App() {
     const { result } = useAtomsValue(AtomInOut, Config);

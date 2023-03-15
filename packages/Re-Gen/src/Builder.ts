@@ -9,6 +9,7 @@ import {
     handleError,
     handleLogger,
     handleUndefined,
+    transformNilOptionToBoolean,
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { lt, cond, equals, forEach } from "ramda";
@@ -61,8 +62,19 @@ const AtomHandle =
             atom.in$
                 .pipe(
                     switchMap(handleResult),
-                    handleUndefined(),
+                    handleUndefined(
+                        transformNilOptionToBoolean(
+                            "In",
+                            _options?.nil ?? "default"
+                        )
+                    ),
                     map(item.handle || identity),
+                    handleUndefined(
+                        transformNilOptionToBoolean(
+                            "HandleAfter",
+                            _options?.nil ?? "default"
+                        )
+                    ),
                     switchMap(handleResult),
                     handleError(`捕获到 ${item.name} handle 中报错`)
                 )
@@ -102,6 +114,12 @@ const HandDepend =
                                 ),
                                 map(item.depend?.handle || identity),
                                 switchMap(handleResult),
+                                handleUndefined(
+                                    transformNilOptionToBoolean(
+                                        "DependAfter",
+                                        _options?.nil ?? "default"
+                                    )
+                                ),
                                 handleError(
                                     `捕获到 ${item.name} depend.handle 中报错`
                                 ),
@@ -109,6 +127,12 @@ const HandDepend =
                                     item?.reduce?.handle ||
                                         defaultReduceFunction,
                                     item.reduce?.init
+                                ),
+                                handleUndefined(
+                                    transformNilOptionToBoolean(
+                                        "ScanAfter",
+                                        _options?.nil ?? "default"
+                                    )
                                 ),
                                 switchMap(handleResult),
                                 handleError(`捕获到 ${item.name} scan 中报错`),
@@ -132,6 +156,12 @@ const HandDepend =
                                         defaultReduceFunction,
                                     item.reduce?.init
                                 ),
+                                handleUndefined(
+                                    transformNilOptionToBoolean(
+                                        "ScanAfter",
+                                        _options?.nil ?? "default"
+                                    )
+                                ),
                                 switchMap(handleResult),
                                 handleDistinct(item.distinct ?? true),
                                 handleError(`捕获到 ${item.name} scan 中报错`),
@@ -146,14 +176,6 @@ const HandDepend =
             ])(dependNames.length);
         })(RelationConfig);
 
-const HandleInitValue = (cacheKey: string) => (RelationConfig: IConfigItem[]) =>
-    forEach((item: IConfigItem) => {
-        if (item.init) {
-            const atom = GlobalStore.get(cacheKey)!.get(item.name)!;
-            atom.in$.next(item.init);
-        }
-    })(RelationConfig);
-
 const BuilderRelation = (
     cacheKey: string,
     RelationConfig: IConfigItem[],
@@ -162,8 +184,7 @@ const BuilderRelation = (
     of<IConfigItem[]>(RelationConfig).pipe(
         map(ConfigToAtomStore(cacheKey, options)),
         map(AtomHandle(cacheKey, options)),
-        map(HandDepend(cacheKey, options)),
-        map(HandleInitValue(cacheKey))
+        map(HandDepend(cacheKey, options))
     );
 
 export const ReGen = (

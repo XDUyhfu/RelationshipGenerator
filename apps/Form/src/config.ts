@@ -21,14 +21,10 @@ export const ConfigItems: IConfigItem[] = [
         name: "Items",
         depend: {
             names: ["addItem", "name"],
-            handle: ([Items, addItem, name]) => 
-                // if (name) {
-                 ({
-                    item: addItem,
-                    updateName: name,
-                })
-                // }
-            ,
+            handle: ([Items, addItem, name]) => ({
+                item: addItem,
+                updateName: name,
+            }),
         },
         reduce: {
             handle: (

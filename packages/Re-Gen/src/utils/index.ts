@@ -1,6 +1,5 @@
 import {
     Observable,
-    isObservable,
     of,
     distinctUntilChanged,
     identity,
@@ -17,16 +16,13 @@ import {
     IConfigItem,
     IDistinct,
     LoggerOption,
+    NilOption,
     ReturnResult,
+    TransformStage,
 } from "../type";
 import { filter, isNil, not, compose } from "ramda";
 import { GlobalLoggerWatcher } from "../Atom";
-import {
-    isArray,
-    isObject,
-    isPlainResult,
-    isPromise,
-} from "@yhfu/re-gen-utils";
+import { isArray, isObject, isPlainResult } from "@yhfu/re-gen-utils";
 
 export const getDependNames = (item: IConfigItem) => item.depend?.names || [];
 export const defaultReduceFunction = (_: any, val: any) => val;
@@ -41,55 +37,13 @@ export const removeUndefined = (value: any) =>
 export const handleResult = (result: ReturnResult) =>
     isPlainResult(result) ? of(removeUndefined(result)) : result;
 
-export const handleObservable: () => (source: AnyObservable) => AnyObservable =
-    () => (source) =>
-        new Observable((observer) => {
-            source.subscribe({
-                next: (value) => {
-                    if (isObservable(value)) {
-                        value.subscribe((val) => {
-                            observer.next(val);
-                        });
-                    } else {
-                        observer.next(value);
-                    }
-                },
-                error: (err) => observer.error(err),
-                complete: () => observer.complete(),
-            });
-        });
-
-export const handlePromise: () => (source: AnyObservable) => AnyObservable =
-    () => (source) =>
-        new Observable((observer) => {
-            source.subscribe({
-                next: (value) => {
-                    // 如果 value 是 Promise 对象，则转换成 Observable 并订阅
-                    if (isPromise(value)) {
-                        value
-                            .then((val) => {
-                                observer.next(val);
-                            })
-                            .catch((err) => {
-                                throw new Error(
-                                    "init value Promise error",
-                                    err
-                                );
-                            });
-                    } else {
-                        observer.next(value);
-                    }
-                },
-                error: (err) => observer.error(err),
-                complete: () => observer.complete(),
-            });
-        });
-
-export const handleUndefined: () => (source: AnyObservable) => AnyObservable =
-    () => (source) =>
-        new Observable((observer) => {
-            source.subscribe({
-                next: (value) => {
+export const handleUndefined: (
+    open: boolean
+) => (source: AnyObservable) => AnyObservable = (open) => (source) =>
+    new Observable((observer) => {
+        source.subscribe({
+            next: (value) => {
+                if (open) {
                     if (isObject(value) || isArray(value)) {
                         observer.next(removeObjectOrListUndefinedValue(value));
                     } else {
@@ -97,11 +51,14 @@ export const handleUndefined: () => (source: AnyObservable) => AnyObservable =
                             observer.next(value);
                         }
                     }
-                },
-                error: (err) => observer.error(err),
-                complete: () => observer.complete(),
-            });
+                } else {
+                    observer.next(value);
+                }
+            },
+            error: (err) => observer.error(err),
+            complete: () => observer.complete(),
         });
+    });
 
 export const handleDistinct =
     (param: IDistinct<any, any>): ((source: AnyObservable) => AnyObservable) =>
@@ -146,3 +103,29 @@ export const handleLogger = (
     open?: LoggerOption
 ): ((source: AnyObservable) => AnyObservable) =>
     open ? GlobalLoggerWatcher.get(cacheKey)!(`${name}`) : identity;
+
+export const transformNilOptionToBoolean: (
+    stage: TransformStage,
+    nil: NilOption
+) => boolean = (stage, nil) => {
+    if (typeof nil === "boolean") {
+        if (!nil) {
+            return false;
+        } else {
+            if (stage === "In") {
+                return true;
+            }
+            return false;
+        }
+    } else {
+        if (nil === "all") {
+            return true;
+        } else {
+            if (stage === "In") {
+                return true;
+            }
+            return false;
+        }
+    }
+    return false;
+};

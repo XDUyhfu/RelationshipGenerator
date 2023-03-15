@@ -1,4 +1,10 @@
-import { BehaviorSubject, Observable, OperatorFunction } from "rxjs";
+import {
+    BehaviorSubject,
+    Observable,
+    OperatorFunction,
+    ReplaySubject,
+} from "rxjs";
+
 import { AnyBehaviorSubject } from "./type";
 
 /**
@@ -10,12 +16,12 @@ import { AnyBehaviorSubject } from "./type";
 
 export class AtomState<T = any> {
     in$: BehaviorSubject<T>;
-    mid$: BehaviorSubject<T>;
+    mid$: ReplaySubject<T>;
     out$: BehaviorSubject<T>;
 
     constructor(init: T) {
         this.in$ = new BehaviorSubject(init);
-        this.mid$ = new BehaviorSubject(init);
+        this.mid$ = new ReplaySubject(0);
         this.out$ = new BehaviorSubject(init);
     }
 }

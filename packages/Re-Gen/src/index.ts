@@ -9,8 +9,10 @@ export type {
     CombineType,
     ReGenOptions,
     LoggerOption,
+    NilOption,
     AnyObservable,
     AnyBehaviorSubject,
     AnyArray,
     AnyPromise,
+    TransformStage,
 } from "./type";

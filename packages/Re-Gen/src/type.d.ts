@@ -29,7 +29,7 @@ export interface IConfigItem {
         handle: (pre: any, val: any) => any;
         init: any;
     };
-    nil?: boolean;
+    filterNil?: boolean;
     depend?: {
         names: string[];
         handle: (args: any) => ReturnResult;
@@ -56,6 +56,7 @@ export interface ReGenOptions {
      * default: 开启对输入值的空值过滤
      */
     filterNil?: FilterNilOption;
+    distinct?: boolean;
 }
 
 export type LoggerOption = boolean | { duration?: number };

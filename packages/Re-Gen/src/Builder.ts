@@ -9,7 +9,8 @@ import {
     handleError,
     handleLogger,
     handleUndefined,
-    transformNilOptionToBoolean,
+    transformFilterNilOptionToBoolean,
+    transformDistinctOptionToBoolean,
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { lt, cond, equals, forEach } from "ramda";
@@ -68,18 +69,18 @@ const AtomHandle =
                 .pipe(
                     switchMap(handleResult),
                     handleUndefined(
-                        transformNilOptionToBoolean(
+                        transformFilterNilOptionToBoolean(
                             "In",
-                            item.nil
+                            item.filterNil
                                 ? true
                                 : _options?.filterNil ?? NilOptionDefaultValue
                         )
                     ),
                     map(item.handle || identity),
                     handleUndefined(
-                        transformNilOptionToBoolean(
+                        transformFilterNilOptionToBoolean(
                             "HandleAfter",
-                            item.nil
+                            item.filterNil
                                 ? true
                                 : _options?.filterNil ?? NilOptionDefaultValue
                         )
@@ -125,9 +126,9 @@ const HandDepend =
                                 map(item.depend?.handle || identity),
                                 switchMap(handleResult),
                                 handleUndefined(
-                                    transformNilOptionToBoolean(
+                                    transformFilterNilOptionToBoolean(
                                         "DependAfter",
-                                        item.nil
+                                        item.filterNil
                                             ? true
                                             : _options?.filterNil ??
                                                   NilOptionDefaultValue
@@ -142,9 +143,9 @@ const HandDepend =
                                     item.reduce?.init
                                 ),
                                 handleUndefined(
-                                    transformNilOptionToBoolean(
+                                    transformFilterNilOptionToBoolean(
                                         "ScanAfter",
-                                        item.nil
+                                        item.filterNil
                                             ? true
                                             : _options?.filterNil ??
                                                   NilOptionDefaultValue
@@ -152,7 +153,12 @@ const HandDepend =
                                 ),
                                 switchMap(handleResult),
                                 handleError(`捕获到 ${item.name} scan 中报错`),
-                                handleDistinct(item.distinct ?? true),
+                                handleDistinct(
+                                    transformDistinctOptionToBoolean(
+                                        _options?.distinct,
+                                        item.distinct
+                                    )
+                                ),
                                 handleLogger(
                                     cacheKey,
                                     item.name,
@@ -173,16 +179,21 @@ const HandDepend =
                                     item.reduce?.init
                                 ),
                                 handleUndefined(
-                                    transformNilOptionToBoolean(
+                                    transformFilterNilOptionToBoolean(
                                         "ScanAfter",
-                                        item.nil
+                                        item.filterNil
                                             ? true
                                             : _options?.filterNil ??
                                                   NilOptionDefaultValue
                                     )
                                 ),
                                 switchMap(handleResult),
-                                handleDistinct(item.distinct ?? true),
+                                handleDistinct(
+                                    transformDistinctOptionToBoolean(
+                                        _options?.distinct,
+                                        item.distinct
+                                    )
+                                ),
                                 handleError(`捕获到 ${item.name} scan 中报错`),
                                 handleLogger(
                                     cacheKey,

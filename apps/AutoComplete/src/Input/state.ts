@@ -16,7 +16,7 @@ export const ConfigList: IConfigItem[] = [
         depend: {
             names: ["inputValue"],
             handle: ([list, inputValue]) => [
-                { value: inputValue },
+                // { value: inputValue },
                 { value: 1 },
                 { value: 2 },
                 { value: 3 },

@@ -148,6 +148,33 @@ const {
 ReGen( CacheKey, RelationConfig, { logger: { duration: 180 } } );
 ```
 
+#### 空值处理
+
+```typescript
+// 全局配置
+// 默认值 false
+// NilOption: boolean | 'default' | 'all'
+// true 和 'default' 策略行为一致，过滤 输入阶段的 nil 值
+// false 关闭过滤 nil 值
+// all 全局过滤 nil 值
+ReGen( CacheKey, RelationConfig, { nil: false } );
+
+// 局部配置
+// 单独对 area 进行空值
+// 优先级高于全局配置
+[{
+	name: "area",
+	handle( val ) {
+		return [val];
+	},
+	nil: boolean
+}]
+```
+
+`combineLatestWith` 的处理方式是当所有的 `Observable` 都有值的时候，才会通过第一个值
+`withLastestFrom` 的处理方式是其他的 `Observable` 有值之后，再次触发上游 `Observable` 才会通过第一个值
+所以在过滤的时候如果不熟悉上边的条件，建议每个配置项都写上 `init` 并且关闭全局 `nil` 过滤，或者在每项中进行控制
+
 
 
 

@@ -55,11 +55,11 @@ export interface ReGenOptions {
      * all: 表示开启所有阶段的空值过滤
      * default: 开启对输入值的空值过滤
      */
-    nil?: NilOption;
+    filterNil?: FilterNilOption;
 }
 
 export type LoggerOption = boolean | { duration?: number };
-export type NilOption = boolean | "all" | "default";
+export type FilterNilOption = boolean | "all" | "default";
 
 // -- in -- handle -- depend -- scan -- out --
 export type TransformStage =

@@ -9,7 +9,7 @@ export type {
     CombineType,
     ReGenOptions,
     LoggerOption,
-    NilOption,
+    FilterNilOption,
     AnyObservable,
     AnyBehaviorSubject,
     AnyArray,

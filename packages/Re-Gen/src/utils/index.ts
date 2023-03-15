@@ -16,7 +16,7 @@ import {
     IConfigItem,
     IDistinct,
     LoggerOption,
-    NilOption,
+    FilterNilOption,
     ReturnResult,
     TransformStage,
 } from "../type";
@@ -106,7 +106,7 @@ export const handleLogger = (
 
 export const transformNilOptionToBoolean: (
     stage: TransformStage,
-    nil: NilOption
+    nil: FilterNilOption
 ) => boolean = (stage, nil) => {
     if (typeof nil === "boolean") {
         if (!nil) {

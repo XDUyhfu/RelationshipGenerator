@@ -1,11 +1,11 @@
-import { ReGen } from "../../../packages/Re-Gen/src/index";
+import { FilterNilOption, ReGen } from "../../../packages/Re-Gen/src/index";
 import { RelationConfig } from "./config";
 import { Button, Select } from "antd";
 import { useAtomsCallback, useAtomsValue } from "@yhfu/re-gen-hooks";
 
 const AtomInOut = ReGen("CACHE_KEY", RelationConfig, {
     logger: true,
-    nil: "default",
+    filterNil: "default",
 });
 
 function App() {

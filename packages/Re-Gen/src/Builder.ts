@@ -72,7 +72,7 @@ const AtomHandle =
                             "In",
                             item.nil
                                 ? true
-                                : _options?.nil ?? NilOptionDefaultValue
+                                : _options?.filterNil ?? NilOptionDefaultValue
                         )
                     ),
                     map(item.handle || identity),
@@ -81,7 +81,7 @@ const AtomHandle =
                             "HandleAfter",
                             item.nil
                                 ? true
-                                : _options?.nil ?? NilOptionDefaultValue
+                                : _options?.filterNil ?? NilOptionDefaultValue
                         )
                     ),
                     switchMap(handleResult),
@@ -129,7 +129,7 @@ const HandDepend =
                                         "DependAfter",
                                         item.nil
                                             ? true
-                                            : _options?.nil ??
+                                            : _options?.filterNil ??
                                                   NilOptionDefaultValue
                                     )
                                 ),
@@ -146,7 +146,7 @@ const HandDepend =
                                         "ScanAfter",
                                         item.nil
                                             ? true
-                                            : _options?.nil ??
+                                            : _options?.filterNil ??
                                                   NilOptionDefaultValue
                                     )
                                 ),
@@ -177,7 +177,7 @@ const HandDepend =
                                         "ScanAfter",
                                         item.nil
                                             ? true
-                                            : _options?.nil ??
+                                            : _options?.filterNil ??
                                                   NilOptionDefaultValue
                                     )
                                 ),

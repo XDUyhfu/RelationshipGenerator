@@ -29,6 +29,7 @@ export interface IConfigItem {
         handle: (pre: any, val: any) => any;
         init: any;
     };
+    nil?: boolean;
     depend?: {
         names: string[];
         handle: (args: any) => ReturnResult;

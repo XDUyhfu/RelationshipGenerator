@@ -15,6 +15,11 @@ import type { IConfigItem } from "./type";
 import { lt, cond, equals, forEach } from "ramda";
 import { ReGenOptions } from "./type";
 import { getGroup } from "rxjs-watcher";
+import {
+    CombineTypeDefaultValue,
+    NilOptionDefaultValue,
+    RxjsWaterDurationDefaultValue,
+} from "./config";
 
 const ConfigToAtomStore =
     (cacheKey: string, _options?: ReGenOptions) =>
@@ -37,7 +42,7 @@ const ConfigToAtomStore =
                                 getGroup(
                                     `${cacheKey} watcher group`,
                                     typeof _options?.logger === "boolean"
-                                        ? 180
+                                        ? RxjsWaterDurationDefaultValue
                                         : _options.logger?.duration
                                 )
                             );
@@ -65,14 +70,18 @@ const AtomHandle =
                     handleUndefined(
                         transformNilOptionToBoolean(
                             "In",
-                            _options?.nil ?? "default"
+                            item.nil
+                                ? true
+                                : _options?.nil ?? NilOptionDefaultValue
                         )
                     ),
                     map(item.handle || identity),
                     handleUndefined(
                         transformNilOptionToBoolean(
                             "HandleAfter",
-                            _options?.nil ?? "default"
+                            item.nil
+                                ? true
+                                : _options?.nil ?? NilOptionDefaultValue
                         )
                     ),
                     switchMap(handleResult),
@@ -109,7 +118,8 @@ const HandDepend =
                             .pipe(
                                 switchMap(handleResult),
                                 handleCombine(
-                                    item.depend?.combineType || "any",
+                                    item.depend?.combineType ||
+                                        CombineTypeDefaultValue,
                                     dependAtomsOut$
                                 ),
                                 map(item.depend?.handle || identity),
@@ -117,7 +127,10 @@ const HandDepend =
                                 handleUndefined(
                                     transformNilOptionToBoolean(
                                         "DependAfter",
-                                        _options?.nil ?? "default"
+                                        item.nil
+                                            ? true
+                                            : _options?.nil ??
+                                                  NilOptionDefaultValue
                                     )
                                 ),
                                 handleError(
@@ -131,7 +144,10 @@ const HandDepend =
                                 handleUndefined(
                                     transformNilOptionToBoolean(
                                         "ScanAfter",
-                                        _options?.nil ?? "default"
+                                        item.nil
+                                            ? true
+                                            : _options?.nil ??
+                                                  NilOptionDefaultValue
                                     )
                                 ),
                                 switchMap(handleResult),
@@ -159,7 +175,10 @@ const HandDepend =
                                 handleUndefined(
                                     transformNilOptionToBoolean(
                                         "ScanAfter",
-                                        _options?.nil ?? "default"
+                                        item.nil
+                                            ? true
+                                            : _options?.nil ??
+                                                  NilOptionDefaultValue
                                     )
                                 ),
                                 switchMap(handleResult),

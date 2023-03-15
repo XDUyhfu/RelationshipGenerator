@@ -48,12 +48,15 @@ redux 派发 action ）。
 如果使用该工具，需要提供一组配置项，单个配置项的格式如下所示，具体使用方式可以参照 apps/demo/src/config.ts 的配置文件。
 
 ```typescript
-export interface IConfigItem {
+interface IConfigItem {
 	name: string;
-	init: Promise | Observable | PlainResult;
+	init?: Promise | Observable | PlainResult;
 	handle?: ( arg: any ) => ReturnResult;
 	distinct?: IDistinct;
-	reduce?: ( pre: any, val: any ) => any;
+	reduce?: {
+		handle: ( pre: any, val: any ) => any; init: any;
+	};
+	filterNil?: boolean;
 	depend?: {
 		names: string[]; handle: ( args: any ) => ReturnResult; combineType?: CombineType;
 	};
@@ -137,7 +140,7 @@ const {
 
 ```
 
-### 可选配置项
+### 全局可选配置项
 
 #### 开启日志
 
@@ -175,6 +178,22 @@ ReGen( CacheKey, RelationConfig, { nil: false } );
 `withLastestFrom` 的处理方式是其他的 `Observable` 有值之后，再次触发上游 `Observable` 才会通过第一个值
 所以在过滤的时候如果不熟悉上边的条件，建议每个配置项都写上 `init` 并且关闭全局 `nil` 过滤，或者在每项中进行控制
 
+#### 重复值过滤
 
+默认全局开启，使用 `ramda` 中的 `equals` 进行对比
+
+```typescript
+ReGen( CacheKey, RelationConfig, { distinct: true } );
+```
+
+也可以在单独的配置项中进行设置，类型如下所示
+
+```typescript
+type IDistinct<T, K> =
+	| boolean
+	| {
+	comparator: ( previous: K, current: K ) => boolean; keySelector?: ( value: T ) => K;
+};
+```
 
 

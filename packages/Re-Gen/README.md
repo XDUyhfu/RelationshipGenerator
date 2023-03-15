@@ -46,12 +46,15 @@ redux 派发 action ）。
 如果使用该工具，需要提供一组配置项，单个配置项的格式如下所示，具体使用方式可以参照 apps/demo/src/config.ts 的配置文件。
 
 ```typescript
-export interface IConfigItem {
+interface IConfigItem {
 	name: string;
-	init: Promise | Observable | PlainResult;
+	init?: Promise | Observable | PlainResult;
 	handle?: ( arg: any ) => ReturnResult;
 	distinct?: IDistinct;
-	reduce?: ( pre: any, val: any ) => any;
+	reduce?: {
+		handle: ( pre: any, val: any ) => any; init: any;
+	};
+	filterNil?: boolean;
 	depend?: {
 		names: string[]; handle: ( args: any ) => ReturnResult; combineType?: CombineType;
 	};
@@ -135,7 +138,7 @@ const {
 
 ```
 
-### 可选配置项
+### 全局可选配置项
 
 #### 开启日志
 
@@ -146,9 +149,49 @@ const {
 ReGen( CacheKey, RelationConfig, { logger: { duration: 180 } } );
 ```
 
+#### 空值处理
 
+```typescript
+// 全局配置
+// 默认值 false
+// NilOption: boolean | 'default' | 'all'
+// true 和 'default' 策略行为一致，过滤 输入阶段的 nil 值
+// false 关闭过滤 nil 值
+// all 全局过滤 nil 值
+ReGen( CacheKey, RelationConfig, { nil: false } );
 
+// 局部配置
+// 单独对 area 进行空值
+// 优先级高于全局配置
+[{
+	name: "area",
+	handle( val ) {
+		return [val];
+	},
+	nil: boolean
+}]
+```
 
+`combineLatestWith` 的处理方式是当所有的 `Observable` 都有值的时候，才会通过第一个值
+`withLastestFrom` 的处理方式是其他的 `Observable` 有值之后，再次触发上游 `Observable` 才会通过第一个值
+所以在过滤的时候如果不熟悉上边的条件，建议每个配置项都写上 `init` 并且关闭全局 `nil` 过滤，或者在每项中进行控制
 
+#### 重复值过滤
+
+默认全局开启，使用 `ramda` 中的 `equals` 进行对比
+
+```typescript
+ReGen( CacheKey, RelationConfig, { distinct: true } );
+```
+
+也可以在单独的配置项中进行设置，类型如下所示
+
+```typescript
+type IDistinct<T, K> =
+	| boolean
+	| {
+	comparator: ( previous: K, current: K ) => boolean; keySelector?: ( value: T ) => K;
+};
+```
 
 

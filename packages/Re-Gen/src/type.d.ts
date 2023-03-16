@@ -20,9 +20,13 @@ export type IDistinct<T, K> =
 
 export type CombineType = "self" | "any" | "every";
 
+export type InitFunctionType = (
+    ...args: any[]
+) => Promise | Observable | PlainResult;
+
 export interface IConfigItem {
     name: string;
-    init?: Promise | Observable | PlainResult;
+    init?: Promise | Observable | PlainResult | InitFunctionType;
     handle?: (arg: any) => ReturnResult;
     distinct?: IDistinct;
     reduce?: {
@@ -73,9 +77,9 @@ export type TransformStage =
     | "DependBefore"
     | "Depend"
     | "DependAfter"
-    | "ScanBefore"
-    | "Scan"
-    | "ScanAfter"
+    | "ReduceBefore"
+    | "Reduce"
+    | "ReduceAfter"
     | "OutBefore"
     | "Out"
     | "OutAfter";

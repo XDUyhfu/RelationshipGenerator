@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { Subject, Observable } from "rxjs";
+import { Subject, Observable, filter, isObservable } from "rxjs";
 import { useObservable } from "rxjs-hooks";
 import type { IConfigItem } from "@yhfu/re-gen";
 import { isPlainResult } from "@yhfu/re-gen-utils";
@@ -28,10 +28,14 @@ export const useAtomsValue = (
         RelationConfig.filter((item) => item.name === name)[0];
     const AtomsValue: IResultAtomsValue = names.reduce((pre, name) => {
         const inout$ = AtomInOut(name);
+
         return {
             ...pre,
             [`${name}`]: useObservable(
-                () => inout$[`${name}Out$`],
+                () =>
+                    inout$[`${name}Out$`].pipe(
+                        filter((item) => !isObservable(item))
+                    ),
                 isPlainResult(getConfigItem(name)?.init)
                     ? getConfigItem(name)?.init
                     : null

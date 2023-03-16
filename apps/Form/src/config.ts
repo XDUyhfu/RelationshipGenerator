@@ -67,11 +67,11 @@ export const ConfigItems: IConfigItem[] = [
             handle: ([ItemNames, Items]: [
                 ItemName: string[],
                 Items: IItem[]
-            ]) => Items.filter((item) => item).map((item) => item.name),
+            ]) => {
+                console.log(Items);
+                return Items.map((item) => item.name);
+            },
         },
     },
-    {
-        name: "name",
-        filterNil: true,
-    },
+    { name: "name" },
 ];

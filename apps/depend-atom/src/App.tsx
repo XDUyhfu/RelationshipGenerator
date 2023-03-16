@@ -10,13 +10,9 @@ import {
     SecondConfig,
 } from "./config";
 
-const first = ReGen(FirstCacheKey, FirstConfig, {
-    logger: true,
-    filterNil: "all",
+const first = ReGen(FirstCacheKey, FirstConfig, {logger: true, // filterNil: "all",
 });
-const second = ReGen(SecondCacheKey, SecondConfig, {
-    logger: true,
-    filterNil: "all",
+const second = ReGen(SecondCacheKey, SecondConfig, {logger: true, // filterNil: "all",
 });
 
 function App() {
@@ -30,7 +26,7 @@ function App() {
         <div>
             first: {JSON.stringify(atom)}
             <br />
-            {/*second: {JSON.stringify(value)}*/}
+            second: {JSON.stringify(value)}
             <br />
             <br />
             <button onClick={atomCallback}>input first</button>

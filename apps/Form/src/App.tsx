@@ -5,7 +5,7 @@ import { ConfigItems, IItem } from "./config";
 import { useAtomsValue, useAtomsCallback } from "@yhfu/re-gen-hooks";
 import { Button, Input, Select, Space } from "antd";
 
-const AtomInOut = ReGen("FORM_CACHE_KEY", ConfigItems, {logger: true,});
+const AtomInOut = ReGen("FORM_CACHE_KEY", ConfigItems, { logger: true });
 
 const App: React.FC = () => {
     const { Items, ItemNames } = useAtomsValue(AtomInOut, ConfigItems);
@@ -27,6 +27,7 @@ const App: React.FC = () => {
             {Items?.filter((val: any) => val).map((item: IItem) => (
                 <Space style={{ marginTop: 10 }} key={item?.id}>
                     <Input
+                        key={item?.id}
                         style={{ width: 160 }}
                         onChange={(value) => {
                             nameCallback({
@@ -37,9 +38,18 @@ const App: React.FC = () => {
                         value={item?.name}
                         placeholder="name"
                     />
-                    <Input style={{ width: 160 }} placeholder="init" />
-                    <Input style={{ width: 160 }} placeholder="function" />
+                    <Input
+                        key={item?.id}
+                        style={{ width: 160 }}
+                        placeholder="init"
+                    />
+                    <Input
+                        key={item?.id}
+                        style={{ width: 160 }}
+                        placeholder="function"
+                    />
                     <Select
+                        key={item?.id}
                         mode="multiple"
                         style={{ width: 160 }}
                         maxTagCount={1}
@@ -50,7 +60,11 @@ const App: React.FC = () => {
                             value: inner,
                         }))}
                     />
-                    <Input style={{ width: 160 }} placeholder="function" />
+                    <Input
+                        key={item?.id}
+                        style={{ width: 160 }}
+                        placeholder="function"
+                    />
                 </Space>
             ))}
         </div>

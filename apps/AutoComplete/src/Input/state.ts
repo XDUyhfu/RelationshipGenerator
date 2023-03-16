@@ -1,4 +1,5 @@
 import type { IConfigItem } from "../../../../packages/Re-Gen/src/index";
+import { BehaviorSubject, of } from "rxjs";
 
 export const ConfigList: IConfigItem[] = [
     {
@@ -12,7 +13,7 @@ export const ConfigList: IConfigItem[] = [
     },
     {
         name: "list",
-        init: [],
+        init: new BehaviorSubject([]),
         depend: {
             names: ["inputValue"],
             handle: ([list, inputValue]) => [

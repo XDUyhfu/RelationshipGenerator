@@ -15,4 +15,5 @@ export type {
     AnyArray,
     AnyPromise,
     TransformStage,
+    InitFunctionType,
 } from "./type";

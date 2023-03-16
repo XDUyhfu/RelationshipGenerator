@@ -7,9 +7,7 @@ import {
 import { Config } from "./config";
 
 const key = "CACHE_KEY_STATE_EXTENSION";
-const AtomInOut = ReGen(key, Config, {
-    logger: true,
-    filterNil: true,
+const AtomInOut = ReGen(key, Config, {logger: true, // filterNil: true,
 });
 
 function App() {

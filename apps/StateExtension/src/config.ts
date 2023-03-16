@@ -21,6 +21,7 @@ export const Config: IConfigItem[] = [
     {
         name: "inputValue",
         handle: (val) => of(val),
+        distinct: false,
         depend: {
             names: ["add"],
             handle([inputValue, add]) {
@@ -31,6 +32,7 @@ export const Config: IConfigItem[] = [
     {
         name: "result",
         init: of([{ key: 123 }]),
+        distinct: false,
         depend: {
             names: ["add"],
             handle([result, add, inputValue]: [

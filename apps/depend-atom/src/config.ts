@@ -2,7 +2,6 @@ import {
     IConfigItem,
     GetAtomObservables,
 } from "../../../packages/Re-Gen/src/index";
-import { BehaviorSubject } from "rxjs";
 
 export const FirstCacheKey = "FirstCacheKey";
 export const SecondCacheKey = "SecondCacheKey";
@@ -10,13 +9,12 @@ export const SecondCacheKey = "SecondCacheKey";
 export const FirstConfig: IConfigItem[] = [
     {
         name: "atom",
+        init: { clientX: 0 },
         handle(v) {
-            return v.clientX;
+            return v?.clientX;
         },
     },
 ];
-
-const sub = new BehaviorSubject(123);
 
 export const SecondConfig: IConfigItem[] = [
     {

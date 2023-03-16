@@ -1,1 +1,7 @@
-export { isPromise, isArray, isObject, isPlainResult } from "./utils";
+export {
+    isPromise,
+    isArray,
+    isObject,
+    isPlainResult,
+    isPlainObject,
+} from "./utils";

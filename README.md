@@ -2,90 +2,59 @@
 
 ![img.png](img.png)
 
-**NPM地址
-** [@yhfu/re-gen](https://www.npmjs.com/package/@yhfu/re-gen)  [@yhfu/re-gen-hooks](https://www.npmjs.com/package/@yhfu/re-gen-hooks)
+**NPM地址** [@yhfu/re-gen](https://www.npmjs.com/package/@yhfu/re-gen)  [@yhfu/re-gen-hooks](https://www.npmjs.com/package/@yhfu/re-gen-hooks)
 
 > demo地址: https://stackblitz.com/edit/react-ts-wv4a9d?file=App.tsx,config.ts,index.html
 
-> 此库不定时更新
-
-✨🌟✨🌟✨🌟 ***依然存在很多问题，但是会尽快解决他们*** 🌟✨🌟✨🌟✨
+> 🚀 此库功能基本完备，测试demo均通过，可放心使用
 
 ## 为什么会有该库
 
->
-有个简单的想法，就是将状态处理和组件UI分开进行管理。为了实现这个想法，目前就是将状态和其处理的函数通过对象数组的方式进行声明 (
-符合SOLID原则) 。有了对象数组之后，就需要有一个程序能够解析并运行它们。为此，通过使用 RxJS 并通过组合操作符的形式进行开发，因此就诞生了这个小工具。
+> 💡 最初的想法是想实现一个状态和UI分离的开发方式，能够开发一个工具对复杂的状态进行构建
+> 
+> 💡 之后探索了一下 RxJS 的开发模式，发现我想做的工具其实就是使用 RxJS 开发的一个较为通用的开发模式 
+> 
+> 💡 同时也想探索一种 RxJS in React 的实现方案 
 
+![流程图.jpg](%E6%B5%81%E7%A8%8B%E5%9B%BE.jpg)
+ 
 ## 什么场景适合使用？
 
 > 它可以应用到平时开发中的任何场景，只是不同场景的接入成本不同。
 
-说明：配置对象中的一些专有的配置项（reduce，distinct）是针对专门的场景使用的，场景大致可以分为如下几类：
-
-- 每个 state 对应 UI 中的一个组件，此时就可以将其做成一个受控组件
-- 当前 state 是通过其他的 state 生成的，也就是不使用 change 回调函数对其进行状态更改，该类状态又可以分为两种情况
-
-  (1) 计算结果和上一次计算结果没有关系，此时直接返回计算结果即可
-
-  (2) 计算结果和上一次计算结果需要进行 reduce ，此时就需要配置 reduce 选项
-
-- 相邻两次 state 相同，是否需要过滤，默认进行过滤，也可以配置 distinct 为 false 不进行过滤
+## Demo 说明
 
 ### apps/FormFilter
 
-这是一个实际的demo，你会发现在这种场景下工具使用起来会非常的丝滑，因为这个工具的诞生就是为了这种场景的需求。它主要以多个不同的field之间进行联动，其次就是比较关键的地方在于它们的数据源都来自组件，包括
-change click 等进行驱动，这也是RxJS能适用的原因之一。
+这是一个实际的 demo，你会发现在这种场景下工具使用起来会非常的丝滑，因为这个工具的诞生就是为了这种场景的需求。它主要以多个不同的 field 之间进行联动，其次就是比较关键的地方在于它们的数据源都来自组件，包括
+change click 等进行驱动，这也是 RxJS 能适用的原因之一。
 
 ### app/Form
 
-这是一个非常规的demo，主要展示的是一个数据是通过其他数据源驱动更新自身（reduce）的一个场景。因为 RxJS
-自身的原因，并不能很好地区分到底是哪个依赖产生了变化，所以需要写一些功能性（例如去重）之类的代码，或者是引入新的变量来标识具体是哪个变量发生了变化（类似于
+这是一个非常规的demo，主要展示的是一个数据是通过其他数据源驱动更新自身（reduce）的一个场景。因为 RxJS 自身的原因，并不能很好地区分到底是哪个依赖产生了变化，所以需要写一些功能性（ 例如去重 ）之类的代码，或者是引入新的变量来标识具体是哪个变量发生了变化（ 类似于
 redux 派发 action ）。
 
-### 接入方式
+## 接入方式
 
 如果使用该工具，需要提供一组配置项，单个配置项的格式如下所示，具体使用方式可以参照 apps/demo/src/config.ts 的配置文件。
 
 ```typescript
 interface IConfigItem {
-	name: string;
-	init?: Promise | Observable | PlainResult;
-	handle?: ( arg: any ) => ReturnResult;
-	distinct?: IDistinct;
-	reduce?: {
-		handle: ( pre: any, val: any ) => any; init: any;
-	};
-	filterNil?: boolean;
-	depend?: {
-		names: string[]; handle: ( args: any ) => ReturnResult; combineType?: CombineType;
-	};
+  name: string;
+  init?: Promise | Observable | PlainResult | InitFunctionType;
+  handle?: (arg: any) => ReturnResult;
+  distinct?: IDistinct;
+  reduce?: {
+    handle: (pre: any, val: any) => any;
+    init: any;
+  };
+  filterNil?: FilterNilOption;
+  depend?: {
+    names: string[];
+    handle: (args: any) => ReturnResult;
+    combineType?: CombineType;
+  };
 }
-
-
-type PlainResult =
-	Record<string, any>
-	| number
-	| string
-	| boolean
-	| undefined
-	| null;
-type RxResult = ObservableInput<any>;
-
-type ReturnResult =
-	PlainResult
-	| RxResult;
-
-type IDistinct<T, K> =
-	boolean
-	| {
-	comparator: ( previous: K, current: K ) => boolean, keySelector?: ( value: T ) => K
-}
-
-export type CombineType =
-	"self"
-	| "any"
-	| "every";
 ```
 
 ### 具体使用方法
@@ -95,19 +64,73 @@ export type CombineType =
 - 创建配置项列表
 
 ```typescript
-export const RelationConfig: IConfigItem[] = [{
-	name: "area",
-	handle( val ) {
-		return [val];
-	}
-}, {
-	name: "region",
-	handle: async ( val: string[] ) => {
-		return val?.filter( Boolean );
-	}
-}];
 // 处理函数支持 async/await 以及返回 Observable 的形式
 // 如果你熟悉 RxJS 的话，那将会有很好的体验
+
+export const RelationConfig: IConfigItem[] = [
+  {
+    name: "area",
+    handle(val) {
+      return of(val);
+    },
+  },
+  {
+    name: "region",
+    handle: (val: string[] = []) =>
+        from(val).pipe(
+              filter(Boolean),
+              map((item) => item?.toLocaleUpperCase()),
+              toArray()
+        ),
+  },
+  {
+    name: "showRegion",
+    init: false,
+    depend: {
+      names: ["area"],
+      handle([show, area]: [show: boolean, area: string]) {
+        if (area === "CN") {
+          return true;
+        }
+        return false;
+      },
+    },
+  },
+  {
+    name: "testMoreDepend",
+    init: "",
+    depend: {
+      names: ["showRegion", "RegionList"],
+      handle: async ([testMoreDepend, showRegion, RegionList]: [
+        testMoreDepend: string[],
+        showRegion: boolean,
+        RegionList: string[]
+      ]) => JSON.stringify(showRegion) + JSON.stringify(RegionList?.length),
+    },
+  },
+  {
+    name: "testMoreMoreDepend",
+    init: "",
+    depend: {
+      names: ["testMoreDepend"],
+      handle: async ([testMoreMoreDepend, testMoreDepend]: [
+        testMoreMoreDepend: string,
+        testMoreDepend: string
+      ]) => {
+        if (
+			testMoreDepend === "true4" && testMoreMoreDepend !== "out"
+        ) {
+          return "full";
+        } else {
+          if (testMoreMoreDepend === "out") {
+            return "out";
+          }
+          return "unfull";
+        }
+      },
+    },
+  },
+];
 ```
 
 - 通过包导出的 `ReGen` 方法获取 `AtomInOut` 方法
@@ -133,22 +156,22 @@ const {
 	area,
 	region
 } = useAtomsValue( AtomInOut, RelationConfig );
+
 const {
 	areaCallback,
 	regionCallback
 } = useAtomsCallback( AtomInOut, RelationConfig );
-
 ```
 
 ### 全局可选配置项
 
-#### 开启日志
+#### 调试日志
 
 日志服务使用的是 `rxjs-watcher` 的库。开启方法是传入第三项配置项 `logger: { duration?:number } | boolean`，其中 `duration`
 为可观察的持续时间。如需看到每个 Observable 的具体情况，请安装 `rxjs-watcher` 相关浏览器插件即可。
 
 ```typescript
-ReGen( CacheKey, RelationConfig, { logger: { duration: 180 } } );
+ReGen( CacheKey, RelationConfig, { logger: { duration: 180 } } )
 ```
 
 #### 空值处理
@@ -156,11 +179,10 @@ ReGen( CacheKey, RelationConfig, { logger: { duration: 180 } } );
 ```typescript
 // 全局配置
 // 默认值 false
-// NilOption: boolean | 'default' | 'all'
-// true 和 'default' 策略行为一致，过滤 输入阶段的 nil 值
-// false 关闭过滤 nil 值
-// all 全局过滤 nil 值
-ReGen( CacheKey, RelationConfig, { nil: false } );
+// type FilterNilOption = "All" | "Default" | "In" | "HandleAfter" | "DependAfter" | "Out"
+// All 表示全局开启过滤  Default 表示默认策略（全部关闭） "In" | "HandleAfter" | "DependAfter" | "Out" 表示不同的阶段进行空值处理
+
+ReGen( CacheKey, RelationConfig, { nil: 'Default' } );
 
 // 局部配置
 // 单独对 area 进行空值
@@ -170,13 +192,15 @@ ReGen( CacheKey, RelationConfig, { nil: false } );
 	handle( val ) {
 		return [val];
 	},
-	nil: boolean
+    filterNil: FilterNilOption
 }]
 ```
 
-`combineLatestWith` 的处理方式是当所有的 `Observable` 都有值的时候，才会通过第一个值
-`withLastestFrom` 的处理方式是其他的 `Observable` 有值之后，再次触发上游 `Observable` 才会通过第一个值
-所以在过滤的时候如果不熟悉上边的条件，建议每个配置项都写上 `init` 并且关闭全局 `nil` 过滤，或者在每项中进行控制
+> `combineLatestWith` 的处理方式是当所有的 `Observable` 都有值的时候，才会通过第一个值
+> 
+> `withLastestFrom` 的处理方式是其他的 `Observable` 有值之后，再次触发上游 `Observable` 才会通过第一个值
+> 
+> 所以在过滤的时候如果不熟悉上边的条件，建议每个配置项都写上 `init` 并且不对 `filterNil` 进行设置
 
 #### 重复值过滤
 

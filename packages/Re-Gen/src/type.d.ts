@@ -53,11 +53,7 @@ export interface ReGenOptions {
     logger?: LoggerOption;
 
     /**
-     * 默认为 default 配置
-     * true: 表示 default 策略
-     * false: 表示关闭所有的空值过滤
-     * all: 表示开启所有阶段的空值过滤
-     * default: 开启对输入值的空值过滤
+     * 默认为 Default 配置
      */
     filterNil?: FilterNilOption;
     distinct?: boolean;

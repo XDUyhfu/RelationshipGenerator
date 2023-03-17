@@ -1,4 +1,4 @@
-# 基于rxjs的状态生成器
+# 基于 RxJS 的状态生成器
 
 ![img.png](img.png)
 

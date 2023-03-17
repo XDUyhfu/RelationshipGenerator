@@ -5,10 +5,17 @@ import {
     FilterNilOption,
     ReturnResult,
     TransformStage,
+    ReGenOptions,
 } from "./type";
 import { isObject, isPlainResult } from "@yhfu/re-gen-utils";
-import { DistinctDefaultValue, NilOptionDefaultValue } from "./config";
+import {
+    DistinctDefaultValue,
+    NilOptionDefaultValue,
+    RxjsWaterDurationDefaultValue,
+} from "./config";
 import { forEach, isEmpty, isNil } from "ramda";
+import { GlobalLoggerWatcher } from "./Atom";
+import { getGroup } from "rxjs-watcher";
 
 export const getDependNames = (item: IConfigItem) => item.depend?.names || [];
 export const defaultReduceFunction = (_: any, val: any) => val;
@@ -75,3 +82,20 @@ export const DependencyDetection = () => (RelationConfig: IConfigItem[]) =>
             }
         });
     })(RelationConfig);
+
+export const OpenLogger =
+    (cacheKey: string, _options?: ReGenOptions) =>
+    (RelationConfig: IConfigItem[]) => {
+        if (!GlobalLoggerWatcher.has(cacheKey) && !!_options?.logger) {
+            GlobalLoggerWatcher.set(
+                cacheKey,
+                getGroup(
+                    `${cacheKey} Watcher Group`,
+                    typeof _options?.logger === "boolean"
+                        ? RxjsWaterDurationDefaultValue
+                        : _options.logger?.duration
+                )
+            );
+        }
+        return RelationConfig;
+    };

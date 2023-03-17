@@ -1,5 +1,5 @@
 import { identity, of, map, switchMap, scan } from "rxjs";
-import { AtomInOut, AtomState, GlobalStore, GlobalLoggerWatcher } from "./Atom";
+import { AtomInOut, AtomState, GlobalStore } from "./Atom";
 import {
     defaultReduceFunction,
     getDependNames,
@@ -8,15 +8,13 @@ import {
     transformDistinctOptionToBoolean,
     JudgeRepetition,
     DependencyDetection,
+    OpenLogger,
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
 import { ReGenOptions } from "./type";
-import { getGroup } from "rxjs-watcher";
-import {
-    CombineTypeDefaultValue,
-    RxjsWaterDurationDefaultValue,
-} from "./config";
+
+import { CombineTypeDefaultValue } from "./config";
 import {
     handleCombine,
     handleDistinct,
@@ -35,17 +33,6 @@ const ConfigToAtomStore =
                     typeof item.init === "function" ? item.init() : item.init
                 )
             );
-            if (!GlobalLoggerWatcher.has(cacheKey) && !!_options?.logger) {
-                GlobalLoggerWatcher.set(
-                    cacheKey,
-                    getGroup(
-                        `${cacheKey} Watcher Group`,
-                        typeof _options?.logger === "boolean"
-                            ? RxjsWaterDurationDefaultValue
-                            : _options.logger?.duration
-                    )
-                );
-            }
         })(RelationConfig);
 
 // 处理自身的 handler
@@ -134,6 +121,7 @@ const BuilderRelation = (
     options?: ReGenOptions
 ) =>
     of<IConfigItem[]>(RelationConfig).pipe(
+        map(OpenLogger(cacheKey, options)),
         map(JudgeRepetition()),
         map(DependencyDetection()),
         map(ConfigToAtomStore(cacheKey, options)),

@@ -33,7 +33,7 @@ export interface IConfigItem {
         handle: (pre: any, val: any) => any;
         init: any;
     };
-    filterNil?: boolean;
+    filterNil?: FilterNilOption;
     depend?: {
         names: string[];
         handle: (args: any) => ReturnResult;
@@ -64,9 +64,15 @@ export interface ReGenOptions {
 }
 
 export type LoggerOption = boolean | { duration?: number };
-export type FilterNilOption = boolean | "all" | "default";
+export type FilterNilOption =
+    | "All"
+    | "Default"
+    | "In"
+    | "HandleAfter"
+    | "DependAfter"
+    | "Out";
 
-// -- in -- handle -- depend -- scan -- out --
+// -- in -- handle -- depend -- reduce -- out --
 export type TransformStage =
     | "InBefore"
     | "In"

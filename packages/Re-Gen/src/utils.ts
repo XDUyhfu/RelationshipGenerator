@@ -10,7 +10,9 @@ import {
 import { isObject, isPlainResult } from "@yhfu/re-gen-utils";
 import {
     DistinctDefaultValue,
-    NilOptionDefaultValue,
+    FilterNilDefaultValue,
+    FilterNilOptionDefaultValue,
+    FilterNilStageDefaultValue,
     RxjsWaterDurationDefaultValue,
 } from "./config";
 import { forEach, isEmpty, isNil } from "ramda";
@@ -25,27 +27,20 @@ export const transformResultToObservable = (result: ReturnResult) =>
 
 export const transformFilterNilOptionToBoolean: (
     stage: TransformStage,
-    globalNil: FilterNilOption,
-    itemNil: boolean | undefined
-) => boolean = (stage, global, item) => {
-    // 这个策略要重新定义一下
-    if (typeof item === "boolean") {
-        return item;
-    }
-    if (global === false) {
-        return false;
-    }
-    if (global === "all") {
+    nilOption: FilterNilOption
+) => boolean = (stage, nilOption) => {
+    if (stage === nilOption) {
         return true;
     }
-
-    if (stage === "In" && global === "default") {
-        return NilOptionDefaultValue;
-    }
-    if (stage === "In" && global === true) {
+    if (nilOption === "All") {
         return true;
     }
-
+    if (
+        nilOption === FilterNilOptionDefaultValue &&
+        FilterNilStageDefaultValue.includes(stage)
+    ) {
+        return FilterNilDefaultValue;
+    }
     return false;
 };
 

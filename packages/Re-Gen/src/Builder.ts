@@ -14,7 +14,7 @@ import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
 import { ReGenOptions } from "./type";
 
-import { CombineTypeDefaultValue } from "./config";
+import { CombineTypeDefaultValue, FilterNilOptionDefaultValue } from "./config";
 import {
     handleCombine,
     handleDistinct,
@@ -47,19 +47,21 @@ const AtomHandle =
                     handleUndefined(
                         transformFilterNilOptionToBoolean(
                             "In",
-                            _options?.filterNil ?? "default",
-                            item.filterNil
+                            item.filterNil ??
+                                _options?.filterNil ??
+                                FilterNilOptionDefaultValue
                         )
                     ),
                     map(item.handle || identity),
+                    switchMap(transformResultToObservable),
                     handleUndefined(
                         transformFilterNilOptionToBoolean(
                             "HandleAfter",
-                            _options?.filterNil ?? "default",
-                            item.filterNil
+                            item.filterNil ??
+                                _options?.filterNil ??
+                                FilterNilOptionDefaultValue
                         )
                     ),
-                    switchMap(transformResultToObservable),
                     handleError(`捕获到 ${item.name} handle 中报错`)
                 )
                 .subscribe(atom.mid$);
@@ -86,8 +88,9 @@ const HandDepend =
                     handleUndefined(
                         transformFilterNilOptionToBoolean(
                             "DependAfter",
-                            _options?.filterNil ?? "default",
-                            item.filterNil
+                            item.filterNil ??
+                                _options?.filterNil ??
+                                FilterNilOptionDefaultValue
                         )
                     ),
                     handleError(`捕获到 ${item.name} depend.handle 中报错`),
@@ -95,19 +98,20 @@ const HandDepend =
                         item?.reduce?.handle || defaultReduceFunction,
                         item.reduce?.init
                     ),
-                    handleUndefined(
-                        transformFilterNilOptionToBoolean(
-                            "ReduceAfter",
-                            _options?.filterNil ?? "default",
-                            item.filterNil
-                        )
-                    ),
                     switchMap(transformResultToObservable),
                     handleError(`捕获到 ${item.name} reduce 中报错`),
                     handleDistinct(
                         transformDistinctOptionToBoolean(
                             _options?.distinct,
                             item.distinct
+                        )
+                    ),
+                    handleUndefined(
+                        transformFilterNilOptionToBoolean(
+                            "Out",
+                            item.filterNil ??
+                                _options?.filterNil ??
+                                FilterNilOptionDefaultValue
                         )
                     ),
                     handleLogger(cacheKey, item.name, _options?.logger)

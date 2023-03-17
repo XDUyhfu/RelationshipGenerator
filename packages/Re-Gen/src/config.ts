@@ -1,6 +1,8 @@
-import { CombineType } from "./type";
+import { CombineType, FilterNilOption, TransformStage } from "./type";
 
-export const NilOptionDefaultValue = false;
+export const FilterNilOptionDefaultValue: FilterNilOption = "Default";
+export const FilterNilDefaultValue = false;
+export const FilterNilStageDefaultValue: TransformStage[] = ["In", "Out"];
 export const RxjsWaterDurationDefaultValue = 200;
 export const CombineTypeDefaultValue: CombineType = "any";
 export const DistinctDefaultValue = true;

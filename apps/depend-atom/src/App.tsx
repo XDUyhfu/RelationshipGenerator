@@ -10,9 +10,13 @@ import {
     SecondConfig,
 } from "./config";
 
-const first = ReGen(FirstCacheKey, FirstConfig, {logger: true, // filterNil: "all",
+const first = ReGen(FirstCacheKey, FirstConfig, {
+    logger: true,
+    filterNil: "In",
 });
-const second = ReGen(SecondCacheKey, SecondConfig, {logger: true, // filterNil: "all",
+const second = ReGen(SecondCacheKey, SecondConfig, {
+    logger: true,
+    filterNil: "In",
 });
 
 function App() {

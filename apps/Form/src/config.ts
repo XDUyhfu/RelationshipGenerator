@@ -52,7 +52,7 @@ export const ConfigItems: IConfigItem[] = [
     },
     {
         name: "addItem",
-        filterNil: true,
+        filterNil: "In",
         handle(e) {
             return {
                 id: Date.now().toString() + Math.random().toString().slice(4),

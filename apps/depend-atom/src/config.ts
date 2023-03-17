@@ -9,9 +9,9 @@ export const SecondCacheKey = "SecondCacheKey";
 export const FirstConfig: IConfigItem[] = [
     {
         name: "atom",
-        init: { clientX: 0 },
+        // init: { clientX: 0 },
         handle(v) {
-            return v?.clientX;
+            return v.clientX;
         },
     },
 ];

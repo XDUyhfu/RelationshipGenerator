@@ -1,20 +1,20 @@
 // 这是一个测试的配置文件，主要用来测试生成的代码
 // 主要用来制定数据之间的关系
 
-import { IConfigItem, GetAtomValues } from "../../../packages/Re-Gen/src/index";
+import { IConfigItem } from "../../../packages/Re-Gen/src/index";
 import { filter, from, map, of, toArray } from "rxjs";
 
 export const RelationConfig: IConfigItem[] = [
     {
         name: "area",
-        init: of("CN"),
+        // init: of("CN"),
         handle(val) {
             return of(val);
         },
     },
     {
         name: "region",
-        init: [],
+        // init: [],
         handle: (val: string[] = []) =>
             from(val).pipe(
                 filter(Boolean),

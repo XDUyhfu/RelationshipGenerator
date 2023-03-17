@@ -24,15 +24,19 @@ export const handleUndefined: (
     open ? source.pipe(filter(Boolean)) : source;
 
 export const handleDistinct =
-    (param: IDistinct<any, any>): ((source: AnyObservable) => AnyObservable) =>
+    (
+        distinct: IDistinct<any, any>
+    ): ((source: AnyObservable) => AnyObservable) =>
     (source) => {
-        if (typeof param === "boolean") {
-            return param ? source.pipe(distinctUntilChanged(equals)) : source;
+        if (typeof distinct === "boolean") {
+            return distinct
+                ? source.pipe(distinctUntilChanged(equals))
+                : source;
         } else {
             return source.pipe(
                 distinctUntilChanged(
-                    param.comparator,
-                    param.keySelector || identity
+                    distinct.comparator,
+                    distinct.keySelector || identity
                 )
             );
         }

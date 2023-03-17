@@ -1,3 +1,4 @@
+import { clone } from "ramda";
 import { IConfigItem } from "../../../packages/Re-Gen/src/index";
 
 export interface IItem {
@@ -9,10 +10,10 @@ export interface IItem {
     dependHandle?: (val: string[]) => any;
 }
 
-function uniqueFunc(arr: any, uniId: string) {
+function uniqueFunc(arr: any, val: string) {
     const res = new Map();
     return arr.filter(
-        (item: any) => !res.has(item[uniId]) && res.set(item[uniId], 1)
+        (item: any) => !res.has(item[val]) && res.set(item[val], 1)
     );
 }
 
@@ -31,19 +32,18 @@ export const ConfigItems: IConfigItem[] = [
                 pre: IItem[],
                 val: { item: IItem; updateName: { id: string; value: string } }
             ) => {
-                if (!pre) {
-                    return val.item ? [val.item] : [];
-                }
-                if (val.updateName) {
-                    const index = pre.findIndex(
-                        (item) => item.id === val.updateName.id
-                    );
-                    if (index >= 0) {
-                        pre[index].name = val?.updateName?.value;
-                    }
-                }
+                const index = pre?.findIndex(
+                    (item) => item?.id === val.updateName?.id
+                );
+
+                const newPre = clone(pre);
+                newPre[index] = {
+                    ...newPre[index],
+                    name: val?.updateName?.value,
+                };
+
                 return uniqueFunc(
-                    [...pre, val.item].filter((item) => item),
+                    [...newPre, val.item].filter((item) => item),
                     "id"
                 );
             },
@@ -67,10 +67,7 @@ export const ConfigItems: IConfigItem[] = [
             handle: ([ItemNames, Items]: [
                 ItemName: string[],
                 Items: IItem[]
-            ]) => {
-                console.log(Items);
-                return Items.map((item) => item.name);
-            },
+            ]) => Items?.map((item) => item?.name),
         },
     },
     { name: "name" },

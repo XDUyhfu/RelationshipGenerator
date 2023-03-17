@@ -87,7 +87,6 @@ const HandDepend =
             const dependAtomsOut$ = dependNames.map(
                 (name) => GlobalStore.get(cacheKey)!.get(name)!.out$
             );
-
             atom.mid$
                 .pipe(
                     switchMap(transformResultToObservable),

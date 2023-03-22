@@ -1,11 +1,17 @@
 import { TabsProps } from "antd";
 import dayjs from "dayjs";
-import type { IConfigItem } from "../../../packages/Re-Gen/src/index";
+import type {
+    IConfigItem,
+    AnyBehaviorSubject,
+} from "../../../packages/Re-Gen/src/index";
+import { SetAtomValue } from "../../../packages/Re-Gen/src/index";
 
 export const DateFormat = "YYYY-MM-DD HH:mm:ss";
 export const DayFormat = "YYYY-MM-DD";
 
-export const RelationConfig: IConfigItem[] = [
+export const RelationConfig: (param: {
+    atoms: AnyBehaviorSubject;
+}) => IConfigItem[] = ({ atoms }) => [
     {
         name: "domain",
         init: [],
@@ -16,10 +22,13 @@ export const RelationConfig: IConfigItem[] = [
     },
     {
         name: "time",
-        init: [
-            dayjs().subtract(600, "s").format(DateFormat),
-            dayjs(Date.now()).format(DateFormat),
-        ],
+        init: [],
+        handle: (value) => {
+            if (value.length) {
+                SetAtomValue(atoms, "shortcut")(0);
+            }
+            return value;
+        },
         depend: {
             names: ["shortcut"],
             handle([time, shortcut]: [time: string[], shortcut: string]) {

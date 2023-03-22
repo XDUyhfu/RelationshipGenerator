@@ -1,5 +1,5 @@
-import { identity, of, map, switchMap, scan } from "rxjs";
-import { AtomInOut, AtomState, GlobalStore } from "./Atom";
+import { identity, of, map, switchMap, scan, BehaviorSubject } from "rxjs";
+import { AtomInOut, AtomState, GlobalAtomsIn, GlobalStore } from "./Atom";
 import {
     defaultReduceFunction,
     getDependNames,
@@ -9,8 +9,9 @@ import {
     JudgeRepetition,
     DependencyDetection,
     OpenLogger,
+    SetParam,
 } from "./utils";
-import type { IConfigItem } from "./type";
+import type { IConfigItem, ReGenParam } from "./type";
 import { forEach } from "ramda";
 import { ReGenOptions } from "./type";
 
@@ -128,20 +129,27 @@ const BuilderRelation = (
         map(JudgeRepetition()),
         map(DependencyDetection()),
         map(ConfigToAtomStore(cacheKey)),
+        map(SetParam(cacheKey)),
         map(AtomHandle(cacheKey, options)),
         map(HandDepend(cacheKey, options))
     );
 
 export const ReGen = (
     cacheKey: string,
-    RelationConfig: IConfigItem[],
+    RelationConfig: IConfigItem[] | ((param: ReGenParam) => IConfigItem[]),
     options?: ReGenOptions
 ) => {
     if (GlobalStore.has(cacheKey)) {
         return AtomInOut(cacheKey);
     }
-
+    GlobalAtomsIn.set(cacheKey, new BehaviorSubject({}));
     GlobalStore.set(cacheKey, new Map<string, AtomState>());
-    BuilderRelation(cacheKey, RelationConfig, options).subscribe();
+    BuilderRelation(
+        cacheKey,
+        Array.isArray(RelationConfig)
+            ? RelationConfig
+            : RelationConfig({ atoms: GlobalAtomsIn.get(cacheKey)! }),
+        options
+    ).subscribe();
     return AtomInOut(cacheKey);
 };

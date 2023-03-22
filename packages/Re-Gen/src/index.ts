@@ -17,3 +17,4 @@ export type {
     TransformStage,
     InitFunctionType,
 } from "./type";
+export { SetAtomValue } from "./utils";

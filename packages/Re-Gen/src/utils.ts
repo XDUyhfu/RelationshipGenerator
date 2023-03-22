@@ -6,6 +6,7 @@ import {
     ReturnResult,
     TransformStage,
     ReGenOptions,
+    AnyBehaviorSubject,
 } from "./type";
 import { isObject, isPlainResult } from "@yhfu/re-gen-utils";
 import {
@@ -15,8 +16,8 @@ import {
     FilterNilStageDefaultValue,
     RxjsWaterDurationDefaultValue,
 } from "./config";
-import { forEach, isEmpty, isNil } from "ramda";
-import { GlobalLoggerWatcher } from "./Atom";
+import { curry, forEach, isEmpty, isNil } from "ramda";
+import { GetAtomIn, GlobalAtomsIn, GlobalLoggerWatcher } from "./Atom";
 import { getGroup } from "rxjs-watcher";
 
 export const getDependNames = (item: IConfigItem) => item.depend?.names || [];
@@ -100,3 +101,14 @@ export const OpenLogger =
         }
         return RelationConfig;
     };
+
+export const SetParam =
+    (cacheKey: string) => (RelationConfig: IConfigItem[]) => {
+        GlobalAtomsIn.get(cacheKey)!.next(GetAtomIn(cacheKey));
+        return RelationConfig;
+    };
+
+export const SetAtomValue = curry(
+    (atoms: AnyBehaviorSubject, name: string, value: any) =>
+        atoms.getValue()?.[name]?.next(value)
+);

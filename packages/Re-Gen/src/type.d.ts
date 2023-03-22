@@ -45,6 +45,10 @@ export type AnyObservable = Observable<any>;
 export type AnyBehaviorSubject = BehaviorSubject<any>;
 export type AnyArray = Array<any>;
 export type AnyPromise = Promise<any>;
+export type AtomsType = Record<string, AnyBehaviorSubject>;
+export type ReGenParam = {
+    atoms: AnyBehaviorSubject;
+};
 
 export interface ReGenOptions {
     /**

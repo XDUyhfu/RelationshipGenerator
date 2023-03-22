@@ -37,7 +37,9 @@ function App() {
         tab,
         areaShow,
         confirm,
-    } = useAtomsValue(AtomInOut, RelationConfig);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+    } = useAtomsValue( AtomInOut, RelationConfig( { atoms: {} } ));
 
     const {
         domainCallback,
@@ -48,7 +50,9 @@ function App() {
         aggregationCallback,
         tabCallback,
         confirmCallback,
-    } = useAtomsCallback(AtomInOut, RelationConfig);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+    } = useAtomsCallback( AtomInOut, RelationConfig( { atoms: {} } ));
 
     return (
         <>
@@ -69,7 +73,7 @@ function App() {
                     value={time as string[]}
                     change={(_, time: string[]) => {
                         timeCallback(time);
-                        shortcutCallback(0);
+                        // shortcutCallback(0);
                     }}
                     range={SelectableTimeRange as string[]}
                 />

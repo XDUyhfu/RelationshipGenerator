@@ -4,7 +4,7 @@ import {
     OperatorFunction,
     ReplaySubject,
 } from "rxjs";
-import { AnyBehaviorSubject } from "./type";
+import { AnyBehaviorSubject, AtomsType } from "./type";
 
 export class AtomState<T = any> {
     in$: BehaviorSubject<T>;
@@ -26,6 +26,7 @@ export const GlobalLoggerWatcher = new Map<
         selector?: ((value: T) => any) | undefined
     ) => OperatorFunction<T, T>
 >();
+export const GlobalAtomsIn = new Map<string, AnyBehaviorSubject>();
 
 export const AtomInOut =
     (cacheKey: string) =>
@@ -51,14 +52,28 @@ export const GetAtomValues = (cacheKey: string): Record<string, any> => {
     });
     return result;
 };
+
 export const GetAtomObservables = (
     cacheKey: string
 ): Record<string, AnyBehaviorSubject> => {
-    const result = {} as Record<string, AnyBehaviorSubject>;
+    const result = {} as AtomsType;
     if (GlobalStore.has(cacheKey)) {
         const entries = GlobalStore.get(cacheKey)!.entries();
         for (const [key, value] of entries) {
             result[key] = value.out$;
+        }
+    }
+    return result;
+};
+
+export const GetAtomIn = (
+    cacheKey: string
+): Record<string, AnyBehaviorSubject> => {
+    const result = {} as AtomsType;
+    if (GlobalStore.has(cacheKey)) {
+        const entries = GlobalStore.get(cacheKey)!.entries();
+        for (const [key, value] of entries) {
+            result[key] = value.in$;
         }
     }
     return result;

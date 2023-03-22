@@ -24,8 +24,7 @@ import {
 } from "./operator";
 
 const ConfigToAtomStore =
-    (cacheKey: string, _options?: ReGenOptions) =>
-    (RelationConfig: IConfigItem[]) =>
+    (cacheKey: string) => (RelationConfig: IConfigItem[]) =>
         forEach((item: IConfigItem) => {
             GlobalStore.get(cacheKey)!.set(
                 item.name,
@@ -128,7 +127,7 @@ const BuilderRelation = (
         map(OpenLogger(cacheKey, options)),
         map(JudgeRepetition()),
         map(DependencyDetection()),
-        map(ConfigToAtomStore(cacheKey, options)),
+        map(ConfigToAtomStore(cacheKey)),
         map(AtomHandle(cacheKey, options)),
         map(HandDepend(cacheKey, options))
     );

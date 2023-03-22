@@ -1,4 +1,4 @@
-import { of } from "rxjs";
+import { ObservableInput, of } from "rxjs";
 import {
     IConfigItem,
     IDistinct,
@@ -22,8 +22,14 @@ import { getGroup } from "rxjs-watcher";
 export const getDependNames = (item: IConfigItem) => item.depend?.names || [];
 export const defaultReduceFunction = (_: any, val: any) => val;
 
-export const transformResultToObservable = (result: ReturnResult) =>
-    isPlainResult(result) ? of(result) : isObject(result) ? of(result) : result;
+export const transformResultToObservable = (
+    result: ReturnResult
+): ObservableInput<any> =>
+    isPlainResult(result)
+        ? of(result)
+        : isObject(result)
+        ? of(result)
+        : (result as ObservableInput<any>);
 
 export const transformFilterNilOptionToBoolean: (
     stage: TransformStage,

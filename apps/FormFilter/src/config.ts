@@ -22,8 +22,7 @@ export const RelationConfig: IConfigItem[] = [
         init: [],
         handle: (value) => {
             if (value.length) {
-                // SetAtomValue(atoms, "shortcut")(0);
-                SetAtomValueByKey(CacheKey, "shortcut", 0);
+                SetAtomValueByKey(CacheKey)("shortcut", 0);
             }
             return value;
         },

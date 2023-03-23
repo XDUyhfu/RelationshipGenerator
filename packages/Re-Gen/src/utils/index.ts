@@ -121,8 +121,9 @@ export const OpenLogger =
         return RelationConfig;
     };
 
-export const SetAtomValueByKey = (cacheKey: string, name: string, value: any) =>
-    GetAtomIn(cacheKey)?.[name]?.next(value);
+export const SetAtomValueByKey =
+    (cacheKey: string) => (name: string, value: any) =>
+        GetAtomIn(cacheKey)?.[name]?.next(value);
 
 export const PluckValue = (config: IConfigItem[]): PluckValueType[] =>
     config.map((item: IConfigItem) => ({ init: item.init, name: item.name }));

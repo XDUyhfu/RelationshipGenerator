@@ -1,3 +1,4 @@
+import { isObservable } from "rxjs";
 import { ObservableInput, of } from "rxjs";
 import {
     IConfigItem,
@@ -6,19 +7,37 @@ import {
     ReturnResult,
     TransformStage,
     ReGenOptions,
-    AnyBehaviorSubject,
-} from "./type";
-import { isObject, isPlainResult } from "@yhfu/re-gen-utils";
+    PluckValueType,
+    AnyArray,
+    AnyPromise,
+    PlainResult,
+} from "../type";
 import {
     DistinctDefaultValue,
     FilterNilDefaultValue,
     FilterNilOptionDefaultValue,
     FilterNilStageDefaultValue,
     RxjsWaterDurationDefaultValue,
-} from "./config";
-import { curry, forEach, isEmpty, isNil } from "ramda";
-import { GetAtomIn, GlobalAtomsIn, GlobalLoggerWatcher } from "./Atom";
+} from "../config";
+import { forEach, isEmpty, isNil } from "ramda";
+import { GetAtomIn, GlobalLoggerWatcher } from "../Atom";
 import { getGroup } from "rxjs-watcher";
+
+export const isPromise = (value: any): value is AnyPromise =>
+    value instanceof Promise;
+
+export const isArray = (value: any): value is AnyArray => Array.isArray(value);
+export const isPlainObject = (value: any) =>
+    Object.prototype.toString.call(value) === "[object Object]" &&
+    value?.constructor === Object;
+export const isObject = (value: any) =>
+    Object.prototype.toString.call(value) === "[object Object]" &&
+    !isObservable(value);
+export const isPlainResult = (result: ReturnResult): result is PlainResult =>
+    ["number", "boolean", "string", "undefined"].includes(typeof result) ||
+    isPlainObject(result) ||
+    Array.isArray(result) ||
+    result === null;
 
 export const getDependNames = (item: IConfigItem) => item.depend?.names || [];
 export const defaultReduceFunction = (_: any, val: any) => val;
@@ -102,13 +121,8 @@ export const OpenLogger =
         return RelationConfig;
     };
 
-export const SetParam =
-    (cacheKey: string) => (RelationConfig: IConfigItem[]) => {
-        GlobalAtomsIn.get(cacheKey)!.next(GetAtomIn(cacheKey));
-        return RelationConfig;
-    };
+export const SetAtomValueByKey = (cacheKey: string, name: string, value: any) =>
+    GetAtomIn(cacheKey)?.[name]?.next(value);
 
-export const SetAtomValue = curry(
-    (atoms: AnyBehaviorSubject, name: string, value: any) =>
-        atoms.getValue()?.[name]?.next(value)
-);
+export const PluckValue = (config: IConfigItem[]): PluckValueType[] =>
+    config.map((item: IConfigItem) => ({ init: item.init, name: item.name }));

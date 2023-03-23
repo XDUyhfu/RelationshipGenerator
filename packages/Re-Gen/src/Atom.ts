@@ -4,7 +4,7 @@ import {
     OperatorFunction,
     ReplaySubject,
 } from "rxjs";
-import { AnyBehaviorSubject, AtomsType } from "./type";
+import { AnyBehaviorSubject, AtomsType, PluckValueType } from "./type";
 
 export class AtomState<T = any> {
     in$: BehaviorSubject<T>;
@@ -26,7 +26,8 @@ export const GlobalLoggerWatcher = new Map<
         selector?: ((value: T) => any) | undefined
     ) => OperatorFunction<T, T>
 >();
-export const GlobalAtomsIn = new Map<string, AnyBehaviorSubject>();
+
+export const GlobalConfig = new Map<string, PluckValueType[]>();
 
 export const AtomInOut =
     (cacheKey: string) =>

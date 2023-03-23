@@ -7,9 +7,8 @@ import { Region } from "./components/Region";
 import { IP } from "./components/IP";
 import styled from "styled-components";
 import { Button, Space, Tabs } from "antd";
-import { ReGen } from "../../../packages/Re-Gen/src/index";
+import { ReGen,useAtomsValue, useAtomsCallback } from "../../../packages/Re-Gen/src/index";
 import { CacheKey, RelationConfig, TabItems } from "./config";
-import { useAtomsValue, useAtomsCallback } from "@yhfu/re-gen-hooks";
 
 const Wrapper = styled(Space)`
     display: flex;
@@ -37,9 +36,7 @@ function App() {
         tab,
         areaShow,
         confirm,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-    } = useAtomsValue( AtomInOut, RelationConfig( { atoms: {} } ));
+    } = useAtomsValue(CacheKey, AtomInOut);
 
     const {
         domainCallback,
@@ -50,9 +47,7 @@ function App() {
         aggregationCallback,
         tabCallback,
         confirmCallback,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-    } = useAtomsCallback( AtomInOut, RelationConfig( { atoms: {} } ));
+    } = useAtomsCallback(CacheKey, AtomInOut);
 
     return (
         <>

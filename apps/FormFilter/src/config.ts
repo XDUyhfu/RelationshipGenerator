@@ -1,17 +1,14 @@
 import { TabsProps } from "antd";
 import dayjs from "dayjs";
-import type {
-    IConfigItem,
-    AnyBehaviorSubject,
-} from "../../../packages/Re-Gen/src/index";
-import { SetAtomValue } from "../../../packages/Re-Gen/src/index";
+import type { IConfigItem } from "../../../packages/Re-Gen/src/index";
+import { SetAtomValueByKey } from "../../../packages/Re-Gen/src/index";
 
 export const DateFormat = "YYYY-MM-DD HH:mm:ss";
 export const DayFormat = "YYYY-MM-DD";
 
-export const RelationConfig: (param: {
-    atoms: AnyBehaviorSubject;
-}) => IConfigItem[] = ({ atoms }) => [
+export const CacheKey = "FORM_FILTER";
+
+export const RelationConfig: IConfigItem[] = [
     {
         name: "domain",
         init: [],
@@ -25,7 +22,8 @@ export const RelationConfig: (param: {
         init: [],
         handle: (value) => {
             if (value.length) {
-                SetAtomValue(atoms, "shortcut")(0);
+                // SetAtomValue(atoms, "shortcut")(0);
+                SetAtomValueByKey(CacheKey, "shortcut", 0);
             }
             return value;
         },
@@ -74,7 +72,7 @@ export const RelationConfig: (param: {
         init: false,
         depend: {
             names: ["area", "tab"],
-            handle: ([regionShow, area, tab]) => {
+            handle: ([, area, tab]) => {
                 if (area === "CN" || tab === "3") {
                     return true;
                 }
@@ -87,7 +85,7 @@ export const RelationConfig: (param: {
         init: [],
         depend: {
             names: ["area", "region", "tab"],
-            handle: async ([list, area, region, tab]: [
+            handle: async ([, area, region, tab]: [
                 list: string[],
                 area: string,
                 region: string[],
@@ -132,7 +130,7 @@ export const RelationConfig: (param: {
         ],
         depend: {
             names: ["aggregation"],
-            handle: ([SelectableTimeRange, aggregation]) => {
+            handle: ([, aggregation]) => {
                 if (aggregation === "300") {
                     return [
                         dayjs()
@@ -168,7 +166,7 @@ export const RelationConfig: (param: {
         init: true,
         depend: {
             names: ["tab"],
-            handle: ([areaShow, tab]) => {
+            handle: ([, tab]) => {
                 if (tab === "3") {
                     return false;
                 }
@@ -182,7 +180,7 @@ export const RelationConfig: (param: {
         depend: {
             combineType: "self",
             names: ["domain", "time", "aggregation", "RegionList"],
-            handle: ([_, domain, time, aggregation, regionList]) => ({
+            handle: ([, domain, time, aggregation, regionList]) => ({
                 domain,
                 time,
                 aggregation,
@@ -191,8 +189,6 @@ export const RelationConfig: (param: {
         },
     },
 ];
-
-export const CacheKey = "FORM_FILTER";
 
 export const TabItems: TabsProps["items"] = [
     {

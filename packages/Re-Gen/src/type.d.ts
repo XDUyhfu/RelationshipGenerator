@@ -46,8 +46,9 @@ export type AnyBehaviorSubject = BehaviorSubject<any>;
 export type AnyArray = Array<any>;
 export type AnyPromise = Promise<any>;
 export type AtomsType = Record<string, AnyBehaviorSubject>;
-export type ReGenParam = {
-    atoms: AnyBehaviorSubject;
+export type PluckValueType = {
+    init: Promise | Observable | PlainResult | InitFunctionType;
+    name: string;
 };
 
 export interface ReGenOptions {

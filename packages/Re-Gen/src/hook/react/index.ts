@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { Subject, Observable, filter, isObservable } from "rxjs";
 import { useObservable } from "rxjs-hooks";
-import type { IConfigItem } from "@yhfu/re-gen";
-import { isPlainResult } from "@yhfu/re-gen-utils";
+import { GlobalConfig } from "../../Atom";
+import { isPlainResult } from "../../utils/index";
 
 type IAtomInOut = <T = any>(
     valueName: string
@@ -19,16 +19,13 @@ interface IResultAtomsCallback<T = any> {
     [x: `${string}`]: T;
 }
 
-export const useAtomsValue = (
-    AtomInOut: IAtomInOut,
-    RelationConfig: IConfigItem[]
-) => {
+export const useAtomsValue = (cacheKey: string, AtomInOut: IAtomInOut) => {
+    const RelationConfig = GlobalConfig.get(cacheKey)!;
     const names = RelationConfig.map((item) => item.name);
     const getConfigItem = (name: string) =>
         RelationConfig.filter((item) => item.name === name)[0];
     const AtomsValue: IResultAtomsValue = names.reduce((pre, name) => {
         const inout$ = AtomInOut(name);
-
         return {
             ...pre,
             [`${name}`]: useObservable(
@@ -46,10 +43,8 @@ export const useAtomsValue = (
     return AtomsValue;
 };
 
-export const useAtomsCallback = (
-    AtomInOut: IAtomInOut,
-    RelationConfig: IConfigItem[]
-) => {
+export const useAtomsCallback = (cacheKey: string, AtomInOut: IAtomInOut) => {
+    const RelationConfig = GlobalConfig.get(cacheKey)!;
     const names = RelationConfig.map((item) => item.name);
     const AtomsCallback: IResultAtomsCallback = names.reduce((pre, name) => {
         const inout$ = AtomInOut(name);

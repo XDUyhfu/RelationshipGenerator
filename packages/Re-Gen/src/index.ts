@@ -17,4 +17,5 @@ export type {
     TransformStage,
     InitFunctionType,
 } from "./type";
-export { SetAtomValue } from "./utils";
+export { SetAtomValueByKey } from "./utils/index";
+export { useAtomsValue, useAtomsCallback } from "./hook/react/index";

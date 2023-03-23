@@ -1,1 +1,0 @@
-- 该包为 `@yhfu/re-gen` 提供 hooks , 详情参考 [@yhfu/re-gen](https://www.npmjs.com/package/@yhfu/re-gen)

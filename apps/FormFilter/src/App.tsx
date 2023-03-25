@@ -1,125 +1,134 @@
-// import { Domain } from "./components/Domain";
-// import { Shortcut } from "./components/Time/Shortcut";
-// import { Time } from "./components/Time/Time";
-// import { Aggregation } from "./components/Time/Aggregation";
-// import { Area } from "./components/Area";
-// import { Region } from "./components/Region";
-// import { IP } from "./components/IP";
-// import styled from "styled-components";
+import { Radio, Select, DatePicker, Input, Tabs } from "@arco-design/web-react";
+import "@arco-design/web-react/dist/css/arco.css";
+import "./index.css";
 import {
-    // Button,
-    Input,
-    // Space, Tabs
-} from "antd";
-// import { ReGen,useAtomsValue, useAtomsCallback } from "../../../packages/Re-Gen/src/index";
-import {
-    // CacheKey,
+    AggregationOption,
+    AreaOption,
+    DomainOption,
+    OperatorOption,
+    ProtocalOption,
+    RegionOption,
     RelationConfig,
-    // TabItems
+    ShortcutOption,
+    TabItems,
 } from "./config";
 
-import { ReComponent } from "@yhfu/re-component";
+import { ReComponent, updateValueByName } from "@yhfu/re-component";
+const { useReValue, ReContainer, ReField } = ReComponent(RelationConfig);
+import dayjs from "dayjs";
+import { DateFormat } from "./config";
+import isBetween from "dayjs/plugin/isBetween";
 
-// const Wrapper = styled(Space)`
-//     display: flex;
-//     flex-wrap: wrap;
-//     margin: 16px 0;
+dayjs.extend(isBetween);
 
-//     > * {
-//         margin-bottom: 10px;
-//     }
-// `;
+const { RangePicker } = DatePicker;
 
-// const AtomInOut = ReGen(CacheKey, RelationConfig, { logger: true });
-
-const  {useReValue, ReContainer, ReField } = ReComponent(RelationConfig);
-
-function App () {
-    const value = useReValue();
-    console.log("useRCValue",value);
-
-    // const {
-    //     domain,
-    //     time,
-    //     shortcut,
-    //     aggregation,
-    //     area,
-    //     region,
-    //     regionShow,
-    //     RegionList,
-    //     SelectableTimeRange,
-    //     tab,
-    //     areaShow,
-    //     confirm,
-    // } = useAtomsValue(CacheKey, AtomInOut);
-
-    // const {
-    //     domainCallback,
-    //     timeCallback,
-    //     shortcutCallback,
-    //     areaCallback,
-    //     regionCallback,
-    //     aggregationCallback,
-    //     tabCallback,
-    //     confirmCallback,
-    // } = useAtomsCallback(CacheKey, AtomInOut);
+function App() {
+    const { tab, SelectableTimeRange } = useReValue();
 
     return (
         <>
-            <ReContainer config={RelationConfig}>
-                <ReField name="areaShow">
-                    <Input></Input>
+            <Tabs
+                activeTab={tab}
+                onChange={(val) => {
+                    updateValueByName("tab", val);
+                }}
+            >
+                {TabItems.map((item) => (
+                    <Tabs.TabPane
+                        key={item.key}
+                        title={item.title}
+                    ></Tabs.TabPane>
+                ))}
+            </Tabs>
+            <ReContainer>
+                <ReField name="domain">
+                    <Select
+                        mode="multiple"
+                        allowClear
+                        style={{ width: 220 }}
+                        placeholder="域名"
+                        maxTagCount={1}
+                        options={DomainOption}
+                    />
                 </ReField>
-                <ReField name="areaShow">
-                    <Input></Input>
+                <ReField name="shortcut">
+                    <Radio.Group type="button">
+                        {ShortcutOption.map((item) => (
+                            <Radio key={item.value} value={item.value}>
+                                {item.label}
+                            </Radio>
+                        ))}
+                    </Radio.Group>
+                </ReField>
+                <ReField name="time">
+                    <RangePicker
+                        showTime
+                        format={DateFormat}
+                        disabledDate={(date) =>
+                            !date.isBetween(
+                                SelectableTimeRange?.[0],
+                                SelectableTimeRange?.[1]
+                            )
+                        }
+                    />
+                </ReField>
+                <ReField name="aggregation">
+                    <Select
+                        allowClear
+                        style={{ width: 220 }}
+                        placeholder="Aggregation"
+                        options={AggregationOption}
+                    />
+                </ReField>
+                <ReField name="protocal">
+                    <Select
+                        mode="multiple"
+                        allowClear
+                        style={{ width: 220 }}
+                        placeholder="选择协议"
+                        maxTagCount={2}
+                        options={ProtocalOption}
+                    />
+                </ReField>
+                <ReField name="area" visible="areaShow">
+                    <Select
+                        allowClear
+                        style={{ width: 220 }}
+                        placeholder="选择大区"
+                        options={AreaOption}
+                    />
+                </ReField>
+                <ReField name="region" visible="regionShow">
+                    <Select
+                        mode="multiple"
+                        allowClear
+                        style={{ width: 220 }}
+                        placeholder="region"
+                        maxTagCount={2}
+                        options={RegionOption}
+                    />
+                </ReField>
+                <ReField name="operator">
+                    <Select
+                        mode="multiple"
+                        allowClear
+                        style={{ width: 220 }}
+                        placeholder="运营商"
+                        maxTagCount={2}
+                        options={OperatorOption}
+                    />
+                </ReField>
+                <ReField name="ip">
+                    <Input style={{ width: 500 }} placeholder="请输入IP" />
                 </ReField>
             </ReContainer>
-            {/* <Tabs
-                activeKey={tab as string}
-                items={TabItems}
-                onChange={tabCallback}
-            /> */}
-            {/* <Wrapper>
-                <Domain value={domain as string[]} change={domainCallback} />
-                <Shortcut
-                    value={shortcut as string}
-                    change={(shortcut) => {
-                        shortcutCallback(shortcut.target.value);
-                    }}
-                />
-                <Time
-                    value={time as string[]}
-                    change={(_, time: string[]) => {
-                        timeCallback(time);
-                        // shortcutCallback(0);
-                    }}
-                    range={SelectableTimeRange as string[]}
-                />
-                <Aggregation
-                    value={aggregation as string}
-                    change={aggregationCallback}
-                />
-                {areaShow ? (
-                    <Area value={area as string} change={areaCallback} />
-                ) : null}
-                {regionShow ? (
-                    <Region
-                        value={region as string[]}
-                        change={regionCallback}
-                    />
-                ) : null}
-                <IP value={domain as string} change={domainCallback} />
-                <Button type="primary" onClick={confirmCallback}>
-                    确认
-                </Button>
-            </Wrapper> */}
-            <br />
-            <br />
-            {/* <div>RegionListValue: {JSON.stringify(RegionList)}</div> */}
 
             <br />
             <br />
-            {/* <div>{JSON.stringify(confirm)}</div> */}
+
+            <br />
+            <br />
         </>
     );
 }

@@ -38,7 +38,6 @@ const { ReContainer, ReField, useReValue } = ReComponent(RelationConfig);
 function App () {
   const [vis, setVis] = useState( false );
   const value = useReValue();
-  console.log(value);
     return (
         <ReContainer>
             <ReField

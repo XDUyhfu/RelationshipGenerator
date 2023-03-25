@@ -1,4 +1,3 @@
-import { TabsProps } from "antd";
 import dayjs from "dayjs";
 import type { IConfigItem } from "../../../packages/Re-Gen/src/index";
 import { SetAtomValueByKey } from "../../../packages/Re-Gen/src/index";
@@ -54,9 +53,14 @@ export const RelationConfig: IConfigItem[] = [
         name: "aggregation",
         init: "300",
     },
+    { name: "area" },
     {
-        name: "area",
-        init: "",
+        name: "protocal",
+        init: [],
+    },
+    {
+        name: "operator",
+        init: [],
     },
     {
         name: "region",
@@ -189,17 +193,113 @@ export const RelationConfig: IConfigItem[] = [
     },
 ];
 
-export const TabItems: TabsProps["items"] = [
+export const TabItems = [
     {
         key: "1",
-        label: "Tab 1",
+        title: "Tab 1",
     },
     {
         key: "2",
-        label: "Tab 2",
+        title: "Tab 2",
     },
     {
         key: "3",
-        label: "Tab 3",
+        title: "Tab 3",
+    },
+];
+
+export const DomainOption = [
+    {
+        value: "1.test.pull.com",
+        label: "1.test.pull.com",
+    },
+    {
+        value: "2.test.pull.com",
+        label: "2.test.pull.com",
+    },
+    {
+        value: "3.test.pull.com",
+        label: "3.test.pull.com",
+    },
+    {
+        value: "4.test.pull.com",
+        label: "4.test.pull.com",
+    },
+];
+
+export const ShortcutOption = [
+    {
+        label: "10分钟",
+        value: "600",
+    },
+    {
+        label: "1小时",
+        value: "3600",
+    },
+    {
+        label: "1天",
+        value: "86400",
+    },
+];
+
+export const AggregationOption = [
+    { value: "300", label: "5分钟" },
+    { value: "600", label: "10分钟" },
+    { value: "3600", label: "1小时" },
+];
+
+export const ProtocalOption = [
+    {
+        value: "FLV",
+        label: "FLV",
+    },
+    {
+        value: "HLS",
+        label: "HLS",
+    },
+    {
+        value: "RTM",
+        label: "RTM",
+    },
+    {
+        value: "RTMP",
+        label: "RTMP",
+    },
+    {
+        value: "SRT",
+        label: "SRT",
+    },
+    {
+        value: "QUIC",
+        label: "QUIC",
+    },
+];
+
+export const AreaOption = [
+    { value: "CN", label: "中国大陆" },
+    { value: "AP1", label: "亚太1区" },
+    { value: "AP2", label: "亚太2区" },
+    { value: "Oversea", label: "海外大区" },
+];
+
+export const RegionOption = [
+    { value: "BJ", label: "北京" },
+    { value: "SH", label: "上海" },
+    { value: "NJ", label: "南京" },
+    { value: "HN", label: "河南" },
+];
+
+export const OperatorOption = [
+    {
+        value: "mobile",
+        label: "移动",
+    },
+    {
+        value: "unicom",
+        label: "联通",
+    },
+    {
+        value: "telecom",
+        label: "电信",
     },
 ];

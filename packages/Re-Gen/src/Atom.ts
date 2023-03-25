@@ -54,6 +54,9 @@ export const GetAtomValues = (cacheKey: string): Record<string, any> => {
     return result;
 };
 
+export const GetAtomValueByName = (cacheKey: string, name: string) =>
+    GetAtomValues(cacheKey)[name];
+
 export const GetAtomObservables = (
     cacheKey: string
 ): Record<string, AnyBehaviorSubject> => {

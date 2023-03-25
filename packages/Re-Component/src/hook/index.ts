@@ -41,4 +41,5 @@ export const useRestProps = (props: Record<string, string>) => {
 export const useVisible = (visible: boolean | string) =>
     typeof visible === "string" ? useAtom(visible)[0] : visible;
 
-export const useReValue = () => useObservable(() => ReValue, {});
+export const useReValue = (): Record<string, any> =>
+    useObservable(() => ReValue, {});

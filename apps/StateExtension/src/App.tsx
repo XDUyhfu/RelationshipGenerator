@@ -1,9 +1,10 @@
 import { Button, Input, Switch } from "antd";
-import { ReGen } from "../../../packages/Re-Gen/src/index";
 import {
+    ReGen,
     useAtomsCallback,
     useAtomsValue,
-} from "../../../packages/Re-Gen-Hooks/src/hooks/index";
+} from "../../../packages/Re-Gen/src/index";
+
 import { Config } from "./config";
 
 const key = "CACHE_KEY_STATE_EXTENSION";
@@ -13,10 +14,10 @@ const AtomInOut = ReGen(key, Config, {
 });
 
 function App() {
-    const { result } = useAtomsValue(AtomInOut, Config);
+    const { result } = useAtomsValue(key, AtomInOut);
     const { inputValueCallback, addCallback } = useAtomsCallback(
-        AtomInOut,
-        Config
+        key,
+        AtomInOut
     );
 
     return (

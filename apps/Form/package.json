@@ -12,7 +12,6 @@
     "@ant-design/icons": "^5.0.1",
     "@types/ramda": "^0.28.20",
     "@yhfu/re-gen": "workspace:*",
-    "@yhfu/re-gen-hooks": "workspace:*",
     "antd": "^5.1.5",
     "ramda": "^0.28.0",
     "react": "^18.2.0",

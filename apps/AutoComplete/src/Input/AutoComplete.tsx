@@ -1,21 +1,19 @@
 import Input from "./input";
-import { ReGen } from "../../../../packages/Re-Gen/src/index";
 import {
+    ReGen,
     useAtomsValue,
     useAtomsCallback,
-} from "../../../../packages/Re-Gen-Hooks/src/hooks/index";
+} from "../../../../packages/Re-Gen/src/index";
+
 import { ConfigList } from "./state";
 
-const AtomInOut = ReGen("Test", ConfigList, {logger: true,});
+const AtomInOut = ReGen("Test", ConfigList, { logger: true });
 
 const AutoComplete = () => {
-    const { inputValue, list, hightIndex } = useAtomsValue(
-        AtomInOut,
-        ConfigList
-    );
+    const { inputValue, list, hightIndex } = useAtomsValue("Test", AtomInOut);
     const { keyCodeCallback, inputValueCallback } = useAtomsCallback(
-        AtomInOut,
-        ConfigList
+        "Test",
+        AtomInOut
     );
 
     const index = hightIndex % list?.length ?? 0;

@@ -1,8 +1,8 @@
-import { ReGen } from "../../../packages/Re-Gen/src/index";
 import {
+    ReGen,
     useAtomsValue,
     useAtomsCallback,
-} from "../../../packages/Re-Gen-Hooks/src/hooks/index";
+} from "../../../packages/Re-Gen/src/index";
 import {
     FirstCacheKey,
     FirstConfig,
@@ -20,9 +20,9 @@ const second = ReGen(SecondCacheKey, SecondConfig, {
 });
 
 function App() {
-    const { atom } = useAtomsValue(first, FirstConfig);
-    const { atomCallback } = useAtomsCallback(first, FirstConfig);
-    const { value } = useAtomsValue(second, SecondConfig);
+    const { atom } = useAtomsValue(FirstCacheKey, first);
+    const { atomCallback } = useAtomsCallback(FirstCacheKey, first);
+    const { value } = useAtomsValue(SecondCacheKey, second);
 
     console.log(value);
 

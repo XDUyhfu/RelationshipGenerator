@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@yhfu/re-gen": "workspace:*",
-    "@yhfu/re-gen-hooks": "workspace:*",
     "antd": "^5.1.5",
     "dayjs": "^1.11.7",
     "react": "^18.2.0",

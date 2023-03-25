@@ -10,8 +10,6 @@ import { Button, Space, Tabs } from "antd";
 import { ReGen,useAtomsValue, useAtomsCallback } from "../../../packages/Re-Gen/src/index";
 import { CacheKey, RelationConfig, TabItems } from "./config";
 
-
-
 const Wrapper = styled(Space)`
     display: flex;
     flex-wrap: wrap;

@@ -8,8 +8,9 @@ export default defineConfig({
     plugins: [react(), dts()],
     build: {
         lib: {
-            entry: resolve(__dirname, "src/components/re-container/index.tsx"),
-            formats: ["es"],
+            entry: resolve(__dirname, "src/index.ts"),
+            formats: ["es", "umd"],
+            name: "ReComponent",
         },
         rollupOptions: {
             external: ["react"],

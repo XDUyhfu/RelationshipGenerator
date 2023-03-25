@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { ReGen } from "@yhfu/re-gen";
 import { Atoms$, CacheKey, Config$ } from "../../context/index";
-import { IReContainer } from "../type";
+import { IReContainer } from "../type.d";
 import "./index.css";
 
 export const ReContainer: FC<IReContainer> = (props) => {

@@ -10,5 +10,4 @@ export interface IReField {
     onChange?: (...args: any[]) => void;
     visible?: boolean | string;
     children: React.ReactElement;
-    [`re-${string}`]: string;
 }

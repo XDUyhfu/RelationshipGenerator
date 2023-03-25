@@ -1,7 +1,7 @@
 import { cloneElement } from "react";
 import {  CacheKey } from "../../context/index";
 import { SetAtomValueByKey } from "@yhfu/re-gen";
-import { IReField } from "../type";
+import { IReField } from "../type.d";
 import { useAtom, useRestProps, useVisible } from "../../hook";
 
 export const ReField = ( props: IReField) => {

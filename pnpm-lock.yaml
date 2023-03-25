@@ -234,10 +234,12 @@ importers:
   packages/Re-Component:
     specifiers:
       '@arco-design/web-react': ^2.46.0
+      '@types/ramda': ^0.28.20
       '@types/react': ^18.0.28
       '@types/react-dom': ^18.0.11
       '@vitejs/plugin-react': ^3.1.0
       '@yhfu/re-gen': workspace:^0.2.2
+      ramda: ^0.28.0
       react: ^18.2.0
       react-dom: ^18.2.0
       react-is: ^18.2.0
@@ -248,7 +250,9 @@ importers:
       vite-plugin-dts: ^2.1.0
     dependencies:
       '@arco-design/web-react': 2.46.0_zula6vjvt3wdocc4mwcxqa6nzi
+      '@types/ramda': 0.28.20
       '@yhfu/re-gen': link:../Re-Gen
+      ramda: 0.28.0
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-is: 18.2.0

@@ -14,7 +14,10 @@ import {
 } from "./config";
 
 import { ReComponent, updateValueByName } from "@yhfu/re-component";
-const { useReValue, ReContainer, ReField } = ReComponent(RelationConfig);
+const { useReValue, ReContainer, ReField } = ReComponent(RelationConfig, {
+    logger: true,
+    initialValues: {},
+});
 import dayjs from "dayjs";
 import { DateFormat } from "./config";
 import isBetween from "dayjs/plugin/isBetween";
@@ -23,7 +26,7 @@ dayjs.extend(isBetween);
 
 const { RangePicker } = DatePicker;
 
-function App() {
+function FilterComponent() {
     const { tab, SelectableTimeRange } = useReValue();
 
     return (
@@ -133,4 +136,4 @@ function App() {
     );
 }
 
-export default App;
+export default FilterComponent;

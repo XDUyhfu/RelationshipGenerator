@@ -10,3 +10,8 @@ export interface IReField {
     visible?: boolean | string;
     children: React.ReactElement;
 }
+
+export interface ReComponentOptions {
+    initialValues?: Record<string, any>;
+    logger?: boolean;
+}

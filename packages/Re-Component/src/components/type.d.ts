@@ -1,6 +1,5 @@
 export interface IReContainer {
     children: React.ReactNode;
-    config: any[];
 }
 
 export interface IReField {

@@ -1,3 +1,2 @@
-export { ReContainer } from "./components/re-container/index";
-export { ReField } from "./components/re-field/index";
-export { updateValueByName } from "./utils/index";
+export { updateValueByName, getReValue, ReComponent } from "./utils/index";
+export type { IConfigItem } from "@yhfu/re-gen";

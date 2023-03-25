@@ -19,3 +19,7 @@ export type {
 } from "./type";
 export { SetAtomValueByKey } from "./utils/index";
 export { useAtomsValue, useAtomsCallback } from "./hook/react/index";
+export type {
+    IResultAtomsValue,
+    IResultAtomsCallback,
+} from "./hook/react/index";

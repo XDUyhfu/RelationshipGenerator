@@ -1,11 +1,9 @@
 import { IConfigItem } from "@yhfu/re-gen";
-import { ReContainer } from "./components/re-container";
-import { ReField } from "./components/re-field";
 import { Button, Input } from "@arco-design/web-react";
 import "@arco-design/web-react/dist/css/arco.css";
 import { delay, map, of } from "rxjs";
 import { useState } from "react";
-import { updateValueByName } from "./utils";
+import { updateValueByName, ReComponent } from "./utils";
 
 const RelationConfig: IConfigItem[] = [
     { name: "input1" },
@@ -35,10 +33,14 @@ const RelationConfig: IConfigItem[] = [
   }
 ];
 
+const { ReContainer, ReField, useReValue } = ReComponent(RelationConfig);
+
 function App () {
-  const [vis, setVis] = useState(false);
+  const [vis, setVis] = useState( false );
+  const value = useReValue();
+  console.log(value);
     return (
-        <ReContainer config={RelationConfig}>
+        <ReContainer>
             <ReField
                 name="input1"
                 defaultValue={"123"}
@@ -54,8 +56,8 @@ function App () {
             </ReField>
             <ReField name="input4" visible={vis} defaultValue={"show"}>
                 <Input />
-        </ReField>
-        <Button type="primary" onClick={ () => { setVis(true); } }>show me</Button>
+            </ReField> 
+            <Button type="primary" onClick={ () => { setVis(true); } }>show me</Button> 
         </ReContainer>
     );
 }

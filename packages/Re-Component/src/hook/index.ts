@@ -1,5 +1,5 @@
 import { useObservable } from "rxjs-hooks";
-import { Atoms$, Config$ } from "../context";
+import { Atoms$, Config$, ReValue } from "../context";
 import { filter, isObservable } from "rxjs";
 import { useCallback } from "react";
 
@@ -40,3 +40,5 @@ export const useRestProps = (props: Record<string, string>) => {
 
 export const useVisible = (visible: boolean | string) =>
     typeof visible === "string" ? useAtom(visible)[0] : visible;
+
+export const useReValue = () => useObservable(() => ReValue, {});

@@ -1,62 +1,85 @@
-import { Domain } from "./components/Domain";
-import { Shortcut } from "./components/Time/Shortcut";
-import { Time } from "./components/Time/Time";
-import { Aggregation } from "./components/Time/Aggregation";
-import { Area } from "./components/Area";
-import { Region } from "./components/Region";
-import { IP } from "./components/IP";
-import styled from "styled-components";
-import { Button, Space, Tabs } from "antd";
-import { ReGen,useAtomsValue, useAtomsCallback } from "../../../packages/Re-Gen/src/index";
-import { CacheKey, RelationConfig, TabItems } from "./config";
+// import { Domain } from "./components/Domain";
+// import { Shortcut } from "./components/Time/Shortcut";
+// import { Time } from "./components/Time/Time";
+// import { Aggregation } from "./components/Time/Aggregation";
+// import { Area } from "./components/Area";
+// import { Region } from "./components/Region";
+// import { IP } from "./components/IP";
+// import styled from "styled-components";
+import {
+    // Button,
+    Input,
+    // Space, Tabs
+} from "antd";
+// import { ReGen,useAtomsValue, useAtomsCallback } from "../../../packages/Re-Gen/src/index";
+import {
+    // CacheKey,
+    RelationConfig,
+    // TabItems
+} from "./config";
 
-const Wrapper = styled(Space)`
-    display: flex;
-    flex-wrap: wrap;
-    margin: 16px 0;
+import { ReComponent } from "@yhfu/re-component";
 
-    > * {
-        margin-bottom: 10px;
-    }
-`;
+// const Wrapper = styled(Space)`
+//     display: flex;
+//     flex-wrap: wrap;
+//     margin: 16px 0;
 
-const AtomInOut = ReGen(CacheKey, RelationConfig, { logger: true });
+//     > * {
+//         margin-bottom: 10px;
+//     }
+// `;
 
-function App() {
-    const {
-        domain,
-        time,
-        shortcut,
-        aggregation,
-        area,
-        region,
-        regionShow,
-        RegionList,
-        SelectableTimeRange,
-        tab,
-        areaShow,
-        confirm,
-    } = useAtomsValue(CacheKey, AtomInOut);
+// const AtomInOut = ReGen(CacheKey, RelationConfig, { logger: true });
 
-    const {
-        domainCallback,
-        timeCallback,
-        shortcutCallback,
-        areaCallback,
-        regionCallback,
-        aggregationCallback,
-        tabCallback,
-        confirmCallback,
-    } = useAtomsCallback(CacheKey, AtomInOut);
+const  {useReValue, ReContainer, ReField } = ReComponent(RelationConfig);
+
+function App () {
+    const value = useReValue();
+    console.log("useRCValue",value);
+
+    // const {
+    //     domain,
+    //     time,
+    //     shortcut,
+    //     aggregation,
+    //     area,
+    //     region,
+    //     regionShow,
+    //     RegionList,
+    //     SelectableTimeRange,
+    //     tab,
+    //     areaShow,
+    //     confirm,
+    // } = useAtomsValue(CacheKey, AtomInOut);
+
+    // const {
+    //     domainCallback,
+    //     timeCallback,
+    //     shortcutCallback,
+    //     areaCallback,
+    //     regionCallback,
+    //     aggregationCallback,
+    //     tabCallback,
+    //     confirmCallback,
+    // } = useAtomsCallback(CacheKey, AtomInOut);
 
     return (
         <>
-            <Tabs
+            <ReContainer config={RelationConfig}>
+                <ReField name="areaShow">
+                    <Input></Input>
+                </ReField>
+                <ReField name="areaShow">
+                    <Input></Input>
+                </ReField>
+            </ReContainer>
+            {/* <Tabs
                 activeKey={tab as string}
                 items={TabItems}
                 onChange={tabCallback}
-            />
-            <Wrapper>
+            /> */}
+            {/* <Wrapper>
                 <Domain value={domain as string[]} change={domainCallback} />
                 <Shortcut
                     value={shortcut as string}
@@ -89,14 +112,14 @@ function App() {
                 <Button type="primary" onClick={confirmCallback}>
                     确认
                 </Button>
-            </Wrapper>
+            </Wrapper> */}
             <br />
             <br />
-            <div>RegionListValue: {JSON.stringify(RegionList)}</div>
+            {/* <div>RegionListValue: {JSON.stringify(RegionList)}</div> */}
 
             <br />
             <br />
-            <div>{JSON.stringify(confirm)}</div>
+            {/* <div>{JSON.stringify(confirm)}</div> */}
         </>
     );
 }

@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "re-gen:build": "pnpm -F @yhfu/re-gen build",
-    "re-gen:publish": "pnpm -F @yhfu/re-gen publish --no-git-checks"
+    "re-component:build": "pnpm -F @yhfu/re-component build",
+    "re-gen:publish": "pnpm -F @yhfu/re-gen publish --no-git-checks",
+    "re-component:publish": "pnpm -F @yhfu/re-component publish --no-git-checks"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.2",

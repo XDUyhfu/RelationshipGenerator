@@ -1,7 +1,8 @@
 import { useObservable } from "rxjs-hooks";
-import { Atoms$, Config$, ReValue } from "../context";
-import { filter, isObservable } from "rxjs";
+import { Atoms$, Config$, ReValues } from "../context";
+import { distinctUntilChanged, filter, isObservable } from "rxjs";
 import { useCallback } from "react";
+import { equals } from "ramda";
 
 export const useAtom = (name: string) => {
     const inout = Atoms$?.getValue()(name);
@@ -20,19 +21,49 @@ export const useAtom = (name: string) => {
     return [val, callback];
 };
 
-export const useRestProps = (props: Record<string, string>) => {
-    const restPropsWithRe = {} as Record<string, any>;
+export const useRestProps = (
+    props: Record<string, string>,
+    children: React.ReactElement
+) => {
+    // const propsWithReInject = handleReInject();
+
+    const propsWithoutReInject = {} as Record<string, any>;
     Object.keys(props).map((item) => {
+        if (item.startsWith("re-inject-")) {
+            const propName = item.replace("re-inject-", "") as string;
+            if (!(propName.length > 0)) {
+                throw Error("无效的 re-inject-* 属性");
+            }
+            if (typeof children.props[propName] !== "function") {
+                throw Error("re-inject-* 属性只能用于函数属性");
+            }
+            const value = useAtom(props[item])[0];
+            console.log(value);
+            propsWithoutReInject[propName] = useCallback(
+                (...args: any[]) => {
+                    children.props[propName](value, ...args);
+                },
+                [value]
+            );
+        } else {
+            propsWithoutReInject[item] = props[item];
+        }
+    });
+
+    const restPropsWithRe = {} as Record<string, any>;
+    Object.keys(propsWithoutReInject).map((item) => {
         if (item.startsWith("re-")) {
             restPropsWithRe[`${item.slice(3)}`] = useAtom(
-                (props as Record<string, string>)[item]
+                (propsWithoutReInject as Record<string, string>)[item]
             )[0];
         }
     });
     const restPropsWithoutRe = {} as Record<string, any>;
-    Object.keys(props).map((item) => {
+    Object.keys(propsWithoutReInject).map((item) => {
         if (!item.startsWith("re-")) {
-            restPropsWithoutRe[item] = (props as Record<string, string>)[item];
+            restPropsWithoutRe[item] = (
+                propsWithoutReInject as Record<string, string>
+            )[item];
         }
     });
     return { ...restPropsWithoutRe, ...restPropsWithRe };
@@ -41,5 +72,8 @@ export const useRestProps = (props: Record<string, string>) => {
 export const useVisible = (visible: boolean | string) =>
     typeof visible === "string" ? useAtom(visible)[0] : visible;
 
-export const useReValue = (): Record<string, any> =>
-    useObservable(() => ReValue, {});
+export const useReValues = (): Record<string, any> =>
+    useObservable(
+        () => ReValues.pipe(distinctUntilChanged(equals)),
+        {}
+    ) as Record<string, any>;

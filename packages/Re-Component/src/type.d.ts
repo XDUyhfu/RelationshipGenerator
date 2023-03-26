@@ -1,3 +1,5 @@
+import { IConfigItem } from "@yhfu/re-gen";
+
 export interface IReContainer {
     children: React.ReactNode;
 }
@@ -12,6 +14,8 @@ export interface IReField {
 }
 
 export interface ReComponentOptions {
-    initialValues?: Record<string, any>;
+    rewriteOrExpendConfig?: Array<
+        Partial<Omit<IConfigItem, "name">> & { name: string }
+    >;
     logger?: boolean;
 }

@@ -4,46 +4,45 @@ import {
     ReGen,
     SetAtomValueByKey,
 } from "@yhfu/re-gen";
-import { Atoms$, CacheKey, Config$, ReValue } from "../context";
-import { ReContainer } from "../components/re-container";
-import { ReField } from "../components/re-field";
-import { useReValue } from "../hook";
+import { Atoms$, CacheKey, Config$, ReValues } from "../context";
 import { ReComponentOptions } from "../type";
+import { mergeDeepRight } from "ramda";
 
-export const updateValueByName = (name: string, value: any) => {
+export const updateReValue = (name: string, value: any) => {
     SetAtomValueByKey(CacheKey)(name, value);
-    ReValue.next(GetAtomValues(CacheKey));
+    ReValues.next(GetAtomValues(CacheKey));
 };
 
-export const getReValue = GetAtomValues(CacheKey);
+export const getReValues = GetAtomValues(CacheKey);
 
-export const InitRecordToConfig = (
-    init: Record<string, any>,
+export const RewriteOrExpendConfig = (
+    rec: IConfigItem[],
     config: IConfigItem[]
 ) => {
-    const initKeys = Object.keys(init);
-    return config.map((item) => {
-        if (initKeys.includes(item.name)) {
-            return {
-                ...item,
-                init: init[item.name],
-            };
+    const expend = rec.filter(
+        (item) => !config.map((it) => it.name).includes(item.name)
+    );
+    const rewrite = config.map((item) => {
+        const index = rec.findIndex((it) => it.name === item.name);
+        if (index >= 0) {
+            return mergeDeepRight(item, rec[index]) as IConfigItem;
         }
         return item;
     });
+
+    return [...rewrite, ...expend];
 };
 
 export const ReComponent = (
     config: IConfigItem[],
     options?: ReComponentOptions
 ) => {
-    const { initialValues = {}, logger = false } = options ?? {};
+    const { logger = false, rewriteOrExpendConfig = [] } = options ?? {};
     const AtomInOut = ReGen(
         CacheKey,
-        InitRecordToConfig(initialValues, config),
+        RewriteOrExpendConfig(rewriteOrExpendConfig, config),
         { logger }
     );
     Atoms$.next(AtomInOut);
     Config$.next(config);
-    return { ReContainer, ReField, useReValue };
 };

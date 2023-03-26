@@ -1,5 +1,5 @@
 import { cloneElement, useEffect } from "react";
-import { CacheKey, ReValue } from "../../context/index";
+import { CacheKey, ReValues } from "../../context/index";
 import { GetAtomValues, SetAtomValueByKey } from "@yhfu/re-gen";
 import { IReField } from "../../type";
 import { useAtom, useRestProps, useVisible } from "../../hook";
@@ -15,26 +15,24 @@ export const ReField = (props: IReField) => {
         ...rest
     } = props;
     const [val, callback] = useAtom(name);
-    const restProps = useRestProps(rest);
+    const restProps = useRestProps(rest, children);
     const isShow = useVisible(visible);
 
     useEffect(() => {
-        ReValue.next(GetAtomValues(CacheKey));
+        ReValues.next(GetAtomValues(CacheKey));
     }, [val]);
 
-    return (
+    return isShow ? (
         <span>
-            {isShow
-                ? cloneElement(children, {
-                      value: value ?? val ?? defaultValue,
-                      onChange: onChange
-                          ? (...vals: any[]) => {
-                                onChange(SetAtomValueByKey(CacheKey), ...vals);
-                            }
-                          : callback,
-                      ...restProps,
-                  })
-                : null}
+            {cloneElement(children, {
+                value: value ?? val ?? defaultValue,
+                onChange: onChange
+                    ? (...vals: any[]) => {
+                          onChange(SetAtomValueByKey(CacheKey), ...vals);
+                      }
+                    : callback,
+                ...restProps,
+            })}
         </span>
-    );
+    ) : null;
 };

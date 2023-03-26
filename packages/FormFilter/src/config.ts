@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
-import type { IConfigItem } from "../../../packages/Re-Gen/src/index";
-import { SetAtomValueByKey } from "../../../packages/Re-Gen/src/index";
+import type { IConfigItem } from "@yhfu/re-gen";
+import { SetAtomValueByKey } from "@yhfu/re-gen";
 
 export const DateFormat = "YYYY-MM-DD HH:mm:ss";
 export const DayFormat = "YYYY-MM-DD";

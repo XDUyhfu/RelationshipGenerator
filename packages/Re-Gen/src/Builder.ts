@@ -10,6 +10,7 @@ import {
     DependencyDetection,
     OpenLogger,
     PluckValue,
+    CheckReGenParams,
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
@@ -134,16 +135,17 @@ const BuilderRelation = (
     );
 
 export const ReGen = (
-    cacheKey: string,
+    CacheKey: string,
     RelationConfig: IConfigItem[],
     options?: ReGenOptions
 ) => {
-    if (GlobalStore.has(cacheKey)) {
-        return AtomInOut(cacheKey);
-    }
 
-    GlobalStore.set(cacheKey, new Map<string, AtomState>());
-    GlobalConfig.set(cacheKey, PluckValue(RelationConfig));
-    BuilderRelation(cacheKey, RelationConfig, options).subscribe();
-    return AtomInOut(cacheKey);
+    CheckReGenParams(CacheKey, RelationConfig);
+
+    if (!GlobalStore.has(CacheKey)) {
+        GlobalStore.set(CacheKey, new Map<string, AtomState>());
+        GlobalConfig.set(CacheKey, PluckValue(RelationConfig));
+        BuilderRelation(CacheKey, RelationConfig, options).subscribe();
+    }
+    return AtomInOut(CacheKey);
 };

@@ -34,7 +34,7 @@ export const AtomInOut =
     <T = any>(name: string) => {
         const atom = GlobalStore.get(cacheKey)!.get(name)!;
         if (!atom) {
-            throw new Error("用于构建的配置列表中不包含该 key 值");
+            throw new Error(`用于构建的配置列表中不包含该 ${name} 值`);
         }
         return {
             [`${name}In$`]: atom.in$,

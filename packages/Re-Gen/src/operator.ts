@@ -1,9 +1,7 @@
 import {
     AnyBehaviorSubject,
     AnyObservable,
-    CombineType,
     IDistinct,
-    LoggerOption,
 } from "./type";
 import {
     catchError,
@@ -15,20 +13,24 @@ import {
     withLatestFrom,
     zipWith,
 } from "rxjs";
-import { equals } from "ramda";
+import {
+    equals,
+    is
+} from "ramda";
 import { GlobalLoggerWatcher } from "./Atom";
+import { CombineType } from "./config";
 
 export const handleUndefined: (
-    open: boolean
-) => (source: AnyObservable) => AnyObservable = (open) => (source) =>
-    open ? source.pipe(filter(Boolean)) : source;
+    filterNil: boolean
+) => (source: AnyObservable) => AnyObservable = (filterNil) => (source) =>
+    filterNil ? source.pipe(filter(Boolean)) : source;
 
 export const handleDistinct =
     (
         distinct: IDistinct<any, any>
     ): ((source: AnyObservable) => AnyObservable) =>
     (source) => {
-        if (typeof distinct === "boolean") {
+        if (is(Boolean, distinct)) {
             return distinct
                 ? source.pipe(distinctUntilChanged(equals))
                 : source;
@@ -42,6 +44,12 @@ export const handleDistinct =
         }
     };
 
+/**
+ * 支持三种合并策略: withLatestFrom combineLatestWith zipWith
+ * - 默认策略为 combineLatestWith
+ * @param type
+ * @param depends
+ */
 export const handleCombine =
     (
         type: CombineType,
@@ -49,9 +57,9 @@ export const handleCombine =
     ): ((source: AnyObservable) => AnyObservable) =>
     (source) =>
         depends.length > 0
-            ? type === "self"
+            ? type === CombineType.SELF_CHANGE
                 ? source.pipe(withLatestFrom(...depends))
-                : type === "every"
+                : type === CombineType.EVERY_CHANGE
                 ? source.pipe(zipWith(...depends))
                 : source.pipe(combineLatestWith(...depends))
             : source;
@@ -69,6 +77,6 @@ export const handleError =
 export const handleLogger = (
     cacheKey: string,
     name: string,
-    open?: LoggerOption
+    open?: { duration?: number } | boolean | number
 ): ((source: AnyObservable) => AnyObservable) =>
     open ? GlobalLoggerWatcher.get(cacheKey)!(`${name}`) : identity;

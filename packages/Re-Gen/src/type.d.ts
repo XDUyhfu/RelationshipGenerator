@@ -1,4 +1,5 @@
 import { BehaviorSubject, Observable, ObservableInput } from "rxjs";
+import { FilterNilStage, CombineType } from "./config";
 
 export type PlainResult =
     | Record<string, any>
@@ -17,8 +18,6 @@ export type IDistinct<T, K> =
           comparator: (previous: K, current: K) => boolean;
           keySelector?: (value: T) => K;
       };
-
-export type CombineType = "self" | "any" | "every";
 
 export type InitFunctionType = (
     ...args: any[]
@@ -54,39 +53,13 @@ export type PluckValueType = {
 export interface ReGenOptions {
     /**
      * 是否开启logger
+     * - 日志持续的时间或者使用默认时间
      */
-    logger?: LoggerOption;
-
+    logger?: { duration?: number } | boolean | number;
     /**
      * 默认为 Default 配置
      */
-    filterNil?: FilterNilOption;
+    filterNil?: FilterNilStage | boolean;
     distinct?: boolean;
 }
 
-export type LoggerOption = boolean | { duration?: number };
-export type FilterNilOption =
-    | "All"
-    | "Default"
-    | "In"
-    | "HandleAfter"
-    | "DependAfter"
-    | "Out";
-
-// -- in -- handle -- depend -- reduce -- out --
-export type TransformStage =
-    | "InBefore"
-    | "In"
-    | "InAfter"
-    | "HandleBefore"
-    | "Handle"
-    | "HandleAfter"
-    | "DependBefore"
-    | "Depend"
-    | "DependAfter"
-    | "ReduceBefore"
-    | "Reduce"
-    | "ReduceAfter"
-    | "OutBefore"
-    | "Out"
-    | "OutAfter";

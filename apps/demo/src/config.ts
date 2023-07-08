@@ -27,7 +27,8 @@ export const RelationConfig: IConfigItem[] = [
         init: false,
         depend: {
             names: ["area"],
-            handle([show, area]: [show: boolean, area: string]) {
+            handle([, area]: [show: boolean, area: string]) {
+                console.log("area", area);
                 if (area === "CN") {
                     return true;
                 }

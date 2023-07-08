@@ -6,17 +6,14 @@ export type {
     RxResult,
     ReturnResult,
     IDistinct,
-    CombineType,
     ReGenOptions,
-    LoggerOption,
-    FilterNilOption,
     AnyObservable,
     AnyBehaviorSubject,
     AnyArray,
     AnyPromise,
-    TransformStage,
     InitFunctionType,
 } from "./type";
+export { TransformStage, FilterNilStage, CombineType } from "./config";
 export { SetAtomValueByKey } from "./utils/index";
 export { useAtomsValue, useAtomsCallback } from "./hook/react/index";
 export type {

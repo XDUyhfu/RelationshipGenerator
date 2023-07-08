@@ -16,7 +16,10 @@ import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
 import { ReGenOptions } from "./type";
 
-import { CombineTypeDefaultValue, FilterNilOptionDefaultValue } from "./config";
+import {
+    CombineType,
+    FilterNilStage,
+} from "./config";
 import {
     handleCombine,
     handleDistinct,
@@ -25,10 +28,16 @@ import {
     handleUndefined,
 } from "./operator";
 
+/**
+ * 该方法将每个配置项构建为一个 AtomState 并进行存储
+ * @param CacheKey
+ * @constructor
+ */
 const ConfigToAtomStore =
-    (cacheKey: string) => (RelationConfig: IConfigItem[]) =>
+    (CacheKey: string) => (RelationConfig: IConfigItem[]) =>
+        // 里面用到的 forEach 来自 ramda，它会将传入的参数返回
         forEach((item: IConfigItem) => {
-            GlobalStore.get(cacheKey)!.set(
+            GlobalStore.get(CacheKey)!.set(
                 item.name,
                 new AtomState(
                     typeof item.init === "function" ? item.init() : item.init
@@ -36,31 +45,34 @@ const ConfigToAtomStore =
             );
         })(RelationConfig);
 
-// 处理自身的 handler
+/**
+ * 该过程用于执行状态自身的 handle 函数
+ * @param CacheKey
+ * @param _options
+ * @constructor
+ */
 const AtomHandle =
-    (cacheKey: string, _options?: ReGenOptions) =>
+    (CacheKey: string, _options?: ReGenOptions) =>
     (RelationConfig: IConfigItem[]) =>
         forEach((item: IConfigItem) => {
-            const atom = GlobalStore.get(cacheKey)!.get(item.name)!;
+            const atom = GlobalStore.get(CacheKey)!.get(item.name)!;
             atom.in$
                 .pipe(
                     switchMap(transformResultToObservable),
                     handleUndefined(
                         transformFilterNilOptionToBoolean(
-                            "In",
+                            FilterNilStage.In,
                             item.filterNil ??
-                                _options?.filterNil ??
-                                FilterNilOptionDefaultValue
+                                _options?.filterNil
                         )
                     ),
                     map(item.handle || identity),
                     switchMap(transformResultToObservable),
                     handleUndefined(
                         transformFilterNilOptionToBoolean(
-                            "HandleAfter",
+                            FilterNilStage.HandleAfter,
                             item.filterNil ??
-                                _options?.filterNil ??
-                                FilterNilOptionDefaultValue
+                                _options?.filterNil
                         )
                     ),
                     handleError(`捕获到 ${item.name} handle 中报错`)
@@ -68,30 +80,36 @@ const AtomHandle =
                 .subscribe(atom.mid$);
         })(RelationConfig);
 
+
+/**
+ * 处理当前状态及其依赖状态, 当依赖状态值发生变化的时候，会根据相关策略进行计算新的状态值
+ * @param CacheKey
+ * @param _options
+ * @constructor
+ */
 const HandDepend =
-    (cacheKey: string, _options?: ReGenOptions) =>
+    (CacheKey: string, _options?: ReGenOptions) =>
     (RelationConfig: IConfigItem[]) =>
         forEach((item: IConfigItem) => {
-            const atom = GlobalStore.get(cacheKey)!.get(item.name)!;
+            const atom = GlobalStore.get(CacheKey)!.get(item.name)!;
             const dependNames = getDependNames(item);
             const dependAtomsOut$ = dependNames.map(
-                (name) => GlobalStore.get(cacheKey)!.get(name)!.out$
+                (name) => GlobalStore.get(CacheKey)!.get(name)!.out$
             );
             atom.mid$
                 .pipe(
                     switchMap(transformResultToObservable),
                     handleCombine(
-                        item.depend?.combineType || CombineTypeDefaultValue,
+                        item.depend?.combineType || CombineType.ANY_CHANGE,
                         dependAtomsOut$
                     ),
                     map(item?.depend?.handle || identity),
                     switchMap(transformResultToObservable),
                     handleUndefined(
                         transformFilterNilOptionToBoolean(
-                            "DependAfter",
+                            FilterNilStage.DependAfter,
                             item.filterNil ??
-                                _options?.filterNil ??
-                                FilterNilOptionDefaultValue
+                                _options?.filterNil
                         )
                     ),
                     handleError(`捕获到 ${item.name} depend.handle 中报错`),
@@ -109,29 +127,35 @@ const HandDepend =
                     ),
                     handleUndefined(
                         transformFilterNilOptionToBoolean(
-                            "Out",
+                            FilterNilStage.Out,
                             item.filterNil ??
-                                _options?.filterNil ??
-                                FilterNilOptionDefaultValue
+                                _options?.filterNil
                         )
                     ),
-                    handleLogger(cacheKey, item.name, _options?.logger)
+                    handleLogger(CacheKey, item.name, _options?.logger)
                 )
                 .subscribe(atom.out$);
         })(RelationConfig);
 
+/**
+ * 构建的整体流程
+ * @param CacheKey
+ * @param RelationConfig
+ * @param options
+ * @constructor
+ */
 const BuilderRelation = (
-    cacheKey: string,
+    CacheKey: string,
     RelationConfig: IConfigItem[],
     options?: ReGenOptions
 ) =>
     of<IConfigItem[]>(RelationConfig).pipe(
-        map(OpenLogger(cacheKey, options)),
         map(JudgeRepetition()),
         map(DependencyDetection()),
-        map(ConfigToAtomStore(cacheKey)),
-        map(AtomHandle(cacheKey, options)),
-        map(HandDepend(cacheKey, options))
+        map(OpenLogger(CacheKey, options)),
+        map(ConfigToAtomStore(CacheKey)),
+        map(AtomHandle(CacheKey, options)),
+        map(HandDepend(CacheKey, options))
     );
 
 export const ReGen = (
@@ -139,9 +163,7 @@ export const ReGen = (
     RelationConfig: IConfigItem[],
     options?: ReGenOptions
 ) => {
-
     CheckReGenParams(CacheKey, RelationConfig);
-
     if (!GlobalStore.has(CacheKey)) {
         GlobalStore.set(CacheKey, new Map<string, AtomState>());
         GlobalConfig.set(CacheKey, PluckValue(RelationConfig));

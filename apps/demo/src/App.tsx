@@ -6,10 +6,7 @@ import {
 import { RelationConfig } from "./config";
 import { Button, Select } from "antd";
 
-const AtomInOut = ReGen("CACHE_KEY", RelationConfig, {
-    logger: true,
-    filterNil: "Default",
-});
+const AtomInOut = ReGen("CACHE_KEY", RelationConfig, { logger: true });
 
 function App() {
     const {

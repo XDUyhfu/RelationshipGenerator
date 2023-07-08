@@ -136,7 +136,8 @@ export const SetAtomValueByKey =
         GetAtomIn(cacheKey)?.[name]?.next(value);
 
 export const PluckValue = (config: IConfigItem[]): PluckValueType[] =>
-    config.map((item: IConfigItem) => ({ init: item?.init, name: item?.name }));
+    config.map(item => ({ init: item?.init, name: item?.name }));
+export const PluckName = (config: IConfigItem[]): string[] => config.map(item => item.name);
 
 
 // 检查 ReGen 函数参数

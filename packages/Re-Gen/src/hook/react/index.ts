@@ -2,7 +2,10 @@ import { useCallback } from "react";
 import { Subject, Observable, filter, isObservable } from "rxjs";
 import { useObservable } from "rxjs-hooks";
 import { GlobalConfig } from "../../Atom";
-import { isPlainResult } from "../../utils";
+import {
+    isPlainResult,
+    PluckName
+} from "../../utils";
 import { DefaultAtomsValue } from "../../config";
 import { IConfigItemInit } from "../../type";
 
@@ -23,7 +26,7 @@ export interface IResultAtomsCallback<T = any> {
 
 export const useAtomsValue = (CacheKey: string, AtomInOut: IAtomInOut) => {
     const RelationConfig = GlobalConfig.get(CacheKey)! || DefaultAtomsValue.RelationConfig;
-    const names = RelationConfig.map((item) => item.name);
+    const names = PluckName(RelationConfig);
     const initMap = RelationConfig.reduce((pre, item) => ({
             ...pre,
             [`${item.name}`]: item.init
@@ -48,8 +51,7 @@ export const useAtomsValue = (CacheKey: string, AtomInOut: IAtomInOut) => {
 };
 
 export const useAtomsCallback = (CacheKey: string, AtomInOut: IAtomInOut) => {
-    const RelationConfig = GlobalConfig.get(CacheKey)! || DefaultAtomsValue.RelationConfig;
-    const names = RelationConfig.map((item) => item.name);
+    const names = PluckName(GlobalConfig.get(CacheKey)! || DefaultAtomsValue.RelationConfig);
     const AtomsCallback: IResultAtomsCallback = names.reduce((pre, name) => {
         const inout = (AtomInOut ?? DefaultAtomsValue.HandleFunction)(name);
         return {

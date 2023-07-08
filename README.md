@@ -2,7 +2,7 @@
 
 ![img.png](img.png)
 
-**NPM地址** [@yhfu/re-gen](https://www.npmjs.com/package/@yhfu/re-gen)  [@yhfu/re-gen-hooks](https://www.npmjs.com/package/@yhfu/re-gen-hooks)
+**NPM地址** [@yhfu/re-gen](https://www.npmjs.com/package/@yhfu/re-gen)
 
 > demo地址: https://stackblitz.com/edit/react-ts-wv4a9d?file=App.tsx,config.ts,index.html
 
@@ -10,17 +10,19 @@
 
 ## 为什么会有该库
 
-> 💡 最初的想法是想实现一个状态和UI分离的开发方式，能够开发一个工具对复杂的状态进行构建
+> 💡 最初的想法是应用于状态和UI分离的开发方式之中，通过声明的方式描述状态以及其依赖和处理方式，通过工具对其进行构建
 > 
-> 💡 之后探索了一下 RxJS 的开发模式，发现我想做的工具其实就是使用 RxJS 开发的一个较为通用的开发模式 
+> 💡 之后探索了一下 RxJS 的开发模式，发现我想做的工具其实就是使用 RxJS 开发的一个较为通用的开发模式（数据流）
 > 
-> 💡 同时也想探索一种 RxJS in React 的实现方案 
+> 💡 最近在探索前端组件/页面复用方案的时候，发现其实这个工具可以作为一个底层构建工具，通过复用状态声明（描述状态以及其依赖和处理方式的配置文件）达到逻辑上的复用，**完全符合最初的想法** 🤔️
+> 
+> 🚀 **更多的复用方案会在之后的仓库中进行更详细的描述**
 
 ![流程图.jpg](%E6%B5%81%E7%A8%8B%E5%9B%BE.jpg)
  
 ## 什么场景适合使用？
 
-> 它可以应用到平时开发中的任何场景，只是不同场景的接入成本不同。
+> 主要的场景聚焦在一个组件的开发当中。当然一个页面的开发过程中也可以使用，可能会遇到状态太多而导致不易维护（该库也提供了状态拆分的方案，详见demo）。
 
 ## Demo 说明
 
@@ -36,22 +38,22 @@ redux 派发 action ）。
 
 ## 接入方式
 
-如果使用该工具，需要提供一组配置项，单个配置项的格式如下所示，具体使用方式可以参照 apps/demo/src/config.ts 的配置文件。
+如果使用该工具，需要提供一组配置项，其中单个配置项的格式如下所示，具体使用方式可以参照 apps/demo/src/config.ts 的配置文件。
 
 ```typescript
 interface IConfigItem {
   name: string;
-  init?: Promise | Observable | PlainResult | InitFunctionType;
+  init?: IConfigItemInit;
   handle?: (arg: any) => ReturnResult;
   distinct?: IDistinct;
   reduce?: {
     handle: (pre: any, val: any) => any;
     init: any;
   };
-  filterNil?: FilterNilOption;
+  filterNil?: FilterNilStage;
   depend?: {
     names: string[];
-    handle: (args: any) => ReturnResult;
+    handle: (args: any[]) => ReturnResult;
     combineType?: CombineType;
   };
 }
@@ -107,29 +109,7 @@ export const RelationConfig: IConfigItem[] = [
         RegionList: string[]
       ]) => JSON.stringify(showRegion) + JSON.stringify(RegionList?.length),
     },
-  },
-  {
-    name: "testMoreMoreDepend",
-    init: "",
-    depend: {
-      names: ["testMoreDepend"],
-      handle: async ([testMoreMoreDepend, testMoreDepend]: [
-        testMoreMoreDepend: string,
-        testMoreDepend: string
-      ]) => {
-        if (
-			testMoreDepend === "true4" && testMoreMoreDepend !== "out"
-        ) {
-          return "full";
-        } else {
-          if (testMoreMoreDepend === "out") {
-            return "out";
-          }
-          return "unfull";
-        }
-      },
-    },
-  },
+  }
 ];
 ```
 
@@ -143,35 +123,34 @@ const AtomInOut = ReGen( CacheKey, RelationConfig );
 
 ### 接下来可以使用hook进行操作
 
-#### hook方法
-
-- 通过使用 `@yhfu/ge-ren-hooks` 包导出的 `useAtomsValue` 以及 `useAtomsCallback` 方法，分别传入 `AtomInOut`
-  以及 `RelationConfig` 参数，hook会返回一个对象，通过解构对象，从而获取 `${name}` 以及 `${name}Callback`。其中 `${name}`
+- 通过包导出的 `useAtomsValue` 以及 `useAtomsCallback` hook方法，分别传入 `CacheKey`
+  以及 `AtomInOut` 参数进行调用即可。
+- hook会返回一个对象，通过解构对象，从而获取 `${name}` 以及 `${name}Callback`。其中 `${name}`
   会被替换为 `RelationConfig` 中的name值。
 
 ```typescript
-const AtomInOut = ReGen( CacheKey, RelationConfig, { logger: { duration: 300 } } ); // 可以写到组件外边，也可以写到组件内部，实际通过 CacheKey 做了缓存的处理
+const AtomInOut = ReGen( "CacheKey", RelationConfig, { logger: { duration: 300 } } ); // 可以写到组件外边，也可以写到组件内部，实际通过 CacheKey 做了缓存的处理
 
 const {
 	area,
 	region
-} = useAtomsValue( AtomInOut, RelationConfig );
+} = useAtomsValue( "CacheKey", AtomInOut );
 
 const {
 	areaCallback,
 	regionCallback
-} = useAtomsCallback( AtomInOut, RelationConfig );
+} = useAtomsCallback( "CacheKey", AtomInOut );
 ```
 
 ### 全局可选配置项
 
 #### 调试日志
 
-日志服务使用的是 `rxjs-watcher` 的库。开启方法是传入第三项配置项 `logger: { duration?:number } | boolean`，其中 `duration`
+日志服务使用的是 `rxjs-watcher` 的库。开启方法是传入第三项配置项 `logger: { duration?:number } | boolean | number`，其中 `duration`
 为可观察的持续时间。如需看到每个 Observable 的具体情况，请安装 `rxjs-watcher` 相关浏览器插件即可。
 
 ```typescript
-ReGen( CacheKey, RelationConfig, { logger: { duration: 180 } } )
+ReGen( CacheKey, RelationConfig, { logger: { duration: 300 } } )
 ```
 
 #### 空值处理
@@ -179,20 +158,19 @@ ReGen( CacheKey, RelationConfig, { logger: { duration: 180 } } )
 ```typescript
 // 全局配置
 // 默认值 false
-// type FilterNilOption = "All" | "Default" | "In" | "HandleAfter" | "DependAfter" | "Out"
-// All 表示全局开启过滤  Default 表示默认策略（全部关闭） "In" | "HandleAfter" | "DependAfter" | "Out" 表示不同的阶段进行空值处理
+// type FilterNilStage = "All" | "Default" | "In" | "HandleAfter" | "DependAfter" | "Out"
+// All 表示全局开启过滤 
+// Default 表示默认策略（处于 In 和 Out 阶段且不进行过滤）
+// "In" | "HandleAfter" | "DependAfter" | "Out" 表示不同的阶段进行空值处理
 
-ReGen( CacheKey, RelationConfig, { nil: 'Default' } );
+ReGen( "CacheKey", RelationConfig, { filterNil: FilterNilStage | boolean } );
 
 // 局部配置
-// 单独对 area 进行空值
+// 单独对当前状态进行空值过滤
 // 优先级高于全局配置
 [{
-	name: "area",
-	handle( val ) {
-		return [val];
-	},
-    filterNil: FilterNilOption
+    name: "area",
+    filterNil: FilterNilStage | boolean
 }]
 ```
 
@@ -200,23 +178,28 @@ ReGen( CacheKey, RelationConfig, { nil: 'Default' } );
 > 
 > `withLastestFrom` 的处理方式是其他的 `Observable` 有值之后，再次触发上游 `Observable` 才会通过第一个值
 > 
-> 所以在过滤的时候如果不熟悉上边的条件，建议每个配置项都写上 `init` 并且不对 `filterNil` 进行设置
+> 所以在过滤的时候如果不熟悉上边的条件，**_建议每个配置项都写上 `init` 并且不对 `filterNil` 进行设置_**
 
 #### 重复值过滤
 
 默认全局开启，使用 `ramda` 中的 `equals` 进行对比
 
 ```typescript
+// 全局配置
 ReGen( CacheKey, RelationConfig, { distinct: true } );
-```
 
-也可以在单独的配置项中进行设置，类型如下所示
+// 局部配置
+// 单独对当前状态进行去重
+// 建议使用布尔值进行配置，如需使用高级方法，可参见 RxJS distinctUntilChanged 操作符相关设置
+[{
+  name: "area",
+  distinct: IDistinct
+}]
 
-```typescript
 type IDistinct<T, K> =
-	| boolean
-	| {
-	comparator: ( previous: K, current: K ) => boolean; keySelector?: ( value: T ) => K;
+        | boolean
+        | {
+  comparator: ( previous: K, current: K ) => boolean; keySelector?: ( value: T ) => K;
 };
 ```
 

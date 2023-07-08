@@ -34,13 +34,15 @@ export const handleDistinct =
             return distinct
                 ? source.pipe(distinctUntilChanged(equals))
                 : source;
-        } else {
+        } else if (distinct) {
             return source.pipe(
                 distinctUntilChanged(
                     distinct.comparator,
                     distinct.keySelector || identity
                 )
             );
+        } else {
+            return source;
         }
     };
 

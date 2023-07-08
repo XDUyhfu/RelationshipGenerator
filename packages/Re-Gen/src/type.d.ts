@@ -12,18 +12,18 @@ export type RxResult = ObservableInput<any>;
 
 export type ReturnResult = PlainResult | RxResult;
 
-export type IDistinct<T, K> =
+export type IDistinct<T = any, K = any> =
     | boolean
     | {
           comparator: (previous: K, current: K) => boolean;
           keySelector?: (value: T) => K;
-      };
+      } | undefined;
 
 export type InitFunctionType = (
     ...args: any[]
-) => Promise | Observable | PlainResult;
+) => AnyPromise | AnyObservable | PlainResult;
 
-export type IConfigItemInit = Promise | Observable | PlainResult | InitFunctionType
+export type IConfigItemInit = AnyPromise | AnyObservable | PlainResult | InitFunctionType
 
 export interface IConfigItem {
     name: string;
@@ -34,10 +34,10 @@ export interface IConfigItem {
         handle: (pre: any, val: any) => any;
         init: any;
     };
-    filterNil?: FilterNilOption;
+    filterNil?: FilterNilStage | boolean;
     depend?: {
         names: string[];
-        handle: (args: any) => ReturnResult;
+        handle: (args: any[]) => ReturnResult;
         combineType?: CombineType;
     };
 }

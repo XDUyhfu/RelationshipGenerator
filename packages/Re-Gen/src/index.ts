@@ -14,9 +14,9 @@ export type {
     InitFunctionType,
 } from "./type";
 export { TransformStage, FilterNilStage, CombineType } from "./config";
-export { SetAtomValueByKey } from "./utils/index";
-export { useAtomsValue, useAtomsCallback } from "./hook/react/index";
+export { SetAtomValueByKey } from "./utils";
+export { useAtomsValue, useAtomsCallback } from "./hook/react";
 export type {
     IResultAtomsValue,
     IResultAtomsCallback,
-} from "./hook/react/index";
+} from "./hook/react";

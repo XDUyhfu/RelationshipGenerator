@@ -45,9 +45,12 @@ export const FilterNilDefaultConfig = {
 
 export const LoggerDurationDefaultValue = 300;
 export const DistinctDefaultValue = true;
-export const DefaultName = "@@$";
-export const DefaultRelationConfig = [{ name: DefaultName }];
-export const DefaultOut$ = of(null);
-export const DefaultIn$ = new BehaviorSubject(null);
-export const DefaultFunction = () => ({});
+
+export const DefaultAtomsValue = {
+	Name: "@@$",
+	RelationConfig: [{ name: "@@$" }],
+	In$: new BehaviorSubject(null),
+	Out$: of(null),
+	HandleFunction: () => ({})
+};
 

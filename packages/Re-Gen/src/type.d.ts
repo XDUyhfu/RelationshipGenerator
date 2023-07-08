@@ -23,9 +23,11 @@ export type InitFunctionType = (
     ...args: any[]
 ) => Promise | Observable | PlainResult;
 
+export type IConfigItemInit = Promise | Observable | PlainResult | InitFunctionType
+
 export interface IConfigItem {
     name: string;
-    init?: Promise | Observable | PlainResult | InitFunctionType;
+    init?: IConfigItemInit;
     handle?: (arg: any) => ReturnResult;
     distinct?: IDistinct;
     reduce?: {
@@ -46,8 +48,8 @@ export type AnyArray = Array<any>;
 export type AnyPromise = Promise<any>;
 export type AtomsType = Record<string, AnyBehaviorSubject>;
 export type PluckValueType = {
-    init: Promise | Observable | PlainResult | InitFunctionType;
     name: string;
+    init: IConfigItemInit;
 };
 
 export interface ReGenOptions {

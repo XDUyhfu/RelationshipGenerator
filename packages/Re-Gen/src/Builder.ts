@@ -160,7 +160,7 @@ const BuilderRelation = (
 export const ReGen = (
     CacheKey: string,
     RelationConfig: IConfigItem[],
-    config: ReGenConfig
+    config?: ReGenConfig
 ) => {
 
     if (!Global.Store.has(CacheKey)) {

@@ -41,7 +41,7 @@ interface IResultAtomsValue {
     [x: `${ string }`]: any;
 }
 
-export const useReGen = (CacheKey: string, RelationConfig: IConfigItem[], config: ReGenConfig) => {
+export const useReGen = (CacheKey: string, RelationConfig: IConfigItem[], config?: ReGenConfig) => {
     CheckParams(CacheKey, RelationConfig);
     const AtomInOut = ReGen(CacheKey, RelationConfig, config);
     const names = PluckName(RelationConfig);

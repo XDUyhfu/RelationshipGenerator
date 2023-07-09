@@ -1,10 +1,10 @@
 import { Button, Input, Switch } from "antd";
-import { useAtomsValue } from "../../../packages/Re-Gen/src/index";
+import { useReGen } from "../../../packages/Re-Gen/src/index";
 
 import { Config } from "./config";
 
 function App() {
-    const { result, ReGenValues: {setValue} } = useAtomsValue("key", Config);
+    const { result, ReGenValues: {setValue} } = useReGen("key", Config);
 
     return (
         <div>

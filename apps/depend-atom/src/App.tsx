@@ -1,4 +1,4 @@
-import { useAtomsValue } from "../../../packages/Re-Gen/src/index";
+import { useReGen } from "../../../packages/Re-Gen/src/index";
 import {
     FirstCacheKey,
     FirstConfig,
@@ -8,8 +8,8 @@ import {
 
 
 function App() {
-    const { atom, ReGenValues: { setValue } } = useAtomsValue(FirstCacheKey, FirstConfig);
-    const { value } = useAtomsValue(SecondCacheKey, SecondConfig);
+    const { atom, ReGenValues: { setValue } } = useReGen(FirstCacheKey, FirstConfig);
+    const { value } = useReGen(SecondCacheKey, SecondConfig);
 
     return (
         <div>

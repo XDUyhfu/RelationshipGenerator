@@ -1,4 +1,4 @@
-import { useAtomsValue } from "../../../packages/Re-Gen/src/index";
+import { useReGen } from "../../../packages/Re-Gen/src/index";
 import { RelationConfig } from "./config";
 import { Button, Select } from "antd";
 function App() {
@@ -10,7 +10,7 @@ function App() {
         testMoreDepend,
         testMoreMoreDepend,
         ReGenValue: {setValue}
-    } = useAtomsValue("CACHE_KEY", RelationConfig);
+    } = useReGen("CACHE_KEY", RelationConfig);
 
     return (
         <div>

@@ -1,12 +1,10 @@
 import Input from "./input";
-import { useAtomsValue, ReGenRegisterConfig } from "../../../../packages/Re-Gen/src";
+import { useReGen } from "../../../../packages/Re-Gen/src";
 
 import { ConfigList } from "./state";
 
-ReGenRegisterConfig("Test", { logger: true });
-
 const AutoComplete = () => {
-    const { inputValue, list, hightIndex, ReGenValues: { setValue } } = useAtomsValue("Test", ConfigList);
+    const { inputValue, list, hightIndex, ReGenValues: { setValue } } = useReGen("Test", ConfigList, { logger: true });
 
     const index = hightIndex % list?.length ?? 0;
 

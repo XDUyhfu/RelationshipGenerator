@@ -4,7 +4,7 @@ import { useReGen } from "../../../../packages/Re-Gen/src";
 import { ConfigList } from "./state";
 
 const AutoComplete = () => {
-    const { inputValue, list, hightIndex, ReGenValues: { setValue } } = useReGen("Test", ConfigList, { logger: true });
+    const { inputValue, list, hightIndex, ReGenValue: { setValue } } = useReGen("Test", ConfigList, { logger: true });
 
     const index = hightIndex % list?.length ?? 0;
 

@@ -8,7 +8,7 @@ import {
 
 
 function App() {
-    const { atom, ReGenValues: { setValue } } = useReGen(FirstCacheKey, FirstConfig);
+    const { atom, ReGenValue: { setValue } } = useReGen(FirstCacheKey, FirstConfig);
     const { value } = useReGen(SecondCacheKey, SecondConfig);
 
     return (

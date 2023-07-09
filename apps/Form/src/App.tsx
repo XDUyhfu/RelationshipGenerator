@@ -6,7 +6,7 @@ import { ConfigItems, IItem } from "./config";
 import { Button, Input, Select, Space } from "antd";
 
 const App: React.FC = () => {
-    const { Items, ItemNames, ReGenValues: {setValue} } = useReGen("FORM_CACHE_KEY", ConfigItems);
+    const { Items, ItemNames, ReGenValue: {setValue} } = useReGen("FORM_CACHE_KEY", ConfigItems);
 
     return (
         <div>

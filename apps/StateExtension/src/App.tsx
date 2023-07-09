@@ -4,7 +4,7 @@ import { useReGen } from "../../../packages/Re-Gen/src/index";
 import { Config } from "./config";
 
 function App() {
-    const { result, ReGenValues: {setValue} } = useReGen("key", Config);
+    const { result, ReGenValue: {setValue} } = useReGen("key", Config);
 
     return (
         <div>

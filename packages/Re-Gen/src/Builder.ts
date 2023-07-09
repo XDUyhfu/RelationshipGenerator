@@ -18,7 +18,7 @@ import {
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
-import { ReGenOptions } from "./type";
+import { ReGenConfig } from "./type";
 
 import {
     CombineType,
@@ -31,11 +31,7 @@ import {
     handleLogger,
     handleUndefined,
 } from "./operator";
-import {
-    GlobalConfig,
-    GlobalOptions,
-    GlobalStore
-} from "./store";
+import { Global } from "./store";
 
 /**
  * 该方法将每个配置项构建为一个 AtomState 并进行存储
@@ -46,7 +42,7 @@ const ConfigToAtomStore =
     (CacheKey: string) => (RelationConfig: IConfigItem[]) =>
         // 里面用到的 forEach 来自 ramda，它会将传入的参数返回
         forEach((item: IConfigItem) => {
-            GlobalStore.get(CacheKey)!.set(
+            Global.Store.get(CacheKey)!.set(
                 item.name,
                 new AtomState(
                     typeof item.init === "function" ? item.init() : item.init
@@ -61,10 +57,10 @@ const ConfigToAtomStore =
  * @constructor
  */
 const AtomHandle =
-    (CacheKey: string, _options?: ReGenOptions) =>
+    (CacheKey: string, _options?: ReGenConfig) =>
     (RelationConfig: IConfigItem[]) =>
         forEach((item: IConfigItem) => {
-            const atom = GlobalStore.get(CacheKey)!.get(item.name)!;
+            const atom = Global.Store.get(CacheKey)!.get(item.name)!;
             atom.in$
                 .pipe(
                     switchMap(transformResultToObservable),
@@ -97,13 +93,13 @@ const AtomHandle =
  * @constructor
  */
 const HandDepend =
-    (CacheKey: string, _options?: ReGenOptions) =>
+    (CacheKey: string, _options?: ReGenConfig) =>
     (RelationConfig: IConfigItem[]) =>
         forEach((item: IConfigItem) => {
-            const atom = GlobalStore.get(CacheKey)!.get(item.name)!;
+            const atom = Global.Store.get(CacheKey)!.get(item.name)!;
             const dependNames = getDependNames(item);
             const dependAtomsOut$ = dependNames.map(
-                (name) => GlobalStore.get(CacheKey)!.get(name)!.out$
+                (name) => Global.Store.get(CacheKey)!.get(name)!.out$
             );
             atom.mid$
                 .pipe(
@@ -156,7 +152,7 @@ const HandDepend =
 const BuilderRelation = (
     CacheKey: string,
     RelationConfig: IConfigItem[],
-    options?: ReGenOptions
+    options?: ReGenConfig
 ) =>
     of<IConfigItem[]>(RelationConfig).pipe(
         map(JudgeRepetition()),
@@ -172,15 +168,15 @@ export const ReGen = (
     RelationConfig: IConfigItem[]
 ) => {
     CheckReGenParams(CacheKey, RelationConfig);
-    if (!GlobalStore.has(CacheKey)) {
-        GlobalStore.set(CacheKey, new Map<string, AtomState>());
-        GlobalConfig.set(CacheKey, PluckValue(RelationConfig));
-        BuilderRelation(CacheKey, RelationConfig, GlobalOptions.get(CacheKey)).subscribe();
+    if (!Global.Store.has(CacheKey)) {
+        Global.Store.set(CacheKey, new Map<string, AtomState>());
+        Global.RelationConfig.set(CacheKey, PluckValue(RelationConfig));
+        BuilderRelation(CacheKey, RelationConfig, Global.Config.get(CacheKey)).subscribe();
     }
     return AtomInOut(CacheKey);
 };
 
-export const ReGenRegisterConfig = (CacheKey: string, options: ReGenOptions) => {
+export const ReGenRegisterConfig = (CacheKey: string, config: ReGenConfig) => {
     CheckCacheKey(CacheKey);
-    GlobalOptions.set(CacheKey, options);
+    Global.Config.set(CacheKey, config);
 };

@@ -4,7 +4,7 @@ import {
     ReplaySubject,
 } from "rxjs";
 import { AtomsType } from "./type";
-import { GlobalStore } from "./store";
+import { Global } from "./store";
 
 export class AtomState<T = any> {
     in$: BehaviorSubject<T>;
@@ -21,7 +21,7 @@ export class AtomState<T = any> {
 export const AtomInOut =
     (cacheKey: string) =>
     <T = any>(name: string) => {
-        const atom = GlobalStore.get(cacheKey)!.get(name)!;
+        const atom = Global.Store.get(cacheKey)!.get(name)!;
         if (!atom) {
             throw new Error(`用于构建的配置列表中不包含该 ${name} 值`);
         }
@@ -50,8 +50,8 @@ export const GetAtomObservables = (
     cacheKey: string
 ): Record<string, BehaviorSubject<any>> => {
     const result = {} as AtomsType;
-    if (GlobalStore.has(cacheKey)) {
-        const entries = GlobalStore.get(cacheKey)!.entries();
+    if (Global.Store.has(cacheKey)) {
+        const entries = Global.Store.get(cacheKey)!.entries();
         for (const [key, value] of entries) {
             result[key] = value.out$;
         }
@@ -63,8 +63,8 @@ export const GetAtomIn = (
     cacheKey: string
 ): Record<string, BehaviorSubject<any>> => {
     const result = {} as AtomsType;
-    if (GlobalStore.has(cacheKey)) {
-        const entries = GlobalStore.get(cacheKey)!.entries();
+    if (Global.Store.has(cacheKey)) {
+        const entries = Global.Store.get(cacheKey)!.entries();
         for (const [key, value] of entries) {
             result[key] = value.in$;
         }

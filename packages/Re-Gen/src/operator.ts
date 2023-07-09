@@ -16,7 +16,7 @@ import {
     is
 } from "ramda";
 import { CombineType } from "./config";
-import { GlobalLoggerWatcher } from "./store";
+import { Global } from "./store";
 
 export const handleUndefined: (
     filterNil: boolean
@@ -79,4 +79,4 @@ export const handleLogger = (
     name: string,
     open?: { duration?: number } | boolean | number
 ): ((source: Observable<any>) => Observable<any>) =>
-    open ? GlobalLoggerWatcher.get(CacheKey)!(`${name}`) : identity;
+    open ? Global.LoggerWatcher.get(CacheKey)!(`${name}`) : identity;

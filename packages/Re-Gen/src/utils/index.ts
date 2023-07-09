@@ -4,7 +4,7 @@ import {
     IConfigItem,
     IDistinct,
     ReturnResult,
-    ReGenOptions,
+    ReGenConfig,
     PluckValueType,
     PlainResult,
 } from "../type";
@@ -24,7 +24,7 @@ import {
 } from "ramda";
 import { GetAtomIn } from "../Atom";
 import { getGroup } from "rxjs-watcher";
-import { GlobalLoggerWatcher } from "../store";
+import { Global } from "../store";
 
 export const isArray = (value: any): value is Array<any> => Array.isArray(value);
 export const isPlainObject = (value: any) =>
@@ -113,10 +113,10 @@ export const DependencyDetection = () => (RelationConfig: IConfigItem[]) =>
     })(RelationConfig);
 
 export const OpenLogger =
-    (CacheKey: string, _options?: ReGenOptions) =>
+    (CacheKey: string, _options?: ReGenConfig) =>
     (RelationConfig: IConfigItem[]) => {
-        if (!GlobalLoggerWatcher.has(CacheKey) && !!_options?.logger) {
-            GlobalLoggerWatcher.set(
+        if (!Global.LoggerWatcher.has(CacheKey) && !!_options?.logger) {
+            Global.LoggerWatcher.set(
                 CacheKey,
                 getGroup(
                     `${CacheKey} Watcher Group`,

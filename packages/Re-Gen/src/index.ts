@@ -5,7 +5,7 @@ export type {
     RxResult,
     ReturnResult,
     IDistinct,
-    ReGenOptions,
+    ReGenConfig,
     InitFunctionType,
 } from "./type";
 export { ReGenRegisterConfig } from "./Builder";

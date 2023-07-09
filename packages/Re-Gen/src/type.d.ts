@@ -49,7 +49,7 @@ export type PluckValueType = {
     init: IConfigItemInit;
 };
 
-export interface ReGenOptions {
+export interface ReGenConfig {
     /**
      * 是否开启logger
      * - 日志持续的时间或者使用默认时间

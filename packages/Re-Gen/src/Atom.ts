@@ -1,10 +1,10 @@
 import {
     BehaviorSubject,
     Observable,
-    OperatorFunction,
     ReplaySubject,
 } from "rxjs";
-import { AtomsType, PluckValueType } from "./type";
+import { AtomsType } from "./type";
+import { GlobalStore } from "./store";
 
 export class AtomState<T = any> {
     in$: BehaviorSubject<T>;
@@ -17,17 +17,6 @@ export class AtomState<T = any> {
         this.out$ = new BehaviorSubject(init);
     }
 }
-
-export const GlobalStore = new Map<string, Map<string, AtomState>>();
-export const GlobalLoggerWatcher = new Map<
-    string,
-    <T>(
-        marbleName: string,
-        selector?: ((value: T) => any) | undefined
-    ) => OperatorFunction<T, T>
->();
-
-export const GlobalConfig = new Map<string, PluckValueType[]>();
 
 export const AtomInOut =
     (cacheKey: string) =>

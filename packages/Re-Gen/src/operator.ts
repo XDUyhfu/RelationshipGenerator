@@ -15,8 +15,8 @@ import {
     equals,
     is
 } from "ramda";
-import { GlobalLoggerWatcher } from "./Atom";
 import { CombineType } from "./config";
+import { GlobalLoggerWatcher } from "./store";
 
 export const handleUndefined: (
     filterNil: boolean
@@ -75,8 +75,8 @@ export const handleError =
         );
 
 export const handleLogger = (
-    cacheKey: string,
+    CacheKey: string,
     name: string,
     open?: { duration?: number } | boolean | number
 ): ((source: Observable<any>) => Observable<any>) =>
-    open ? GlobalLoggerWatcher.get(cacheKey)!(`${name}`) : identity;
+    open ? GlobalLoggerWatcher.get(CacheKey)!(`${name}`) : identity;

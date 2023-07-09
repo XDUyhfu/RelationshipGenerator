@@ -7,8 +7,7 @@ import {
 } from "../../utils";
 import {
     IConfigItem,
-    IConfigItemInit,
-    ReGenOptions
+    IConfigItemInit
 } from "../../type";
 import { ReGen } from "../../Builder";
 
@@ -20,8 +19,8 @@ export interface IResultAtomsCallback<T = any> {
     [x: `${string}`]: T;
 }
 
-export const useAtomsValue = (CacheKey: string, RelationConfig: IConfigItem[], options?: ReGenOptions) => {
-    const AtomInOut = ReGen(CacheKey, RelationConfig, options);
+export const useAtomsValue = (CacheKey: string, RelationConfig: IConfigItem[]) => {
+    const AtomInOut = ReGen(CacheKey, RelationConfig);
     const names = PluckName(RelationConfig);
     const initMap = RelationConfig.reduce((pre, item) => ({
             ...pre,
@@ -46,8 +45,8 @@ export const useAtomsValue = (CacheKey: string, RelationConfig: IConfigItem[], o
     return AtomsValue;
 };
 
-export const useAtomsCallback = (CacheKey: string, RelationConfig: IConfigItem[], options?: ReGenOptions) => {
-    const AtomInOut = ReGen(CacheKey, RelationConfig, options);
+export const useAtomsCallback = (CacheKey: string, RelationConfig: IConfigItem[]) => {
+    const AtomInOut = ReGen(CacheKey, RelationConfig);
     const names = PluckName(RelationConfig);
     const AtomsCallback: IResultAtomsCallback = names.reduce((pre, name) => {
         const inout = AtomInOut?.(name);

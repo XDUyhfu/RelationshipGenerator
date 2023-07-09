@@ -1,13 +1,14 @@
 import {
     useAtomsCallback,
     useAtomsValue,
+    // ReGenRegisterConfig
 } from "../../../packages/Re-Gen/src/index";
 import { RelationConfig } from "./config";
 import { Button, Select } from "antd";
 
 
 function App() {
-
+    // ReGenRegisterConfig("CACHE_KEY", {logger: true});
     const {
         area,
         region,
@@ -15,10 +16,8 @@ function App() {
         RegionList,
         testMoreDepend,
         testMoreMoreDepend,
-    } = useAtomsValue("CACHE_KEY", RelationConfig, { logger: true });
-    const { areaCallback, regionCallback } = useAtomsCallback(
-        "CACHE_KEY", RelationConfig, { logger: true }
-    );
+    } = useAtomsValue("CACHE_KEY", RelationConfig);
+    const { areaCallback, regionCallback } = useAtomsCallback("CACHE_KEY", RelationConfig );
 
     return (
         <div>

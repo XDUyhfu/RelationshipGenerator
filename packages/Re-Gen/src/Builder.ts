@@ -1,5 +1,8 @@
 import { identity, of, map, switchMap, scan } from "rxjs";
-import { AtomInOut, AtomState, GlobalConfig, GlobalStore } from "./Atom";
+import {
+    AtomInOut,
+    AtomState,
+} from "./Atom";
 import {
     defaultReduceFunction,
     getDependNames,
@@ -11,6 +14,7 @@ import {
     OpenLogger,
     PluckValue,
     CheckReGenParams,
+    CheckCacheKey,
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
@@ -27,6 +31,11 @@ import {
     handleLogger,
     handleUndefined,
 } from "./operator";
+import {
+    GlobalConfig,
+    GlobalOptions,
+    GlobalStore
+} from "./store";
 
 /**
  * 该方法将每个配置项构建为一个 AtomState 并进行存储
@@ -160,14 +169,18 @@ const BuilderRelation = (
 
 export const ReGen = (
     CacheKey: string,
-    RelationConfig: IConfigItem[],
-    options?: ReGenOptions
+    RelationConfig: IConfigItem[]
 ) => {
     CheckReGenParams(CacheKey, RelationConfig);
     if (!GlobalStore.has(CacheKey)) {
         GlobalStore.set(CacheKey, new Map<string, AtomState>());
         GlobalConfig.set(CacheKey, PluckValue(RelationConfig));
-        BuilderRelation(CacheKey, RelationConfig, options).subscribe();
+        BuilderRelation(CacheKey, RelationConfig, GlobalOptions.get(CacheKey)).subscribe();
     }
     return AtomInOut(CacheKey);
+};
+
+export const ReGenRegisterConfig = (CacheKey: string, options: ReGenOptions) => {
+    CheckCacheKey(CacheKey);
+    GlobalOptions.set(CacheKey, options);
 };

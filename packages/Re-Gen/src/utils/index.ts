@@ -137,18 +137,21 @@ export const SetAtomValueByKey =
 export const PluckValue = (config: IConfigItem[]): PluckValueType[] =>
     config.map(item => ({ init: item?.init, name: item?.name }));
 export const PluckName = (config: IConfigItem[]): string[] => config.map(item => item.name);
+const isNotEmpty = complement(isEmpty);
 
+export const CheckCacheKey = (CacheKey: string) => {
+    if (not(is(String, CacheKey) && isNotEmpty(CacheKey))) {
+        throw new Error("cacheKey 需要为字符串类型且长度大于0");
+    }
+};
 
 // 检查 ReGen 函数参数
-export const CheckReGenParams = (cacheKey: string, RelationConfig: IConfigItem[]) => {
+export const CheckReGenParams = (CacheKey: string, RelationConfig: IConfigItem[]) => {
     // 对 JudgeRepetition 的补充
     // 判断条件：
     // cacheKey是一个有效的字符串
     // RelationConfig 长度大于 0
-    const isNotEmpty = complement(isEmpty);
-    if (not(is(String, cacheKey) && isNotEmpty(cacheKey))) {
-         throw new Error("cacheKey 需要为字符串类型且长度大于0");
-    }
+    CheckCacheKey(CacheKey);
     if (not(is(Array, RelationConfig) && isNotEmpty(RelationConfig))) {
         throw new Error("RelationConfig 需要为数据类型且长度大于0");
     }

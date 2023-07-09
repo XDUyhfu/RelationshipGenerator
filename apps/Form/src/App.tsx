@@ -1,25 +1,12 @@
-import {
-    ReGen,
-    useAtomsValue,
-    useAtomsCallback,
-} from "../../../packages/Re-Gen/src/index";
+import { useAtomsValue } from "../../../packages/Re-Gen/src/index";
 
 import React from "react";
 import { ConfigItems, IItem } from "./config";
 
 import { Button, Input, Select, Space } from "antd";
 
-const AtomInOut = ReGen("FORM_CACHE_KEY", ConfigItems, {
-    logger: true,
-    distinct: true,
-});
-
 const App: React.FC = () => {
-    const { Items, ItemNames } = useAtomsValue("FORM_CACHE_KEY", AtomInOut);
-    const { addItemCallback, nameCallback } = useAtomsCallback(
-        "FORM_CACHE_KEY",
-        AtomInOut
-    );
+    const { Items, ItemNames, ReGenValues: {setValue} } = useAtomsValue("FORM_CACHE_KEY", ConfigItems);
 
     return (
         <div>
@@ -28,7 +15,7 @@ const App: React.FC = () => {
             {JSON.stringify(ItemNames)}
             <br />
 
-            <Button onClick={addItemCallback}>添加</Button>
+            <Button onClick={setValue("addItem")}>添加</Button>
             <br />
             <br />
             {Items?.filter((val: any) => val).map((item: IItem) => (
@@ -39,7 +26,7 @@ const App: React.FC = () => {
                     <Input
                         style={{ width: 160 }}
                         onChange={(value) => {
-                            nameCallback({
+                            setValue("name",{
                                 value: value.target.value,
                                 id: item.id,
                             });

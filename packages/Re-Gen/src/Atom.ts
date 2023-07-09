@@ -5,6 +5,7 @@ import {
 } from "rxjs";
 import { AtomsType } from "./type";
 import { Global } from "./store";
+import { isNil } from "ramda";
 
 export class AtomState<T = any> {
     in$: BehaviorSubject<T>;
@@ -34,7 +35,7 @@ export const AtomInOut =
         };
     };
 
-export const GetCurrentAtomValues = (cacheKey: string): Record<string, any> => {
+ const GetCurrentAtomValues = (cacheKey: string): Record<string, any> => {
     const observables = GetAtomObservables(cacheKey);
     const result = {} as Record<string, any>;
     Object.keys(observables).forEach((key) => {
@@ -43,10 +44,10 @@ export const GetCurrentAtomValues = (cacheKey: string): Record<string, any> => {
     return result;
 };
 
-export const GetCurrentAtomValueByName =(CacheKey: string, name: string) =>
+ const GetCurrentAtomValueByName =(CacheKey: string, name: string) =>
     GetCurrentAtomValues(CacheKey)[name];
 
-export const GetAtomObservables = (
+ const GetAtomObservables = (
     CacheKey: string
 ): Record<string, BehaviorSubject<any>> => {
     const result = {} as AtomsType;
@@ -58,8 +59,7 @@ export const GetAtomObservables = (
     }
     return result;
 };
-
-export const GetAtomObservableByName = (
+ const GetAtomObservableByName = (
     CacheKey: string, name: string
 ): BehaviorSubject<any> => GetAtomObservables(CacheKey)[name];
 
@@ -76,6 +76,41 @@ const GetAtomIn = (
     return result;
 };
 
-export const SetAtomValueByName =
+const SetAtomValueByName =
     (CacheKey: string) => (name: string, value: any) =>
         GetAtomIn(CacheKey)?.[name]?.next(value);
+
+
+export function getValue(CacheKey: string): Record<string, any>
+export function getValue(CacheKey: string, name?: string): any
+export function getValue(CacheKey: string, name?: string)  {
+    if (name) {
+        return GetCurrentAtomValueByName(CacheKey, name);
+    }
+    return GetCurrentAtomValues(CacheKey);
+}
+
+export function getAtom(CacheKey: string): Record<string, BehaviorSubject<any>>
+export function getAtom(CacheKey: string, name?: string): BehaviorSubject<any>
+export function getAtom(CacheKey: string, name?: string) {
+    if (name) {
+        return GetAtomObservableByName(CacheKey, name);
+    }
+    return GetAtomObservables(CacheKey);
+}
+
+export function setValue(CacheKey: string, name: string): (value: any) => void
+export function setValue(CacheKey: string, name: string, value?: any): void
+export function setValue(CacheKey:string, name:string, value?:any) {
+    if (!isNil(value)) {
+        SetAtomValueByName(CacheKey)(name, value);
+        return;
+    }
+    return (value: any) => {
+        SetAtomValueByName(CacheKey)(name, value);
+    };
+}
+
+
+
+

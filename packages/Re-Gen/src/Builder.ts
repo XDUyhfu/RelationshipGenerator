@@ -173,5 +173,7 @@ export const ReGen = (
 
 export const ReGenRegisterConfig = (CacheKey: string, config: ReGenConfig) => {
     CheckCacheKey(CacheKey);
-    Global.Config.set(CacheKey, config);
+    if (!Global.Config.has(CacheKey)) {
+        Global.Config.set(CacheKey, config);
+    }
 };

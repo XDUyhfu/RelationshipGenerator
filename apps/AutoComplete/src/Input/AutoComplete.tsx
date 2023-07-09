@@ -1,17 +1,12 @@
 import Input from "./input";
-import {
-    useAtomsValue,
-    useAtomsCallback,
-} from "../../../../packages/Re-Gen/src";
+import { useAtomsValue, ReGenRegisterConfig } from "../../../../packages/Re-Gen/src";
 
 import { ConfigList } from "./state";
 
+ReGenRegisterConfig("Test", { logger: true });
+
 const AutoComplete = () => {
-    const { inputValue, list, hightIndex } = useAtomsValue("Test", ConfigList, { logger: true });
-    const { keyCodeCallback, inputValueCallback } = useAtomsCallback(
-        "Test",
-        ConfigList, { logger: true }
-    );
+    const { inputValue, list, hightIndex, ReGenValues: { setValue } } = useAtomsValue("Test", ConfigList);
 
     const index = hightIndex % list?.length ?? 0;
 
@@ -22,10 +17,10 @@ const AutoComplete = () => {
             <Input
                 value={inputValue}
                 onChange={(value) => {
-                    inputValueCallback(value);
-                    keyCodeCallback("");
+                    setValue("inputValue", value);
+                    setValue("keyCode", "");
                 }}
-                onKey={keyCodeCallback}
+                onKey={setValue("keyCode")}
             />
             {list?.map((item: { value: string }, idx: number) => (
                 <>

@@ -1,24 +1,10 @@
 import { Button, Input, Switch } from "antd";
-import {
-    ReGen,
-    useAtomsCallback,
-    useAtomsValue,
-} from "../../../packages/Re-Gen/src/index";
+import { useAtomsValue } from "../../../packages/Re-Gen/src/index";
 
 import { Config } from "./config";
 
-const key = "CACHE_KEY_STATE_EXTENSION";
-const AtomInOut = ReGen(key, Config, {
-    logger: true,
-    // filterNil: "In"
-});
-
 function App() {
-    const { result } = useAtomsValue(key, AtomInOut);
-    const { inputValueCallback, addCallback } = useAtomsCallback(
-        key,
-        AtomInOut
-    );
+    const { result, ReGenValues: {setValue} } = useAtomsValue("key", Config);
 
     return (
         <div>
@@ -30,7 +16,7 @@ function App() {
                         <Input
                             value={item.value}
                             onChange={(val) => {
-                                inputValueCallback({
+                                setValue("inputValue", {
                                     index,
                                     value: val.target.value,
                                 });
@@ -44,7 +30,7 @@ function App() {
 
             <br />
             <br />
-            <Button type="primary" onClick={addCallback}>
+            <Button type="primary" onClick={setValue("add")}>
                 添加
             </Button>
         </div>

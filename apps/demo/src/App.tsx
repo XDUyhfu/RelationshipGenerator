@@ -11,7 +11,7 @@ function App() {
         RegionList,
         testMoreDepend,
         testMoreMoreDepend,
-        ReValues: {setValue}
+        ReGenValues: {setValue}
     } = useAtomsValue("CACHE_KEY", RelationConfig);
 
     return (

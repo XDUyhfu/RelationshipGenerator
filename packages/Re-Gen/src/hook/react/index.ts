@@ -16,22 +16,28 @@ import {
 } from "../../type";
 import { ReGen } from "../../Builder";
 import {
-    GetAtomObservableByName,
-    GetAtomObservables,
-    GetCurrentAtomValueByName,
-    GetCurrentAtomValues,
-    SetAtomValueByName
+    getAtom,
+    getValue,
+    setValue
 } from "../../Atom";
 
 interface IResultAtomsValue {
-    ReValues: {
-        getValue: (name?: string) => Record<string, any> | any,
-        getAtom: (name?: string) => Record<string, BehaviorSubject<any>> | BehaviorSubject<any>
-        // setValue: (name: string) => (value: any) => void;
-        // setValue: (name: string, value: any) => void;
-        setValue: (name: string, value?:any) => (value: any) => void | void;
+    ReGenValues: {
+        getValue: {
+            (): Record<string, any>,
+            ( name: string ): any
+        },
+        getAtom: {
+            (): Record<string, BehaviorSubject<any>>
+            (name: string): BehaviorSubject<any>
+        },
+        setValue: {
+            (name: string): (value: any) => void,
+            (name: string, value: any): void
+        }
     },
-    [x: `${string}`]: any;
+
+    [x: `${ string }`]: any;
 }
 
 export const useAtomsValue = (CacheKey: string, RelationConfig: IConfigItem[]) => {
@@ -57,29 +63,12 @@ export const useAtomsValue = (CacheKey: string, RelationConfig: IConfigItem[]) =
             ),
         };
     }, {
-        ReValues: {
-            getValue: (name) => {
-                if (name) {
-                    return GetCurrentAtomValueByName(CacheKey, name);
-                }
-                return GetCurrentAtomValues(CacheKey);
-            },
-            getAtom: (name) => {
-                if (name) {
-                    return GetAtomObservableByName(CacheKey, name);
-                }
-                return GetAtomObservables(CacheKey);
-            },
-            setValue: (name, value) => {
-                if (value) {
-                    return SetAtomValueByName(CacheKey)(name, value);
-                }
-                return (value) => {
-                    SetAtomValueByName(CacheKey)(name, value);
-                };
-            }
+        ReGenValues: {
+            getValue: ( name?: string ) => getValue( CacheKey, name ),
+            getAtom: ( name?: string ) => getAtom( CacheKey, name ),
+            setValue: ( name: string, value?: any ) => setValue( CacheKey, name, value )
         },
-    } as IResultAtomsValue);
+    } as unknown as IResultAtomsValue);
 
     return AtomsValue;
 };

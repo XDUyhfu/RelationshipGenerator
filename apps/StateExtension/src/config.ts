@@ -7,7 +7,7 @@ export const Config: IConfigItem[] = [
         name: "test",
         depend: {
             names: ["add"],
-            handle: ([add, data]) =>
+            handle: () =>
                 of({
                     value: Date.now(),
                     id: Date.now(),
@@ -24,7 +24,7 @@ export const Config: IConfigItem[] = [
         distinct: false,
         depend: {
             names: ["add"],
-            handle([inputValue, add]) {
+            handle() {
                 return of([]);
             },
         },
@@ -40,7 +40,10 @@ export const Config: IConfigItem[] = [
                 add: any[],
                 inputValue: any[]
             ]) {
-                return of([]);
+                return of([{
+                    value: Date.now(),
+                    id: Date.now(),
+                }]);
             },
         },
     },

@@ -1,8 +1,4 @@
-import {
-    ReGen,
-    useAtomsValue,
-    useAtomsCallback,
-} from "../../../packages/Re-Gen/src/index";
+import { useAtomsValue } from "../../../packages/Re-Gen/src/index";
 import {
     FirstCacheKey,
     FirstConfig,
@@ -10,21 +6,10 @@ import {
     SecondConfig,
 } from "./config";
 
-const first = ReGen(FirstCacheKey, FirstConfig, {
-    logger: true,
-    filterNil: "In",
-});
-const second = ReGen(SecondCacheKey, SecondConfig, {
-    logger: true,
-    filterNil: "In",
-});
 
 function App() {
-    const { atom } = useAtomsValue(FirstCacheKey, first);
-    const { atomCallback } = useAtomsCallback(FirstCacheKey, first);
-    const { value } = useAtomsValue(SecondCacheKey, second);
-
-    console.log(value);
+    const { atom, ReGenValues: { setValue } } = useAtomsValue(FirstCacheKey, FirstConfig);
+    const { value } = useAtomsValue(SecondCacheKey, SecondConfig);
 
     return (
         <div>
@@ -33,7 +18,7 @@ function App() {
             second: {JSON.stringify(value)}
             <br />
             <br />
-            <button onClick={atomCallback}>input first</button>
+            <button onClick={ setValue("atom") }>input first</button>
         </div>
     );
 }

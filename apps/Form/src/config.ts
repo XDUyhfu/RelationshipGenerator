@@ -1,5 +1,8 @@
 import { clone } from "ramda";
-import { IConfigItem } from "../../../packages/Re-Gen/src/index";
+import {
+    FilterNilStage,
+    IConfigItem
+} from "../../../packages/Re-Gen/src/index";
 
 export interface IItem {
     id: string;
@@ -52,7 +55,7 @@ export const ConfigItems: IConfigItem[] = [
     },
     {
         name: "addItem",
-        filterNil: "In",
+        filterNil: FilterNilStage.In,
         handle(e) {
             return {
                 id: Date.now().toString() + Math.random().toString().slice(4),

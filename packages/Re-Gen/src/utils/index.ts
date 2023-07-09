@@ -136,8 +136,6 @@ export const OpenLogger =
         return RelationConfig;
     };
 
-
-
 export const PluckValue = (config: IConfigItem[]): PluckValueType[] =>
     config.map(item => ({ init: item?.init, name: item?.name }));
 export const PluckName = (config: IConfigItem[]): string[] => config.map(item => item.name);

@@ -12,7 +12,8 @@ import {
 } from "../../utils";
 import {
     IConfigItem,
-    IConfigItemInit
+    IConfigItemInit,
+    ReGenConfig
 } from "../../type";
 import { ReGen } from "../../Builder";
 import {
@@ -22,7 +23,7 @@ import {
 } from "../../Atom";
 
 interface IResultAtomsValue {
-    ReGenValues: {
+    ReGenValue: {
         getValue: {
             (): Record<string, any>,
             ( name: string ): any
@@ -40,9 +41,9 @@ interface IResultAtomsValue {
     [x: `${ string }`]: any;
 }
 
-export const useAtomsValue = (CacheKey: string, RelationConfig: IConfigItem[]) => {
+export const useReGen = (CacheKey: string, RelationConfig: IConfigItem[], config: ReGenConfig) => {
     CheckParams(CacheKey, RelationConfig);
-    const AtomInOut = ReGen(CacheKey, RelationConfig);
+    const AtomInOut = ReGen(CacheKey, RelationConfig, config);
     const names = PluckName(RelationConfig);
     const initMap = RelationConfig.reduce((pre, item) => ({
             ...pre,
@@ -63,7 +64,7 @@ export const useAtomsValue = (CacheKey: string, RelationConfig: IConfigItem[]) =
             ),
         };
     }, {
-        ReGenValues: {
+        ReGenValue: {
             getValue: ( name?: string ) => getValue( CacheKey, name ),
             getAtom: ( name?: string ) => getAtom( CacheKey, name ),
             setValue: ( name: string, value?: any ) => setValue( CacheKey, name, value )

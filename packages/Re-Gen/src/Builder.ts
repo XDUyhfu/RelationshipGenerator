@@ -10,8 +10,7 @@ import {
     transformFilterNilOptionToBoolean,
     transformDistinctOptionToBoolean,
     OpenLogger,
-    PluckValue,
-    CheckCacheKey,
+    PluckValue
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
@@ -160,20 +159,16 @@ const BuilderRelation = (
 
 export const ReGen = (
     CacheKey: string,
-    RelationConfig: IConfigItem[]
+    RelationConfig: IConfigItem[],
+    config: ReGenConfig
 ) => {
 
     if (!Global.Store.has(CacheKey)) {
         Global.Store.set(CacheKey, new Map<string, AtomState>());
         Global.RelationConfig.set(CacheKey, PluckValue(RelationConfig));
-        BuilderRelation(CacheKey, RelationConfig, Global.Config.get(CacheKey)).subscribe();
+        BuilderRelation(CacheKey, RelationConfig, config).subscribe();
     }
     return AtomInOut(CacheKey);
 };
 
-export const ReGenRegisterConfig = (CacheKey: string, config: ReGenConfig) => {
-    CheckCacheKey(CacheKey);
-    if (!Global.Config.has(CacheKey)) {
-        Global.Config.set(CacheKey, config);
-    }
-};
+

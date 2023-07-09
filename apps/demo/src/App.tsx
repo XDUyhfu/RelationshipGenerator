@@ -1,8 +1,6 @@
 import { useAtomsValue } from "../../../packages/Re-Gen/src/index";
 import { RelationConfig } from "./config";
 import { Button, Select } from "antd";
-
-
 function App() {
     const {
         area,
@@ -11,7 +9,7 @@ function App() {
         RegionList,
         testMoreDepend,
         testMoreMoreDepend,
-        ReGenValues: {setValue}
+        ReGenValue: {setValue}
     } = useAtomsValue("CACHE_KEY", RelationConfig);
 
     return (

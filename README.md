@@ -113,33 +113,46 @@ export const RelationConfig: IConfigItem[] = [
 ];
 ```
 
-- 通过包导出的 `ReGen` 方法获取 `AtomInOut` 方法
-
-```typescript
-const AtomInOut = ReGen( CacheKey, RelationConfig );
-// 该工具通过 CacheKey 进行区分存储的状态，相同的 CacheKey 会获取相同的状态。
-// 建议在组件外部进行调用，避免重复渲染。但是该函数做了缓存处理，写在组件里也不会造成性能浪费。
-```
-
 ### 接下来可以使用hook进行操作
 
-- 通过包导出的 `useAtomsValue` 以及 `useAtomsCallback` hook方法，分别传入 `CacheKey`
-  以及 `AtomInOut` 参数进行调用即可。
-- hook会返回一个对象，通过解构对象，从而获取 `${name}` 以及 `${name}Callback`。其中 `${name}`
-  会被替换为 `RelationConfig` 中的name值。
-
+- 通过包导出的 `useReGen` 方法，分别传入 `CacheKey` 以及 `RelationConfig` 参数进行调用即可
+- 函数会返回一个对象，通过解构对象，从而获取 `${name}`。其中 `${name}` 会被替换为 `RelationConfig` 中的name值
+- 返回值中会存在一个特殊的名为 `ReGenValue` 的对象，从中可以结构出获取或修改值的方法: `getValue` `getAtom` `setValue`, 这些方法默认修改的是当前传入的`CacheKey`对应的值。
+- 如果是在非组件的位置修改对应的值，可以通过包导出的 `getValue` `getAtom` `setValue` 进行修改，与hook导出的方法相比，需要第一个参数传入需要修改的`CacheKey`
 ```typescript
-const AtomInOut = ReGen( "CacheKey", RelationConfig, { logger: { duration: 300 } } ); // 可以写到组件外边，也可以写到组件内部，实际通过 CacheKey 做了缓存的处理
-
+// 使用方法
 const {
-	area,
-	region
-} = useAtomsValue( "CacheKey", AtomInOut );
+  area,
+  region,
+  ReGenValue: {setValue, getValue, getAtom}
+} = useReGen( "CacheKey", RelationConfig );
 
-const {
-	areaCallback,
-	regionCallback
-} = useAtomsCallback( "CacheKey", AtomInOut );
+
+// hook 导出的函数签名
+ReGenValue: {
+  getValue: {
+    (): Record<string, any>
+    ( name: string ): any
+  }
+  getAtom: {
+    (): Record<string, BehaviorSubject<any>>
+    (name: string): BehaviorSubject<any>
+  }
+  setValue: {
+    (name: string): (value: any) => void
+    (name: string, value: any): void
+  }
+}
+
+// 全局导出的函数签名
+export function getValue(CacheKey: string): Record<string, any>
+export function getValue(CacheKey: string, name?: string): any
+
+export function getAtom(CacheKey: string): Record<string, BehaviorSubject<any>>
+export function getAtom(CacheKey: string, name?: string): BehaviorSubject<any>
+
+export function setValue(CacheKey: string, name: string): (value: any) => void
+export function setValue(CacheKey: string, name: string, value?: any): void
 ```
 
 ### 全局可选配置项
@@ -163,7 +176,7 @@ ReGen( CacheKey, RelationConfig, { logger: { duration: 300 } } )
 // Default 表示默认策略（处于 In 和 Out 阶段且不进行过滤）
 // "In" | "HandleAfter" | "DependAfter" | "Out" 表示不同的阶段进行空值处理
 
-ReGen( "CacheKey", RelationConfig, { filterNil: FilterNilStage | boolean } );
+useReGen( "CacheKey", RelationConfig, { filterNil: FilterNilStage | boolean } );
 
 // 局部配置
 // 单独对当前状态进行空值过滤
@@ -186,7 +199,7 @@ ReGen( "CacheKey", RelationConfig, { filterNil: FilterNilStage | boolean } );
 
 ```typescript
 // 全局配置
-ReGen( CacheKey, RelationConfig, { distinct: true } );
+useReGen( CacheKey, RelationConfig, { distinct: true } );
 
 // 局部配置
 // 单独对当前状态进行去重

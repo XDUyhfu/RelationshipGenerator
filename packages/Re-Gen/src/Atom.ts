@@ -34,7 +34,7 @@ export const AtomInOut =
         };
     };
 
-export const GetAtomValues = (cacheKey: string): Record<string, any> => {
+export const GetCurrentAtomValues = (cacheKey: string): Record<string, any> => {
     const observables = GetAtomObservables(cacheKey);
     const result = {} as Record<string, any>;
     Object.keys(observables).forEach((key) => {
@@ -43,10 +43,8 @@ export const GetAtomValues = (cacheKey: string): Record<string, any> => {
     return result;
 };
 
-export const GetAtomValueByName =(CacheKey: string, name: string) =>
-    GetAtomValues(CacheKey)[name];
-export const GetAtomValueByNameCurry =(CacheKey: string) => (name: string) =>
-    GetAtomValues(CacheKey)[name];
+export const GetCurrentAtomValueByName =(CacheKey: string, name: string) =>
+    GetCurrentAtomValues(CacheKey)[name];
 
 export const GetAtomObservables = (
     CacheKey: string
@@ -60,6 +58,10 @@ export const GetAtomObservables = (
     }
     return result;
 };
+
+export const GetAtomObservableByName = (
+    CacheKey: string, name: string
+): BehaviorSubject<any> => GetAtomObservables(CacheKey)[name];
 
 export const GetAtomIn = (
     CacheKey: string

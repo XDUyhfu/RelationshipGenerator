@@ -1,5 +1,9 @@
 import { useCallback } from "react";
-import { filter, isObservable } from "rxjs";
+import {
+    BehaviorSubject,
+    filter,
+    isObservable
+} from "rxjs";
 import { useObservable } from "rxjs-hooks";
 import {
     isPlainResult,
@@ -10,13 +14,24 @@ import {
     IConfigItemInit
 } from "../../type";
 import { ReGen } from "../../Builder";
+import {
+    GetAtomObservableByName,
+    GetAtomObservables,
+    GetCurrentAtomValueByName,
+    GetCurrentAtomValues
+} from "../../Atom";
 
-export interface IResultAtomsValue<T = any> {
-    [x: `${string}`]: T;
+export interface IResultAtomsValue {
+    ReValues: {
+        getValue: (name?: string) => Record<string, any> | any,
+        getAtom: (name?: string) => Record<string, BehaviorSubject<any>> | BehaviorSubject<any>
+    },
+
+    [x: `${string}`]: any;
 }
 
-export interface IResultAtomsCallback<T = any> {
-    [x: `${string}`]: T;
+export interface IResultAtomsCallback {
+    [x: `${string}`]: any;
 }
 
 export const useAtomsValue = (CacheKey: string, RelationConfig: IConfigItem[]) => {
@@ -40,7 +55,22 @@ export const useAtomsValue = (CacheKey: string, RelationConfig: IConfigItem[]) =
                     : null
             ),
         };
-    }, {} as IResultAtomsValue);
+    }, {
+        ReValues: {
+            getValue: (name?: string) => {
+                if (name) {
+                    return GetCurrentAtomValueByName(CacheKey, name);
+                }
+                return GetCurrentAtomValues(CacheKey);
+            },
+            getAtom: (name?: string) => {
+                if (name) {
+                    return GetAtomObservableByName(CacheKey, name);
+                }
+                return GetAtomObservables(CacheKey);
+            }
+        },
+    } as IResultAtomsValue);
 
     return AtomsValue;
 };

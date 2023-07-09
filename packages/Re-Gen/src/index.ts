@@ -1,4 +1,3 @@
-export { GetAtomValues, GetAtomObservables, GetAtomValueByName } from "./Atom";
 export type {
     IConfigItem,
     PlainResult,

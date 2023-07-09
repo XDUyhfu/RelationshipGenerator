@@ -6,10 +6,6 @@ export type {
     ReturnResult,
     IDistinct,
     ReGenOptions,
-    AnyObservable,
-    AnyBehaviorSubject,
-    AnyArray,
-    AnyPromise,
     InitFunctionType,
 } from "./type";
 export { TransformStage, FilterNilStage, CombineType } from "./config";

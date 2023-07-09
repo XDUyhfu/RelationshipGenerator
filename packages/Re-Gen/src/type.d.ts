@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, ObservableInput } from "rxjs";
+import { Observable, ObservableInput } from "rxjs";
 import { FilterNilStage, CombineType } from "./config";
 
 export type PlainResult =
@@ -21,9 +21,9 @@ export type IDistinct<T = any, K = any> =
 
 export type InitFunctionType = (
     ...args: any[]
-) => AnyPromise | AnyObservable | PlainResult;
+) => Promise<any> | Observable<any> | PlainResult;
 
-export type IConfigItemInit = AnyPromise | AnyObservable | PlainResult | InitFunctionType
+export type IConfigItemInit = Promise<any> | Observable<any> | PlainResult | InitFunctionType
 
 export interface IConfigItem {
     name: string;
@@ -37,16 +37,13 @@ export interface IConfigItem {
     filterNil?: FilterNilStage | boolean;
     depend?: {
         names: string[];
-        handle: (args: any[]) => ReturnResult;
+        handle: (args: any) => ReturnResult;
         combineType?: CombineType;
     };
 }
 
-export type AnyObservable = Observable<any>;
-export type AnyBehaviorSubject = BehaviorSubject<any>;
-export type AnyArray = Array<any>;
-export type AnyPromise = Promise<any>;
 export type AtomsType = Record<string, AnyBehaviorSubject>;
+
 export type PluckValueType = {
     name: string;
     init: IConfigItemInit;

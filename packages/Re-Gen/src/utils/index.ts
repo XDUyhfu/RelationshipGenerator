@@ -6,7 +6,6 @@ import {
     ReturnResult,
     ReGenOptions,
     PluckValueType,
-    AnyArray,
     PlainResult,
 } from "../type";
 import {
@@ -26,7 +25,7 @@ import {
 import { GetAtomIn, GlobalLoggerWatcher } from "../Atom";
 import { getGroup } from "rxjs-watcher";
 
-export const isArray = (value: any): value is AnyArray => Array.isArray(value);
+export const isArray = (value: any): value is Array<any> => Array.isArray(value);
 export const isPlainObject = (value: any) =>
     Object.prototype.toString.call(value) === "[object Object]" &&
     value?.constructor === Object;

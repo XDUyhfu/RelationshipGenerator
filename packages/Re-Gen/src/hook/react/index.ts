@@ -27,14 +27,13 @@ export const useAtomsValue = (CacheKey: string, RelationConfig: IConfigItem[], o
             ...pre,
             [`${item.name}`]: item.init
         }), {} as Record<string, IConfigItemInit>);
-
     const AtomsValue: IResultAtomsValue = names.reduce((pre, name) => {
-        const inout = AtomInOut(name);
+        const inout = AtomInOut?.(name);
         return {
             ...pre,
             [`${name}`]: useObservable(
                 () =>
-                    inout[`${name}Out$`].pipe(
+                    inout?.[`${name}Out$`]?.pipe(
                         filter((item) => !isObservable(item))
                     ),
                 isPlainResult(initMap[name])
@@ -51,11 +50,11 @@ export const useAtomsCallback = (CacheKey: string, RelationConfig: IConfigItem[]
     const AtomInOut = ReGen(CacheKey, RelationConfig, options);
     const names = PluckName(RelationConfig);
     const AtomsCallback: IResultAtomsCallback = names.reduce((pre, name) => {
-        const inout = AtomInOut(name);
+        const inout = AtomInOut?.(name);
         return {
             ...pre,
             [`${name}Callback`]: useCallback(
-                (arg: any) => inout[`${name}In$`].next(arg),
+                (arg: any) => inout?.[`${name}In$`]?.next(arg),
                 []
             ),
         };

@@ -1,15 +1,13 @@
+import { IDistinct } from "./type";
 import {
-    AnyBehaviorSubject,
-    AnyObservable,
-    IDistinct,
-} from "./type";
-import {
+    BehaviorSubject,
     catchError,
     combineLatestWith,
     distinctUntilChanged,
     EMPTY,
     filter,
     identity,
+    Observable,
     withLatestFrom,
     zipWith,
 } from "rxjs";
@@ -22,13 +20,13 @@ import { CombineType } from "./config";
 
 export const handleUndefined: (
     filterNil: boolean
-) => (source: AnyObservable) => AnyObservable = (filterNil) => (source) =>
+) => (source: Observable<any>) => Observable<any> = (filterNil) => (source) =>
     filterNil ? source.pipe(filter(Boolean)) : source;
 
 export const handleDistinct =
     (
         distinct: IDistinct<any, any>
-    ): ((source: AnyObservable) => AnyObservable) =>
+    ): ((source: Observable<any>) => Observable<any>) =>
     (source) => {
         if (is(Boolean, distinct)) {
             return distinct
@@ -55,8 +53,8 @@ export const handleDistinct =
 export const handleCombine =
     (
         type: CombineType,
-        depends: AnyBehaviorSubject[]
-    ): ((source: AnyObservable) => AnyObservable) =>
+        depends: BehaviorSubject<any>[]
+    ): ((source: Observable<any>) => Observable<any>) =>
     (source) =>
         depends.length > 0
             ? type === CombineType.SELF_CHANGE
@@ -67,7 +65,7 @@ export const handleCombine =
             : source;
 
 export const handleError =
-    (message: string): ((source: AnyObservable) => AnyObservable) =>
+    (message: string): ((source: Observable<any>) => Observable<any>) =>
     (source) =>
         source.pipe(
             catchError((e) => {
@@ -80,5 +78,5 @@ export const handleLogger = (
     cacheKey: string,
     name: string,
     open?: { duration?: number } | boolean | number
-): ((source: AnyObservable) => AnyObservable) =>
+): ((source: Observable<any>) => Observable<any>) =>
     open ? GlobalLoggerWatcher.get(cacheKey)!(`${name}`) : identity;

@@ -4,7 +4,7 @@ import {
     OperatorFunction,
     ReplaySubject,
 } from "rxjs";
-import { AnyBehaviorSubject, AtomsType, PluckValueType } from "./type";
+import { AtomsType, PluckValueType } from "./type";
 
 export class AtomState<T = any> {
     in$: BehaviorSubject<T>;
@@ -59,7 +59,7 @@ export const GetAtomValueByName = (cacheKey: string, name: string) =>
 
 export const GetAtomObservables = (
     cacheKey: string
-): Record<string, AnyBehaviorSubject> => {
+): Record<string, BehaviorSubject<any>> => {
     const result = {} as AtomsType;
     if (GlobalStore.has(cacheKey)) {
         const entries = GlobalStore.get(cacheKey)!.entries();
@@ -72,7 +72,7 @@ export const GetAtomObservables = (
 
 export const GetAtomIn = (
     cacheKey: string
-): Record<string, AnyBehaviorSubject> => {
+): Record<string, BehaviorSubject<any>> => {
     const result = {} as AtomsType;
     if (GlobalStore.has(cacheKey)) {
         const entries = GlobalStore.get(cacheKey)!.entries();

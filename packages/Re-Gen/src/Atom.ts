@@ -19,9 +19,9 @@ export class AtomState<T = any> {
 }
 
 export const AtomInOut =
-    (cacheKey: string) =>
+    (CacheKey: string) =>
     <T = any>(name: string) => {
-        const atom = Global.Store.get(cacheKey)!.get(name)!;
+        const atom = Global.Store.get(CacheKey)!.get(name)!;
         if (!atom) {
             throw new Error(`用于构建的配置列表中不包含该 ${name} 值`);
         }
@@ -43,15 +43,17 @@ export const GetAtomValues = (cacheKey: string): Record<string, any> => {
     return result;
 };
 
-export const GetAtomValueByName = (cacheKey: string, name: string) =>
-    GetAtomValues(cacheKey)[name];
+export const GetAtomValueByName =(CacheKey: string, name: string) =>
+    GetAtomValues(CacheKey)[name];
+export const GetAtomValueByNameCurry =(CacheKey: string) => (name: string) =>
+    GetAtomValues(CacheKey)[name];
 
 export const GetAtomObservables = (
-    cacheKey: string
+    CacheKey: string
 ): Record<string, BehaviorSubject<any>> => {
     const result = {} as AtomsType;
-    if (Global.Store.has(cacheKey)) {
-        const entries = Global.Store.get(cacheKey)!.entries();
+    if (Global.Store.has(CacheKey)) {
+        const entries = Global.Store.get(CacheKey)!.entries();
         for (const [key, value] of entries) {
             result[key] = value.out$;
         }
@@ -60,11 +62,11 @@ export const GetAtomObservables = (
 };
 
 export const GetAtomIn = (
-    cacheKey: string
+    CacheKey: string
 ): Record<string, BehaviorSubject<any>> => {
     const result = {} as AtomsType;
-    if (Global.Store.has(cacheKey)) {
-        const entries = Global.Store.get(cacheKey)!.entries();
+    if (Global.Store.has(CacheKey)) {
+        const entries = Global.Store.get(CacheKey)!.entries();
         for (const [key, value] of entries) {
             result[key] = value.in$;
         }

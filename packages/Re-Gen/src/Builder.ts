@@ -53,11 +53,11 @@ const ConfigToAtomStore =
 /**
  * 该过程用于执行状态自身的 handle 函数
  * @param CacheKey
- * @param _options
+ * @param config
  * @constructor
  */
 const AtomHandle =
-    (CacheKey: string, _options?: ReGenConfig) =>
+    (CacheKey: string, config?: ReGenConfig) =>
     (RelationConfig: IConfigItem[]) =>
         forEach((item: IConfigItem) => {
             const atom = Global.Store.get(CacheKey)!.get(item.name)!;
@@ -68,7 +68,7 @@ const AtomHandle =
                         transformFilterNilOptionToBoolean(
                             FilterNilStage.In,
                             item.filterNil ??
-                                _options?.filterNil
+                            config?.filterNil
                         )
                     ),
                     map(item.handle || identity),
@@ -77,7 +77,7 @@ const AtomHandle =
                         transformFilterNilOptionToBoolean(
                             FilterNilStage.HandleAfter,
                             item.filterNil ??
-                                _options?.filterNil
+                            config?.filterNil
                         )
                     ),
                     handleError(`捕获到 ${item.name} handle 中报错`)
@@ -89,11 +89,11 @@ const AtomHandle =
 /**
  * 处理当前状态及其依赖状态, 当依赖状态值发生变化的时候，会根据相关策略进行计算新的状态值
  * @param CacheKey
- * @param _options
+ * @param config
  * @constructor
  */
 const HandDepend =
-    (CacheKey: string, _options?: ReGenConfig) =>
+    (CacheKey: string, config?: ReGenConfig) =>
     (RelationConfig: IConfigItem[]) =>
         forEach((item: IConfigItem) => {
             const atom = Global.Store.get(CacheKey)!.get(item.name)!;
@@ -114,7 +114,7 @@ const HandDepend =
                         transformFilterNilOptionToBoolean(
                             FilterNilStage.DependAfter,
                             item.filterNil ??
-                                _options?.filterNil
+                            config?.filterNil
                         )
                     ),
                     handleError(`捕获到 ${item.name} depend.handle 中报错`),
@@ -126,7 +126,7 @@ const HandDepend =
                     handleError(`捕获到 ${item.name} reduce 中报错`),
                     handleDistinct(
                         transformDistinctOptionToBoolean(
-                            _options?.distinct,
+                            config?.distinct,
                             item.distinct
                         )
                     ),
@@ -134,10 +134,10 @@ const HandDepend =
                         transformFilterNilOptionToBoolean(
                             FilterNilStage.Out,
                             item.filterNil ??
-                                _options?.filterNil
+                            config?.filterNil
                         )
                     ),
-                    handleLogger(CacheKey, item.name, _options?.logger)
+                    handleLogger(CacheKey, item.name, config?.logger)
                 )
                 .subscribe(atom.out$);
         })(RelationConfig);

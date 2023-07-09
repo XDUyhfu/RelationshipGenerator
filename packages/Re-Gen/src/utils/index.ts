@@ -113,18 +113,18 @@ export const DependencyDetection = () => (RelationConfig: IConfigItem[]) =>
     })(RelationConfig);
 
 export const OpenLogger =
-    (CacheKey: string, _options?: ReGenConfig) =>
+    (CacheKey: string, config?: ReGenConfig) =>
     (RelationConfig: IConfigItem[]) => {
-        if (!Global.LoggerWatcher.has(CacheKey) && !!_options?.logger) {
+        if (!Global.LoggerWatcher.has(CacheKey) && !!config?.logger) {
             Global.LoggerWatcher.set(
                 CacheKey,
                 getGroup(
                     `${CacheKey} Watcher Group`,
-                    typeof _options?.logger === "boolean"
+                    typeof config?.logger === "boolean"
                         ? LoggerDurationDefaultValue
-                        : typeof _options?.logger === "number"
-                            ? _options.logger
-                        : _options.logger?.duration
+                        : typeof config?.logger === "number"
+                            ? config.logger
+                        : config.logger?.duration
                 )
             );
         }
@@ -132,8 +132,8 @@ export const OpenLogger =
     };
 
 export const SetAtomValueByKey =
-    (cacheKey: string) => (name: string, value: any) =>
-        GetAtomIn(cacheKey)?.[name]?.next(value);
+    (CacheKey: string) => (name: string, value: any) =>
+        GetAtomIn(CacheKey)?.[name]?.next(value);
 
 export const PluckValue = (config: IConfigItem[]): PluckValueType[] =>
     config.map(item => ({ init: item?.init, name: item?.name }));

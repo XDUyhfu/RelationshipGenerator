@@ -63,7 +63,7 @@ export const GetAtomObservableByName = (
     CacheKey: string, name: string
 ): BehaviorSubject<any> => GetAtomObservables(CacheKey)[name];
 
-export const GetAtomIn = (
+const GetAtomIn = (
     CacheKey: string
 ): Record<string, BehaviorSubject<any>> => {
     const result = {} as AtomsType;
@@ -75,3 +75,7 @@ export const GetAtomIn = (
     }
     return result;
 };
+
+export const SetAtomValueByName =
+    (CacheKey: string) => (name: string, value: any) =>
+        GetAtomIn(CacheKey)?.[name]?.next(value);

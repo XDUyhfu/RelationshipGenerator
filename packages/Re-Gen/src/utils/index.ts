@@ -22,7 +22,6 @@ import {
     isNil,
     not,
 } from "ramda";
-import { GetAtomIn } from "../Atom";
 import { getGroup } from "rxjs-watcher";
 import { Global } from "../store";
 
@@ -88,7 +87,13 @@ export const transformDistinctOptionToBoolean: (
     return global ?? DistinctDefaultValue;
 };
 
-export const JudgeRepetition = () => (RelationConfig: IConfigItem[]) =>
+export const CheckParams = (CacheKey: string, RelationConfig: IConfigItem[]) => {
+    CheckReGenParams(CacheKey, RelationConfig);
+    JudgeRepetition(RelationConfig);
+    DependencyDetection(RelationConfig);
+};
+
+const JudgeRepetition = (RelationConfig: IConfigItem[]) =>
     forEach((item: IConfigItem) => {
         if (isEmpty(item.name) || isNil(item.name)) {
             throw new Error(`${item.name}: 无效的 name 属性`);
@@ -99,7 +104,7 @@ export const JudgeRepetition = () => (RelationConfig: IConfigItem[]) =>
         }
     })(RelationConfig);
 
-export const DependencyDetection = () => (RelationConfig: IConfigItem[]) =>
+export const DependencyDetection = (RelationConfig: IConfigItem[]) =>
     forEach((item: IConfigItem) => {
         const dependNames = getDependNames(item);
         if (dependNames.includes(item.name)) {
@@ -131,9 +136,7 @@ export const OpenLogger =
         return RelationConfig;
     };
 
-export const SetAtomValueByKey =
-    (CacheKey: string) => (name: string, value: any) =>
-        GetAtomIn(CacheKey)?.[name]?.next(value);
+
 
 export const PluckValue = (config: IConfigItem[]): PluckValueType[] =>
     config.map(item => ({ init: item?.init, name: item?.name }));
@@ -147,7 +150,7 @@ export const CheckCacheKey = (CacheKey: string) => {
 };
 
 // 检查 ReGen 函数参数
-export const CheckReGenParams = (CacheKey: string, RelationConfig: IConfigItem[]) => {
+const CheckReGenParams = (CacheKey: string, RelationConfig: IConfigItem[]) => {
     // 对 JudgeRepetition 的补充
     // 判断条件：
     // cacheKey是一个有效的字符串

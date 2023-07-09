@@ -1,25 +1,26 @@
 import { Observable, ObservableInput } from "rxjs";
 import { FilterNilStage, CombineType } from "./config";
 
-export type PlainResult =
+type PlainResult =
     | Record<string, any>
     | number
     | string
     | boolean
     | undefined
     | null;
-export type RxResult = ObservableInput<any>;
 
-export type ReturnResult = PlainResult | RxResult;
+type RxResult = ObservableInput<any>;
 
-export type IDistinct<T = any, K = any> =
+type ReturnResult = PlainResult | RxResult;
+
+type IDistinct<T = any, K = any> =
     | boolean
     | {
           comparator: (previous: K, current: K) => boolean;
           keySelector?: (value: T) => K;
       } | undefined;
 
-export type InitFunctionType = (
+type InitFunctionType = (
     ...args: any[]
 ) => Promise<any> | Observable<any> | PlainResult;
 

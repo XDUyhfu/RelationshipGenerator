@@ -1,14 +1,9 @@
-import {
-    useAtomsCallback,
-    useAtomsValue,
-    // ReGenRegisterConfig
-} from "../../../packages/Re-Gen/src/index";
+import { useAtomsValue } from "../../../packages/Re-Gen/src/index";
 import { RelationConfig } from "./config";
 import { Button, Select } from "antd";
 
 
 function App() {
-    // ReGenRegisterConfig("CACHE_KEY", {logger: true});
     const {
         area,
         region,
@@ -16,8 +11,8 @@ function App() {
         RegionList,
         testMoreDepend,
         testMoreMoreDepend,
+        ReValues: {setValue}
     } = useAtomsValue("CACHE_KEY", RelationConfig);
-    const { areaCallback, regionCallback } = useAtomsCallback("CACHE_KEY", RelationConfig );
 
     return (
         <div>
@@ -35,7 +30,7 @@ function App() {
             <Select
                 style={{ width: 120 }}
                 onChange={(val) => {
-                    areaCallback(Promise.resolve(val));
+                    setValue("area", Promise.resolve(val));
                 }}
                 value={area}
                 placeholder="area"
@@ -63,7 +58,7 @@ function App() {
                     allowClear
                     style={{ width: 120 }}
                     placeholder="region"
-                    onChange={regionCallback}
+                    onChange={setValue("region")}
                     options={[
                         {
                             value: "BJ",

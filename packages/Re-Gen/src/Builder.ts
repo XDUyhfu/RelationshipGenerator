@@ -9,11 +9,8 @@ import {
     transformResultToObservable,
     transformFilterNilOptionToBoolean,
     transformDistinctOptionToBoolean,
-    JudgeRepetition,
-    DependencyDetection,
     OpenLogger,
     PluckValue,
-    CheckReGenParams,
     CheckCacheKey,
 } from "./utils";
 import type { IConfigItem } from "./type";
@@ -155,8 +152,6 @@ const BuilderRelation = (
     options?: ReGenConfig
 ) =>
     of<IConfigItem[]>(RelationConfig).pipe(
-        map(JudgeRepetition()),
-        map(DependencyDetection()),
         map(OpenLogger(CacheKey, options)),
         map(ConfigToAtomStore(CacheKey)),
         map(AtomHandle(CacheKey, options)),
@@ -167,7 +162,7 @@ export const ReGen = (
     CacheKey: string,
     RelationConfig: IConfigItem[]
 ) => {
-    CheckReGenParams(CacheKey, RelationConfig);
+
     if (!Global.Store.has(CacheKey)) {
         Global.Store.set(CacheKey, new Map<string, AtomState>());
         Global.RelationConfig.set(CacheKey, PluckValue(RelationConfig));

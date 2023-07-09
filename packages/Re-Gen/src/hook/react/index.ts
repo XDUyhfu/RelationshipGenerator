@@ -1,20 +1,16 @@
 import { useCallback } from "react";
-import { Subject, Observable, filter, isObservable } from "rxjs";
+import { filter, isObservable } from "rxjs";
 import { useObservable } from "rxjs-hooks";
-import { GlobalConfig } from "../../Atom";
 import {
     isPlainResult,
     PluckName
 } from "../../utils";
-import { DefaultAtomsValue } from "../../config";
-import { IConfigItemInit } from "../../type";
-
-type IAtomInOut = <T = any>(
-    valueName: string
-) => {
-    [x: `${string}In$`]: Subject<T>;
-    [x: `${string}Out$`]: Observable<T>;
-};
+import {
+    IConfigItem,
+    IConfigItemInit,
+    ReGenOptions
+} from "../../type";
+import { ReGen } from "../../Builder";
 
 export interface IResultAtomsValue<T = any> {
     [x: `${string}`]: T;
@@ -24,20 +20,21 @@ export interface IResultAtomsCallback<T = any> {
     [x: `${string}`]: T;
 }
 
-export const useAtomsValue = (CacheKey: string, AtomInOut: IAtomInOut) => {
-    const RelationConfig = GlobalConfig.get(CacheKey)! || DefaultAtomsValue.RelationConfig;
+export const useAtomsValue = (CacheKey: string, RelationConfig: IConfigItem[], options?: ReGenOptions) => {
+    const AtomInOut = ReGen(CacheKey, RelationConfig, options);
     const names = PluckName(RelationConfig);
     const initMap = RelationConfig.reduce((pre, item) => ({
             ...pre,
             [`${item.name}`]: item.init
         }), {} as Record<string, IConfigItemInit>);
+
     const AtomsValue: IResultAtomsValue = names.reduce((pre, name) => {
-        const inout = (AtomInOut ?? DefaultAtomsValue.HandleFunction)(name);
+        const inout = AtomInOut(name);
         return {
             ...pre,
             [`${name}`]: useObservable(
                 () =>
-                    (inout[`${name}Out$`] ?? DefaultAtomsValue.Out$).pipe(
+                    inout[`${name}Out$`].pipe(
                         filter((item) => !isObservable(item))
                     ),
                 isPlainResult(initMap[name])
@@ -50,14 +47,15 @@ export const useAtomsValue = (CacheKey: string, AtomInOut: IAtomInOut) => {
     return AtomsValue;
 };
 
-export const useAtomsCallback = (CacheKey: string, AtomInOut: IAtomInOut) => {
-    const names = PluckName(GlobalConfig.get(CacheKey)! || DefaultAtomsValue.RelationConfig);
+export const useAtomsCallback = (CacheKey: string, RelationConfig: IConfigItem[], options?: ReGenOptions) => {
+    const AtomInOut = ReGen(CacheKey, RelationConfig, options);
+    const names = PluckName(RelationConfig);
     const AtomsCallback: IResultAtomsCallback = names.reduce((pre, name) => {
-        const inout = (AtomInOut ?? DefaultAtomsValue.HandleFunction)(name);
+        const inout = AtomInOut(name);
         return {
             ...pre,
             [`${name}Callback`]: useCallback(
-                (arg: any) => (inout[`${name}In$`] || DefaultAtomsValue.In$).next(arg),
+                (arg: any) => inout[`${name}In$`].next(arg),
                 []
             ),
         };

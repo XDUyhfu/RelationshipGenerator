@@ -1,4 +1,3 @@
-import { BehaviorSubject, of } from "rxjs";
 
 // -- in -- handle -- depend -- reduce -- out --
 export enum TransformStage {
@@ -45,12 +44,4 @@ export const FilterNilDefaultConfig = {
 
 export const LoggerDurationDefaultValue = 300;
 export const DistinctDefaultValue = true;
-
-export const DefaultAtomsValue = {
-	Name: "@@$",
-	RelationConfig: [{ name: "@@$" }],
-	In$: new BehaviorSubject(null),
-	Out$: of(null),
-	HandleFunction: () => ({})
-};
 

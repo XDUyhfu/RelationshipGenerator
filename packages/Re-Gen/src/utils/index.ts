@@ -22,8 +22,9 @@ import {
     isNil,
     not,
 } from "ramda";
-import { GetAtomIn, GlobalLoggerWatcher } from "../Atom";
+import { GetAtomIn } from "../Atom";
 import { getGroup } from "rxjs-watcher";
+import { GlobalLoggerWatcher } from "../store";
 
 export const isArray = (value: any): value is Array<any> => Array.isArray(value);
 export const isPlainObject = (value: any) =>

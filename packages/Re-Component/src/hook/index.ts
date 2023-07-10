@@ -1,31 +1,21 @@
-import { useObservable } from "rxjs-hooks";
-import { Atoms$, Config$, ReValues } from "../context";
-import { distinctUntilChanged, filter, isObservable } from "rxjs";
-import { useCallback } from "react";
-import { equals } from "ramda";
+import { BehaviorSubject } from "rxjs";
+import {
+	useEffect,
+	useState
+} from "react";
 
-export const useAtom = (name: string) => {
-    const inout = Atoms$?.getValue()(name);
-    const config = Config$.getValue();
-    if (!inout[`${name}In$`]) {
-        throw Error(`配置对象数组中没有 name 属性为 ${name} 的对象`);
-    }
-    const callback = useCallback(
-        (val: any) => inout[`${name}In$`].next(val),
-        []
-    );
-    const val = useObservable(
-        () => inout[`${name}Out$`].pipe(filter((item) => !isObservable(item))),
-        config.filter((item) => item.name === name)[0].init
-    );
-    return [val, callback];
-};
+import {
+	getOutObservable,
+	setValue
+} from "@yhfu/re-gen";
+import { CacheKey } from "../context";
+
 
 export const useRestProps = (
     props: Record<string, string>,
     children: React.ReactElement
 ) => {
-    // const propsWithReInject = handleReInject();
+    const propsWithReInject = handleReInject();
 
     const propsWithoutReInject = {} as Record<string, any>;
     Object.keys(props).map((item) => {
@@ -69,11 +59,39 @@ export const useRestProps = (
     return { ...restPropsWithoutRe, ...restPropsWithRe };
 };
 
-export const useVisible = (visible: boolean | string) =>
-    typeof visible === "string" ? useAtom(visible)[0] : visible;
+/**
+ * 根据传入的 visible 进行判断，如果是 boolean 类型则直接返回，如果是 string 类型，则订阅对应的 Observable
+ * @param visible
+ */
+export const useVisible = (visible: boolean | string) => {
+	let visibleObservable: boolean | null | BehaviorSubject<any> = typeof visible === "string" ? null : visible;
+	if (typeof visible === "string") {
+		visibleObservable = getOutObservable(CacheKey, visible);
+	}
+	// if (isNil(visibleObservable)) {
+	// 	throw new Error("传入的 visible 不正确");
+	// }
+	const [vis, setVis] = useState(visibleObservable);
+	useEffect(() => {
+		if (typeof visibleObservable === "boolean") {
+			setVis(visibleObservable);
+		} else {
+			if (visibleObservable) {
+				visibleObservable.subscribe(setVis);
+			}
+		}
+	}, []);
+	return vis;
+};
 
-export const useReValues = (): Record<string, any> =>
-    useObservable(
-        () => ReValues.pipe(distinctUntilChanged(equals)),
-        {}
-    ) as Record<string, any>;
+export const useReValue = (name: string) => {
+	const [val, setVal] = useState<any>();
+	const valueObservable = getOutObservable(CacheKey, name);
+	const setter = setValue(CacheKey, name);
+	useEffect(() => {
+		if (valueObservable) {
+			valueObservable.subscribe(setVal);
+		}
+	}, []);
+	return [val, setter];
+};

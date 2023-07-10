@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@arco-design/web-react": "^2.46.0",
-    "@yhfu/re-gen": "workspace:^0.2.2",
+    "@yhfu/re-gen": "workspace:*",
     "ramda": "^0.28.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

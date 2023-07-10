@@ -1,4 +1,4 @@
-import { IConfigItem, getAtom } from "../../../packages/Re-Gen/src/index";
+import { IConfigItem, getOutObservable } from "../../../packages/Re-Gen/src/index";
 
 export const FirstCacheKey = "FirstCacheKey";
 export const SecondCacheKey = "SecondCacheKey";
@@ -17,7 +17,7 @@ export const FirstConfig: IConfigItem[] = [
 export const SecondConfig: IConfigItem[] = [
     {
         name: "value",
-        init: () => getAtom(FirstCacheKey)["atom"],
+        init: () => getOutObservable(FirstCacheKey)["atom"],
         handle(val) {
             console.log("val -- >", val);
             return val;

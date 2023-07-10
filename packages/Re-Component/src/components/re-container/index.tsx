@@ -1,9 +1,17 @@
-import { FC } from "react";
-import { IReContainer } from "../../type";
-import "./index.css";
+import { Form, FormProps } from "@arco-design/web-react";
+import type { FC } from "react";
+import {
+    IConfigItem,
+    ReGen,
+} from "@yhfu/re-gen";
+import { CacheKey } from "../../context";
 
-export const ReContainer: FC<IReContainer> = (props) => {
-    const { children } = props;
+interface IReContainer {
+    config: IConfigItem[]
+}
 
-    return <div className="re-container">{children}</div>;
+export const ReContainer: FC<FormProps & IReContainer> = (props) => {
+    const {config, children} = props;
+    ReGen(CacheKey, config);
+    return <Form>{children}</Form>;
 };

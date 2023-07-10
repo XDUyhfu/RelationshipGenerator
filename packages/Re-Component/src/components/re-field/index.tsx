@@ -1,38 +1,44 @@
-import { cloneElement, useEffect } from "react";
-import { CacheKey, ReValues } from "../../context/index";
-import { GetAtomValues, SetAtomValueByKey } from "@yhfu/re-gen";
-import { IReField } from "../../type";
-import { useAtom, useRestProps, useVisible } from "../../hook";
+import React, { cloneElement } from "react";
+import {
+    useRestProps,
+    useReValue,
+    useVisible
+} from "../../hook";
+import { Form, FormItemProps } from "@arco-design/web-react";
 
-export const ReField = (props: IReField) => {
+export interface IReField {
+    name: string;
+    value?: any;
+    onChange?: (...args: any[]) => void;
+    visible?: boolean | string;
+    children: React.ReactElement;
+}
+
+export const ReField = (props: Omit<FormItemProps, "field" | "initialValue" | "defaultValue"> & IReField) => {
     const {
         name,
-        defaultValue,
         children,
         onChange,
         value,
         visible = true,
         ...rest
     } = props;
-    const [val, callback] = useAtom(name);
+
+    const [reValue, setReValue] = useReValue(name);
     const restProps = useRestProps(rest, children);
     const isShow = useVisible(visible);
 
-    useEffect(() => {
-        ReValues.next(GetAtomValues(CacheKey));
-    }, [val]);
-
     return isShow ? (
-        <span>
+        <Form.Item {...restProps}>
             {cloneElement(children, {
-                value: value ?? val ?? defaultValue,
-                onChange: onChange
-                    ? (...vals: any[]) => {
-                          onChange(SetAtomValueByKey(CacheKey), ...vals);
-                      }
-                    : callback,
-                ...restProps,
+                value: value ?? reValue,
+                // 这个地方得判断是否传入完全了 value 和 onChange
+                onChange: (...args: any[]) => {
+                    console.log("...args", ...args);
+                    onChange?.(...args);
+                    !value && setReValue(...args);
+                }
             })}
-        </span>
+        </Form.Item>
     ) : null;
 };

@@ -13,8 +13,8 @@ export default defineConfig({
             name: "ReComponent",
         },
         rollupOptions: {
-            external: ["react"],
-            output: { globals: { react: "React" } },
+            external: ["react", "react-dom"],
+            output: { globals: { react: "React", "react-dom": "ReactDOM" } },
         },
     },
 });

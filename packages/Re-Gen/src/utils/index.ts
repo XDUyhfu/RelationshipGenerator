@@ -87,36 +87,6 @@ export const transformDistinctOptionToBoolean: (
     return global ?? DistinctDefaultValue;
 };
 
-export const CheckParams = (CacheKey: string, RelationConfig: IConfigItem[]) => {
-    CheckReGenParams(CacheKey, RelationConfig);
-    JudgeRepetition(RelationConfig);
-    DependencyDetection(RelationConfig);
-};
-
-const JudgeRepetition = (RelationConfig: IConfigItem[]) =>
-    forEach((item: IConfigItem) => {
-        if (isEmpty(item.name) || isNil(item.name)) {
-            throw new Error(`${item.name}: 无效的 name 属性`);
-        }
-
-        if (RelationConfig.filter((it) => it.name === item.name).length > 1) {
-            throw new Error(`${item.name}: 重复的 name 属性`);
-        }
-    })(RelationConfig);
-
-export const DependencyDetection = (RelationConfig: IConfigItem[]) =>
-    forEach((item: IConfigItem) => {
-        const dependNames = getDependNames(item);
-        if (dependNames.includes(item.name)) {
-            throw Error(`${item.name} 依赖了自己`);
-        }
-        dependNames.forEach((name) => {
-            if (RelationConfig.filter((it) => it.name === name).length === 0) {
-                throw Error(`${item.name} 的依赖项 ${name} 不存在`);
-            }
-        });
-    })(RelationConfig);
-
 export const OpenLogger =
     (CacheKey: string, config?: ReGenConfig) =>
     (RelationConfig: IConfigItem[]) => {
@@ -141,20 +111,61 @@ export const PluckValue = (config: IConfigItem[]): PluckValueType[] =>
 export const PluckName = (config: IConfigItem[]): string[] => config.map(item => item.name);
 const isNotEmpty = complement(isEmpty);
 
+const JudgeRepetition = (RelationConfig: IConfigItem[]) =>
+    forEach((item: IConfigItem) => {
+        if (isEmpty(item.name) || isNil(item.name)) {
+            throw new Error(`${item.name}: 无效的 name 属性`);
+        }
+
+        if (RelationConfig.filter((it) => it.name === item.name).length > 1) {
+            throw new Error(`${item.name}: 重复的 name 属性`);
+        }
+    })(RelationConfig);
+
 export const CheckCacheKey = (CacheKey: string) => {
     if (not(is(String, CacheKey) && isNotEmpty(CacheKey))) {
         throw new Error("cacheKey 需要为字符串类型且长度大于0");
     }
+    return true;
 };
 
 // 检查 ReGen 函数参数
-const CheckReGenParams = (CacheKey: string, RelationConfig: IConfigItem[]) => {
+const CheckReGenParams = (CacheKey: string, RelationConfig: IConfigItem[], entry: "hook" | "library") => {
     // 对 JudgeRepetition 的补充
     // 判断条件：
     // cacheKey是一个有效的字符串
     // RelationConfig 长度大于 0
     CheckCacheKey(CacheKey);
-    if (not(is(Array, RelationConfig) && isNotEmpty(RelationConfig))) {
-        throw new Error("RelationConfig 需要为数据类型且长度大于0");
+    if (entry === "hook") {
+        if (not(isArray(RelationConfig) && isNotEmpty(RelationConfig))) {
+            throw new Error("RelationConfig 需要为数组类型且长度大于0");
+        }
+    } else if (entry === "library") {
+        if (not(isArray(RelationConfig))) {
+            throw new Error("RelationConfig 需要为数组类型");
+        }
     }
 };
+
+export const DependencyDetection = (RelationConfig: IConfigItem[]) =>
+    forEach((item: IConfigItem) => {
+        const dependNames = getDependNames(item);
+        if (dependNames.includes(item.name)) {
+            throw Error(`${item.name} 依赖了自己`);
+        }
+        dependNames.forEach((name) => {
+            if (RelationConfig.filter((it) => it.name === name).length === 0) {
+                throw Error(`${item.name} 的依赖项 ${name} 不存在`);
+            }
+        });
+    })(RelationConfig);
+
+export const CheckParams = (CacheKey: string, RelationConfig: IConfigItem[], entry: "hook" | "library") => {
+    // 参数检查在 hook 中，配置项不能为空，在使用函数时可以为空，如果为空将不会对 CacheKey 进行存储
+    CheckReGenParams(CacheKey, RelationConfig, entry);
+    // 下面这两个判断是不论什么场景都需要进行判断的
+    JudgeRepetition(RelationConfig);
+    DependencyDetection(RelationConfig);
+};
+
+

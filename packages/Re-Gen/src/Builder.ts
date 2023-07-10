@@ -10,7 +10,8 @@ import {
     transformFilterNilOptionToBoolean,
     transformDistinctOptionToBoolean,
     OpenLogger,
-    PluckValue
+    PluckValue,
+    CheckParams
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
@@ -162,6 +163,11 @@ export const ReGen = (
     RelationConfig: IConfigItem[],
     config?: ReGenConfig
 ) => {
+
+    CheckParams(CacheKey, RelationConfig, "library");
+    if (RelationConfig.length === 0) {
+        return () => ({});
+    }
 
     if (!Global.Store.has(CacheKey)) {
         Global.Store.set(CacheKey, new Map<string, AtomState>());

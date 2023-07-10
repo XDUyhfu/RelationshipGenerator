@@ -1,14 +1,16 @@
 import {
-    getValue,
-    IConfigItem
+    IConfigItem,
+    setValue
 } from "@yhfu/re-gen";
-import { Input } from "@arco-design/web-react";
+import {
+    Input,
+    Select
+} from "@arco-design/web-react";
 import { delay, map, of } from "rxjs";
-import { updateReValue } from "./utils";
 import { ReContainer } from "./components/re-container";
 import { ReField } from "./components/re-field";
-import { CacheKey } from "./context";
 import { TestComponent } from "./TestComponent";
+import { CacheKey } from "./context";
 
 const RelationConfig: IConfigItem[] = [
     { name: "input1" },
@@ -17,11 +19,11 @@ const RelationConfig: IConfigItem[] = [
         name: "input3",
         init: "123",
         handle(val) {
-            updateReValue("range", [val]);
+            setValue(CacheKey,"range", [val]);
             return val;
         },
     },
-    { name: "input4", init: "input4" },
+    { name: "input4" },
     { name: "input5" },
     {
         name: "show",
@@ -40,16 +42,16 @@ const RelationConfig: IConfigItem[] = [
             handle([range, input1]) {
                 return [...range, input1];
             },
-        },
+        }
     },
 ];
 
 function App() {
     return (
-        <ReContainer config={RelationConfig} layout={"inline"}>
+        <ReContainer config={RelationConfig} layout={"vertical"}>
             <ReField
                 name="input1"
-                // re-range={"range"}
+                re-range={"range"}
                 // re-inject-onChange={"show"}
                 // onChange={() => {
                 //     console.log( getValue( CacheKey, "show" ) );
@@ -58,18 +60,8 @@ function App() {
                 label={"input1"}
                 style={{width: 300}}
             />
-            <ReField name={"input2"} element={Input} label={"input2"} style={{width: 300}} />
-            {/*<ReField name="input2" label="这是一个input框" onChange={(va) => {*/}
-
-            {/*}}>*/}
-            {/*    <Input />*/}
-            {/*</ReField>*/}
-            {/*<ReField name="input3" value={v} onChange={setV}>*/}
-            {/*    <Input />*/}
-            {/*</ReField>*/}
-            {/*<ReField name="input4" visible={"show"}>*/}
-            {/*    <Input />*/}
-            {/*</ReField>*/}
+            <ReField name={"input2"} re-vv={"input1"} element={TestComponent} label={"input2"} style={{width: 300}} />
+            <ReField name="input4" label={"input2"} element={Select} elementProps={{options: [{label: "label", value: "value"}]}} />
         </ReContainer>
     );
 }

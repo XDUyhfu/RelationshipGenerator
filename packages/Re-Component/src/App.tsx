@@ -1,9 +1,14 @@
-import {IConfigItem} from "@yhfu/re-gen";
+import {
+    getValue,
+    IConfigItem
+} from "@yhfu/re-gen";
 import { Input } from "@arco-design/web-react";
 import { delay, map, of } from "rxjs";
 import { updateReValue } from "./utils";
 import { ReContainer } from "./components/re-container";
 import { ReField } from "./components/re-field";
+import { CacheKey } from "./context";
+import { TestComponent } from "./TestComponent";
 
 const RelationConfig: IConfigItem[] = [
     { name: "input1" },
@@ -41,21 +46,21 @@ const RelationConfig: IConfigItem[] = [
 
 function App() {
     return (
-        <ReContainer config={RelationConfig} layout={"vertical"}>
+        <ReContainer config={RelationConfig} layout={"inline"}>
             <ReField
                 name="input1"
-                re-range={"range"}
-                re-inject-onChange={"show"}
-            >
-                <Input
-                    // value={"123"}
-                    // onChange={(inject, val) => {
-                    //     console.log(inject, val);
-                    // }}
-                />
-            </ReField>
+                // re-range={"range"}
+                // re-inject-onChange={"show"}
+                // onChange={() => {
+                //     console.log( getValue( CacheKey, "show" ) );
+                // }}
+                element={Input}
+                label={"input1"}
+                style={{width: 300}}
+            />
+            <ReField name={"input2"} element={Input} label={"input2"} style={{width: 300}} />
             {/*<ReField name="input2" label="这是一个input框" onChange={(va) => {*/}
-            {/*    console.log( "logchang", va );*/}
+
             {/*}}>*/}
             {/*    <Input />*/}
             {/*</ReField>*/}

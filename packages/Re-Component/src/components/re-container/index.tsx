@@ -11,7 +11,7 @@ interface IReContainer {
 }
 
 export const ReContainer: FC<FormProps & IReContainer> = (props) => {
-    const {config, children} = props;
+    const {config, children, ...rest} = props;
     ReGen(CacheKey, config);
-    return <Form>{children}</Form>;
+    return <Form {...rest}>{children}</Form>;
 };

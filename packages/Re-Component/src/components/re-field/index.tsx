@@ -1,6 +1,10 @@
-import React, { cloneElement } from "react";
+import React, {
+    cloneElement,
+    createElement,
+    FC
+} from "react";
 import {
-    useRestProps,
+    // useRestProps,
     useReValue,
     useVisible
 } from "../../hook";
@@ -11,13 +15,15 @@ export interface IReField {
     value?: any;
     onChange?: (...args: any[]) => void;
     visible?: boolean | string;
-    children: React.ReactElement;
+    element: FC<any>;
+    [x: `re-${string}`]: string
+    [x: `re-inject-${string}`]: string
 }
 
 export const ReField = (props: Omit<FormItemProps, "field" | "initialValue" | "defaultValue"> & IReField) => {
     const {
         name,
-        children,
+        element,
         onChange,
         value,
         visible = true,
@@ -25,20 +31,20 @@ export const ReField = (props: Omit<FormItemProps, "field" | "initialValue" | "d
     } = props;
 
     const [reValue, setReValue] = useReValue(name);
-    const restProps = useRestProps(rest, children);
+    // const restProps = useRestProps(rest, element);
     const isShow = useVisible(visible);
 
     return isShow ? (
-        <Form.Item {...restProps}>
-            {cloneElement(children, {
-                value: value ?? reValue,
-                // 这个地方得判断是否传入完全了 value 和 onChange
-                onChange: (...args: any[]) => {
-                    console.log("...args", ...args);
-                    onChange?.(...args);
-                    !value && setReValue(...args);
-                }
-            })}
+        <Form.Item {...rest}>
+            {
+                createElement( element, {
+                    value: value ?? reValue, // 这个地方得判断是否传入完全了 value 和 onChange
+                    onChange: ( ...args: any[] ) => {
+                        onChange?.( ...args );
+                        !value && setReValue( ...args );
+                    }
+                } )
+            }
         </Form.Item>
     ) : null;
 };

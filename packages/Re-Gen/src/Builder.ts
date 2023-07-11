@@ -1,4 +1,10 @@
-import { identity, of, map, switchMap, scan } from "rxjs";
+import {
+    identity,
+    of,
+    map,
+    switchMap,
+    scan,
+} from "rxjs";
 import {
     AtomInOut,
     AtomState,
@@ -68,6 +74,7 @@ const AtomHandle =
                             config?.filterNil
                         )
                     ),
+                    switchMap(transformResultToObservable),
                     map(item.handle || identity),
                     switchMap(transformResultToObservable),
                     handleUndefined(
@@ -105,6 +112,7 @@ const HandDepend =
                         item.depend?.combineType || CombineType.ANY_CHANGE,
                         dependAtomsOut$
                     ),
+                    // TODO 需要检测是否存在依赖项，有依赖项才使用 handle 进行处理
                     map(item?.depend?.handle || identity),
                     switchMap(transformResultToObservable),
                     handleUndefined(
@@ -134,7 +142,17 @@ const HandDepend =
                             config?.filterNil
                         )
                     ),
-                    handleLogger(CacheKey, item.name, config?.logger)
+                    map(item.interceptor || identity ),
+                    switchMap(transformResultToObservable),
+                    handleUndefined(
+                        transformFilterNilOptionToBoolean(
+                            FilterNilStage.OutBefore,
+                            item.filterNil ??
+                            config?.filterNil
+                        )
+                    ),
+                    handleError(`捕获到 ${item.name} interceptor 中报错`),
+                    handleLogger(CacheKey, item.name, config?.logger),
                 )
                 .subscribe(atom.out$);
         })(RelationConfig);

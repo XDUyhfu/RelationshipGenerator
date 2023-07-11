@@ -10,7 +10,7 @@ function App() {
         testMoreDepend,
         testMoreMoreDepend,
         ReGenValue: {setValue}
-    } = useReGen("CACHE_KEY", RelationConfig);
+    } = useReGen("CACHE_KEY", RelationConfig, {logger: true});
 
     return (
         <div>

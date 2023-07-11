@@ -47,12 +47,8 @@ export const defaultReduceFunction = (_: any, val: any) => val;
  */
 export const transformResultToObservable = (
     result: ReturnResult
-): ObservableInput<any> =>
-    isPlainResult(result)
-        ? of(result)
-        : isObject(result)
-        ? of(result)
-        : (result as ObservableInput<any>);
+): ObservableInput<any> => isPlainResult( result ) ? of( result ) : isObject( result ) ? of( result ) : (result as ObservableInput<any>);
+
 /**
  * 根据用户传入的条件判断是否对空值进行过滤
  * - 支持传入布尔值或过滤阶段

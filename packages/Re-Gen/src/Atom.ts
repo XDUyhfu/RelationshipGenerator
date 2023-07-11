@@ -2,10 +2,13 @@ import {
     BehaviorSubject,
     Observable,
     ReplaySubject,
+    switchMap,
+    tap
 } from "rxjs";
 import { AtomsType } from "./type";
 import { Global } from "./store";
 import { isNil } from "ramda";
+import { transformResultToObservable } from "./utils";
 
 export class AtomState<T = any> {
     in$: BehaviorSubject<T>;
@@ -15,10 +18,12 @@ export class AtomState<T = any> {
     constructor(init: T) {
         this.in$ = new BehaviorSubject(init);
         this.mid$ = new ReplaySubject(0);
-        this.out$ = new BehaviorSubject(init);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // 防止初始值为
+        this.out$ = new BehaviorSubject(init).pipe(switchMap(transformResultToObservable), tap(console.log));
     }
 }
-
 
 export const AtomInOut =
     (CacheKey: string) =>

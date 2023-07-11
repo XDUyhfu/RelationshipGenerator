@@ -2,12 +2,25 @@
 // 主要用来制定数据之间的关系
 
 import { IConfigItem } from "../../../packages/Re-Gen/src";
-import { filter, from, map, of, toArray } from "rxjs";
+import {
+    BehaviorSubject,
+    delay,
+    filter,
+    from,
+    interval,
+    map,
+    of,
+    switchMap,
+    toArray
+} from "rxjs";
 
 export const RelationConfig: IConfigItem[] = [
     {
         name: "area",
-        // init: of("CN"),
+        init: new BehaviorSubject("CN").pipe(
+            delay(2000),
+            switchMap(() => interval(3000)),
+        ),
         handle(val) {
             return of(val);
         },
@@ -15,8 +28,7 @@ export const RelationConfig: IConfigItem[] = [
     {
         name: "region",
         // init: [],
-        handle: (val: string[] = []) =>
-            from(val).pipe(
+        handle: (val: string[] = []) => from(val).pipe(
                 filter(Boolean),
                 map((item) => item?.toLocaleUpperCase()),
                 toArray()

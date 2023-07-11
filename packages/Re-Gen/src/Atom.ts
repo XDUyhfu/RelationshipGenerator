@@ -3,7 +3,8 @@ import {
     filter,
     isObservable,
     Observable,
-    ReplaySubject
+    ReplaySubject,
+    skipWhile,
 } from "rxjs";
 import { AtomsType } from "./type";
 import { Global } from "./store";
@@ -24,8 +25,9 @@ export class AtomState<T = any> {
         this.out$ = new BehaviorSubject(init).pipe(
             filter(item=> !isObservable(item)),
             filter(item => !isJointAtom(item)),
-            // TODO 配置项的空值处理应用到此处
-            filter(item => !isNil(item))
+            // TODO 需要在进行观察
+            skipWhile(item => isNil(item))
+
         );
     }
 }

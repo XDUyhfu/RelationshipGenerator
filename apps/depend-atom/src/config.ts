@@ -1,30 +1,53 @@
 import {
+    CombineType,
+    FilterNilStage,
     IConfigItem,
-    getOutObservable,
     ReGenPrefix
 } from "../../../packages/Re-Gen/src/index";
+import axios from "axios";
 
-export const FirstCacheKey = "FirstCacheKey";
-export const SecondCacheKey = "SecondCacheKey";
+export const ParamsKey = "ParamsKey";
+export const RequestKey = "RequestKey";
+export const HandleRequstKey = "HandleRequstKey";
 
-export const FirstConfig: IConfigItem[] = [
+export const ParamsConfig: IConfigItem[] = [
     {
-        name: "atom",
-        // init: { clientX: 0 },
-        filterNil: true,
+        name: "param1",
+        filterNil: FilterNilStage.All,
         handle(v) {
-            return v.clientX;
+            return v;
+        },
+    },
+    {
+        name: "param2",
+        filterNil: FilterNilStage.All,
+        handle(v) {
+            return v;
+        }
+    },
+    {
+        name: "button",
+        depend: {
+            names: ["param1", "param2"],
+            combineType: CombineType.SELF_CHANGE,
+            handle: ([, param1, param2]) => ({
+                    param1,
+                    param2
+                })
+        }
+    }
+];
+
+export const RequestConfig: IConfigItem[] = [
+    {
+        name: "result",
+        init: `${ReGenPrefix}:${ParamsKey}:button`,
+        handle(val) {
+            if (val) {
+                return axios.get(`https://api.github.com/users/${val?.param1 ?? "XDUyhfu"}`);
+            }
         },
     },
 ];
 
-export const SecondConfig: IConfigItem[] = [
-    {
-        name: "value",
-        init: `${ReGenPrefix}:${FirstCacheKey}:atom`,
-        handle(val) {
-            console.log("val -- >", val);
-            return val;
-        },
-    },
-];
+

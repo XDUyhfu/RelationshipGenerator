@@ -8,6 +8,7 @@ import {
 import { AtomsType } from "./type";
 import { Global } from "./store";
 import { isNil } from "ramda";
+import { isJointAtom } from "./utils";
 
 export class AtomState<T = any> {
     in$: BehaviorSubject<T>;
@@ -20,7 +21,12 @@ export class AtomState<T = any> {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // 对初始值为 Observable 的进行过滤，防止使用过程中报错
-        this.out$ = new BehaviorSubject(init).pipe(filter((item) => !isObservable(item)));
+        this.out$ = new BehaviorSubject(init).pipe(
+            filter(item=> !isObservable(item)),
+            filter(item => !isJointAtom(item)),
+            // TODO 配置项的空值处理应用到此处
+            filter(item => !isNil(item))
+        );
     }
 }
 

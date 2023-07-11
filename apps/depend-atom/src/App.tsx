@@ -1,24 +1,32 @@
 import { useReGen } from "../../../packages/Re-Gen/src/index";
 import {
-    FirstCacheKey,
-    FirstConfig,
-    SecondCacheKey,
-    SecondConfig,
+    ParamsConfig,
+    ParamsKey,
+    RequestConfig,
+    RequestKey
 } from "./config";
+import {
+    Button,
+    Select
+} from "antd";
 
 
 function App() {
-    const { atom, ReGenValue: { setValue } } = useReGen(FirstCacheKey, FirstConfig);
-    const { value } = useReGen(SecondCacheKey, SecondConfig);
+    const { button, ReGenValue: { setValue: setParamsValue } } = useReGen(ParamsKey, ParamsConfig);
+    const { result } = useReGen(RequestKey, RequestConfig);
+    // const { value } = useReGen(SecondCacheKey, SecondConfig);
+
+    // console.log(result);
 
     return (
         <div>
-            first: {JSON.stringify(atom)}
-            <br />
-            second: {JSON.stringify(value)}
-            <br />
-            <br />
-            <button onClick={ setValue("atom") }>input first</button>
+            {JSON.stringify(result)}
+            <br/>
+            <Select style={{width: 200}} onChange={setParamsValue("param1")} options={[{label: "XDUyhfu", value: "XDUyhfu"},{label: "p2", value: "p2"}]}></Select>
+            <br/>
+            <Select style={{width: 200}} onChange={setParamsValue("param2")} options={[{label: "p3", value: "p3"},{label: "p4", value: "p4"}]}></Select>
+            <br/>
+            <Button onClick={setParamsValue("button")}>发起请求</Button>
         </div>
     );
 }

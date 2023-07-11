@@ -5,6 +5,7 @@ import {
     isPlainResult,
     PluckName,
     CheckParams,
+    isJointAtom,
 } from "../../utils";
 import {
     IConfigItem,
@@ -60,7 +61,8 @@ export const useReGen = (CacheKey: string, RelationConfig: IConfigItem[], config
                 () =>
                     inout?.[`${name}Out$`],
                 isPlainResult(initMap[name])
-                    ? initMap[name]
+                    // TODO 数据过滤
+                    ? isJointAtom(initMap[name]) ? null : initMap[name]
                     : null
             ),
         };

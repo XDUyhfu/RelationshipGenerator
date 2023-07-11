@@ -1,9 +1,5 @@
 
-import {
-    BehaviorSubject,
-    filter,
-    isObservable
-} from "rxjs";
+import { BehaviorSubject } from "rxjs";
 import { useObservable } from "rxjs-hooks";
 import {
     isPlainResult,
@@ -62,9 +58,7 @@ export const useReGen = (CacheKey: string, RelationConfig: IConfigItem[], config
             ...pre,
             [`${name}`]: useObservable(
                 () =>
-                    inout?.[`${name}Out$`]?.pipe(
-                        filter((item) => !isObservable(item))
-                    ),
+                    inout?.[`${name}Out$`],
                 isPlainResult(initMap[name])
                     ? initMap[name]
                     : null

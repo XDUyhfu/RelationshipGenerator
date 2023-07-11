@@ -1,14 +1,13 @@
 import {
     BehaviorSubject,
+    filter,
+    isObservable,
     Observable,
-    ReplaySubject,
-    switchMap,
-    tap
+    ReplaySubject
 } from "rxjs";
 import { AtomsType } from "./type";
 import { Global } from "./store";
 import { isNil } from "ramda";
-import { transformResultToObservable } from "./utils";
 
 export class AtomState<T = any> {
     in$: BehaviorSubject<T>;
@@ -20,8 +19,8 @@ export class AtomState<T = any> {
         this.mid$ = new ReplaySubject(0);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        // 防止初始值为
-        this.out$ = new BehaviorSubject(init).pipe(switchMap(transformResultToObservable), tap(console.log));
+        // 对初始值为 Observable 的进行过滤，防止使用过程中报错
+        this.out$ = new BehaviorSubject(init).pipe(filter((item) => !isObservable(item)));
     }
 }
 

@@ -13,6 +13,7 @@ import {
     LoggerDurationDefaultValue,
     FilterNilDefaultConfig,
     FilterNilStage,
+    ReGenPrefix,
 } from "../config";
 import {
     complement,
@@ -162,6 +163,25 @@ export const CheckParams = (CacheKey: string, RelationConfig: IConfigItem[], ent
     // 下面这两个判断是不论什么场景都需要进行判断的
     JudgeRepetition(RelationConfig);
     DependencyDetection(RelationConfig);
+};
+
+/**
+ * 正确的格式是: prefix:CacheKey:name
+ * @param joint
+ */
+export const isJointAtom = (joint: any) => {
+    if (is(String, joint)) {
+        if (joint.startsWith(`${ReGenPrefix}:`)) {
+            const rest = joint.replace(`${ReGenPrefix}:`, "").split(":");
+            if (rest.length === 2) {
+                if (rest[0].length > 0 && rest[1].length > 0) {
+                    return rest;
+                }
+            }
+        }
+    }
+
+    return false;
 };
 
 

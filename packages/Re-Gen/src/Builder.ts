@@ -8,6 +8,7 @@ import {
 import {
     AtomInOut,
     AtomState,
+    getOutObservable
 } from "./Atom";
 import {
     defaultReduceFunction,
@@ -17,7 +18,8 @@ import {
     transformDistinctOptionToBoolean,
     OpenLogger,
     PluckValue,
-    CheckParams
+    CheckParams,
+    isJointAtom
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
@@ -45,12 +47,11 @@ const ConfigToAtomStore =
     (CacheKey: string) => (RelationConfig: IConfigItem[]) =>
         // 里面用到的 forEach 来自 ramda，它会将传入的参数返回
         forEach((item: IConfigItem) => {
-            Global.Store.get(CacheKey)!.set(
-                item.name,
-                new AtomState(
-                    typeof item.init === "function" ? item.init() : item.init
-                )
-            );
+            let initValue = item.init;
+            if (typeof item.init === "function") { initValue = item.init(); }
+            const joint = isJointAtom(item.init);
+            if (joint) { initValue = getOutObservable(joint[0])[joint[1]]; }
+            Global.Store.get(CacheKey)!.set( item.name, new AtomState( initValue ) );
         })(RelationConfig);
 
 /**

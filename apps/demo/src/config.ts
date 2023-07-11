@@ -1,7 +1,6 @@
 // 这是一个测试的配置文件，主要用来测试生成的代码
 // 主要用来制定数据之间的关系
 
-import { IConfigItem } from "../../../packages/Re-Gen/src";
 import {
     BehaviorSubject,
     delay,
@@ -13,6 +12,7 @@ import {
     switchMap,
     toArray
 } from "rxjs";
+import { IConfigItem } from "../../../packages/Re-Gen/src";
 
 export const RelationConfig: IConfigItem[] = [
     {

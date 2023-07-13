@@ -30,7 +30,9 @@ export const isArray = (value: any): value is Array<any> => Array.isArray(value)
 export const isPlainObject = (value: any) =>
     Object.prototype.toString.call(value) === "[object Object]" &&
     value?.constructor === Object;
-export const isObject = (value: any) =>
+
+const isFunction = (value: any) => Object.prototype.toString.call(value) === "[object Function]";
+const isObject = (value: any) =>
     Object.prototype.toString.call(value) === "[object Object]" &&
     !isObservable(value);
 export const isPlainResult = (result: ReturnResult): result is PlainResult =>
@@ -38,6 +40,7 @@ export const isPlainResult = (result: ReturnResult): result is PlainResult =>
     isPlainObject(result) ||
     Array.isArray(result) ||
     result === null;
+const isNotObservable = (value: any) => isPlainResult(value) || isObject(value) || isFunction(value);
 
 export const getDependNames = (item: IConfigItem) => item.depend?.names || [];
 export const defaultReduceFunction = (_: any, val: any) => val;
@@ -48,7 +51,7 @@ export const defaultReduceFunction = (_: any, val: any) => val;
  */
 export const transformResultToObservable = (
     result: ReturnResult
-): ObservableInput<any> => isPlainResult( result ) ? of( result ) : isObject( result ) ? of( result ) : (result as ObservableInput<any>);
+): ObservableInput<any> => isNotObservable(result) ? of( result ) : (result as ObservableInput<any>);
 
 /**
  * 根据用户传入的条件判断是否对空值进行过滤

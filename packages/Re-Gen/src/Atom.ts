@@ -6,17 +6,14 @@ import { AtomsType } from "./type";
 import { Global } from "./store";
 import { isNil } from "ramda";
 
-export class AtomState<T = any> {
-    in$: BehaviorSubject<T>;
-    mid$: ReplaySubject<T>;
-    out$: BehaviorSubject<T>;
+export class AtomState {
+    in$: BehaviorSubject<any>;
+    mid$: ReplaySubject<any>;
+    out$: BehaviorSubject<any>;
 
-    constructor(init: T) {
+    constructor(init: any) {
         this.in$ = new BehaviorSubject(init);
         this.mid$ = new ReplaySubject(0);
-        // TODO 能否换成 ReplaySubject 呢
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         this.out$ = new BehaviorSubject(null);
     }
 }

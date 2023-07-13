@@ -4,7 +4,8 @@ import {
     map,
     switchMap,
     scan,
-    filter
+    filter,
+    BehaviorSubject
 } from "rxjs";
 import {
     AtomInOut,
@@ -173,11 +174,11 @@ const BuilderRelation = (
     RelationConfig: IConfigItem[],
     options?: ReGenConfig
 ) =>
-    of<IConfigItem[]>(RelationConfig).pipe(
+    of(RelationConfig).pipe(
         map(OpenLogger(CacheKey, options)),
         map(ConfigToAtomStore(CacheKey)),
         map(AtomHandle(CacheKey, options)),
-        map(HandDepend(CacheKey, options))
+        map(HandDepend(CacheKey, options)),
     );
 
 export const ReGen = (
@@ -188,7 +189,7 @@ export const ReGen = (
 
     CheckParams(CacheKey, RelationConfig, "library");
     if (RelationConfig.length === 0) {
-        return () => ({});
+        return (() => ({})) as (name: string) => {[p: `${string}In$`]: BehaviorSubject<any>, [p: `${string}Out$`]: BehaviorSubject<any>};
     }
 
     if (!Global.Store.has(CacheKey)) {

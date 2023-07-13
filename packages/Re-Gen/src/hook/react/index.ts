@@ -4,9 +4,12 @@ import { useObservable } from "rxjs-hooks";
 import {
     PluckName,
     CheckParams,
+    isPlainResult,
+    isJointAtom,
 } from "../../utils";
 import {
     IConfigItem,
+    IConfigItemInit,
     ReGenConfig
 } from "../../type";
 import { ReGen } from "../../Builder";
@@ -46,13 +49,21 @@ export const useReGen = (CacheKey: string, RelationConfig: IConfigItem[], config
     CheckParams(CacheKey, RelationConfig, "hook");
     const AtomInOut = ReGen(CacheKey, RelationConfig, config);
     const names = PluckName(RelationConfig);
+    const initMap = RelationConfig.reduce((pre, item) => ({
+        ...pre,
+        [`${item.name}`]: item.init
+    }), {} as Record<string, IConfigItemInit>);
     const AtomsValue: IResultAtomsValue = names.reduce((pre, name) => {
         const inout = AtomInOut?.(name);
+        // TODO 加上默认值
         return {
             ...pre,
             [`${name}`]: useObservable(
-                () =>
-                    inout?.[`${name}Out$`],
+                () => inout?.[`${name}Out$`],
+                isPlainResult(initMap[name])
+                    // TODO 数据过滤
+                    ? isJointAtom(initMap[name]) ? null : initMap[name]
+                    : null
             ),
         };
     }, {

@@ -18,16 +18,17 @@ export const RelationConfig: IConfigItem[] = [
     {
         name: "area",
         init: new BehaviorSubject("CN").pipe(
-            delay(2000),
-            switchMap(() => interval(3000)),
+            delay(1000),
+            switchMap(() => interval(1000)),
         ),
+        // init: "CN",
         handle(val) {
             return of(val);
         },
     },
     {
         name: "region",
-        // init: [],
+        init: ["ni", "hello"],
         handle: (val: string[] = []) => from(val).pipe(
                 filter(Boolean),
                 map((item) => item?.toLocaleUpperCase()),

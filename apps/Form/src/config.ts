@@ -2,7 +2,7 @@ import { clone } from "ramda";
 import {
     FilterNilStage,
     IConfigItem
-} from "../../../packages/Re-Gen/src/index";
+} from "../../../packages/Re-Gen/src";
 
 export interface IItem {
     id: string;
@@ -26,9 +26,9 @@ export const ConfigItems: IConfigItem[] = [
         depend: {
             names: ["addItem", "name"],
             handle: ([Items, addItem, name]) => ({
-                item: addItem,
-                updateName: name,
-            }),
+                    item: addItem,
+                    updateName: name,
+                }),
         },
         reduce: {
             handle: (

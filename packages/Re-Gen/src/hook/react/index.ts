@@ -5,7 +5,7 @@ import {
     isPlainResult,
     PluckName,
     CheckParams,
-    isJointAtom,
+    isJointAtom
 } from "../../utils";
 import {
     IConfigItem,

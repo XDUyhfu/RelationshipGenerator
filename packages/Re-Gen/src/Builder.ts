@@ -4,6 +4,7 @@ import {
     map,
     switchMap,
     scan,
+    filter
 } from "rxjs";
 import {
     AtomInOut,
@@ -67,6 +68,8 @@ const AtomHandle =
             const atom = Global.Store.get(CacheKey)!.get(item.name)!;
             atom.in$
                 .pipe(
+                    //  filter(item=> !isObservable(item)),
+                filter(item => !isJointAtom(item)),
                     switchMap(transformResultToObservable),
                     handleUndefined(
                         transformFilterNilOptionToBoolean(
@@ -85,7 +88,8 @@ const AtomHandle =
                             config?.filterNil
                         )
                     ),
-                    handleError(`捕获到 ${item.name} handle 中报错`)
+                    handleError(`捕获到 ${item.name} handle 中报错`),
+
                 )
                 .subscribe(atom.mid$);
         })(RelationConfig);
@@ -155,7 +159,7 @@ const HandDepend =
                     handleError(`捕获到 ${item.name} interceptor 中报错`),
                     handleLogger(CacheKey, item.name, config?.logger),
                 )
-                .subscribe(atom.out$);
+                .subscribe( atom.out$ );
         })(RelationConfig);
 
 /**

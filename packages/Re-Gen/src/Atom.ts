@@ -1,34 +1,23 @@
 import {
     BehaviorSubject,
-    filter,
-    isObservable,
-    Observable,
-    ReplaySubject,
-    skipWhile,
+    ReplaySubject
 } from "rxjs";
 import { AtomsType } from "./type";
 import { Global } from "./store";
 import { isNil } from "ramda";
-import { isJointAtom } from "./utils";
 
 export class AtomState<T = any> {
     in$: BehaviorSubject<T>;
     mid$: ReplaySubject<T>;
     out$: BehaviorSubject<T>;
 
-    constructor(init: T) {
+    constructor(init: any) {
         this.in$ = new BehaviorSubject(init);
         this.mid$ = new ReplaySubject(0);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // 对初始值为 Observable 的进行过滤，防止使用过程中报错
-        this.out$ = new BehaviorSubject(init).pipe(
-            filter(item=> !isObservable(item)),
-            filter(item => !isJointAtom(item)),
-            // TODO 需要在进行观察
-            skipWhile(item => isNil(item))
-
-        );
+        this.out$ = new BehaviorSubject( null );
     }
 }
 
@@ -44,7 +33,7 @@ export const AtomInOut =
             [`${name}Out$`]: atom.out$,
         } as {
             [x: `${string}In$`]: BehaviorSubject<T>;
-            [x: `${string}Out$`]: Observable<T>;
+            [x: `${string}Out$`]: BehaviorSubject<T>;
         };
     };
 

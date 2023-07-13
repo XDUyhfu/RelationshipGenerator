@@ -16,7 +16,7 @@
 // 	Out = "Out",
 // }
 
-export const ReGenPrefix = "$$ReGenPrefix";
+export const ReGenPrefix = "$$@ReGenPrefix";
 
 export enum FilterNilStage {
 	In = "In",

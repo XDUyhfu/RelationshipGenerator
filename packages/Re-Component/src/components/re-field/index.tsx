@@ -1,38 +1,53 @@
-import { cloneElement, useEffect } from "react";
-import { CacheKey, ReValues } from "../../context/index";
-import { GetAtomValues, SetAtomValueByKey } from "@yhfu/re-gen";
-import { IReField } from "../../type";
-import { useAtom, useRestProps, useVisible } from "../../hook";
+import React, {
+    createElement,
+    FC
+} from "react";
+import {
+    useRestProps,
+    useReValue,
+    useVisible
+} from "../../hook";
+import { Form, FormItemProps } from "@arco-design/web-react";
 
-export const ReField = (props: IReField) => {
+export interface IReField {
+    name: string;
+    value?: any;
+    onChange?: (...args: any[]) => void;
+    visible?: boolean | string;
+    element: FC<any>;
+    elementProps?: Record<string, any>,
+    [x: `re-${string}`]: string
+    [x: `re-inject-${string}`]: string
+}
+
+export const ReField = (props: Omit<FormItemProps, "field" | "initialValue" | "defaultValue"> & IReField) => {
     const {
         name,
-        defaultValue,
-        children,
+        element,
         onChange,
         value,
         visible = true,
+        elementProps,
         ...rest
     } = props;
-    const [val, callback] = useAtom(name);
-    const restProps = useRestProps(rest, children);
+
+    const [reValue, setReValue] = useReValue(name);
+    const [reProps, withoutReProps] = useRestProps(rest);
     const isShow = useVisible(visible);
 
-    useEffect(() => {
-        ReValues.next(GetAtomValues(CacheKey));
-    }, [val]);
-
     return isShow ? (
-        <span>
-            {cloneElement(children, {
-                value: value ?? val ?? defaultValue,
-                onChange: onChange
-                    ? (...vals: any[]) => {
-                          onChange(SetAtomValueByKey(CacheKey), ...vals);
-                      }
-                    : callback,
-                ...restProps,
-            })}
-        </span>
+        <Form.Item {...withoutReProps}>
+            {
+                createElement( element, {
+                    value: value ?? reValue, // 这个地方得判断是否传入完全了 value 和 onChange
+                    onChange: ( ...args: any[] ) => {
+                        onChange?.( ...args );
+                        !value && setReValue( ...args );
+                    },
+                    ...elementProps,
+                    ...reProps
+                } )
+            }
+        </Form.Item>
     ) : null;
 };

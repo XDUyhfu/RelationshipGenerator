@@ -60,9 +60,10 @@ export const handleCombine =
             ? type === CombineType.SELF_CHANGE
                 ? source.pipe(withLatestFrom(...depends))
                 : type === CombineType.EVERY_CHANGE
-                ? source.pipe(zipWith(...depends))
-                : source.pipe(combineLatestWith(...depends))
+                    ? source.pipe(zipWith(...depends))
+                    : source.pipe(combineLatestWith(...depends))
             : source;
+
 
 export const handleError =
     (message: string): ((source: Observable<any>) => Observable<any>) =>

@@ -1,27 +1,28 @@
 
 // -- in -- handle -- depend -- reduce -- out --
-export enum TransformStage {
-	// InBefore = "InBefore",
-	// InAfter = "InAfter",
-	In = "In",
-	// HandleBefore = "HandleBefore",
-	// Handle = "Handle",
-	HandleAfter = "HandleAfter",
-	// DependBefore = "DependBefore",
-	// Depend = "Depend",
-	DependAfter = "DependAfter",
-	// ReduceBefore = "ReduceBefore",
-	// Reduce = "Reduce",
-	// ReduceAfter = "ReduceAfter",
-	// OutBefore = "OutBefore",
-	Out = "Out",
-	// OutAfter = "OutAfter",
-}
+// export enum TransformStage {
+// 	// InAfter = "InAfter",
+// 	In = "In",
+// 	// HandleBefore = "HandleBefore",
+// 	// Handle = "Handle",
+// 	HandleAfter = "HandleAfter",
+// 	// DependBefore = "DependBefore",
+// 	// Depend = "Depend",
+// 	DependAfter = "DependAfter",
+// 	// ReduceBefore = "ReduceBefore",
+// 	// Reduce = "Reduce",
+// 	// ReduceAfter = "ReduceAfter",
+// 	// OutBefore = "OutBefore",
+// 	Out = "Out",
+// }
+
+export const ReGenPrefix = "$$@ReGenPrefix";
 
 export enum FilterNilStage {
 	In = "In",
 	HandleAfter = "HandleAfter",
 	DependAfter = "DependAfter",
+	OutBefore = "OutBefore",
 	Out = "Out",
 	All = "All",
 	Default = "Default"

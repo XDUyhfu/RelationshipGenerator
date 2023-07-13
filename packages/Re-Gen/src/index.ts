@@ -3,6 +3,7 @@ export type {
     ReGenConfig
 } from "./type";
 
-export { FilterNilStage, CombineType } from "./config";
+export { FilterNilStage, CombineType, ReGenPrefix } from "./config";
 export { useReGen } from "./hook/react";
-export { setValue, getAtom, getValue } from "./Atom";
+export { ReGen } from "./Builder";
+export { setValue, getValue, getInObservable, getOutObservable } from "./Atom";

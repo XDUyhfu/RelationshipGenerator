@@ -1,7 +1,15 @@
-import { identity, of, map, switchMap, scan } from "rxjs";
+import {
+    identity,
+    of,
+    map,
+    switchMap,
+    scan,
+    filter
+} from "rxjs";
 import {
     AtomInOut,
     AtomState,
+    getOutObservable
 } from "./Atom";
 import {
     defaultReduceFunction,
@@ -10,7 +18,9 @@ import {
     transformFilterNilOptionToBoolean,
     transformDistinctOptionToBoolean,
     OpenLogger,
-    PluckValue
+    PluckValue,
+    CheckParams,
+    isJointAtom
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
@@ -38,12 +48,11 @@ const ConfigToAtomStore =
     (CacheKey: string) => (RelationConfig: IConfigItem[]) =>
         // 里面用到的 forEach 来自 ramda，它会将传入的参数返回
         forEach((item: IConfigItem) => {
-            Global.Store.get(CacheKey)!.set(
-                item.name,
-                new AtomState(
-                    typeof item.init === "function" ? item.init() : item.init
-                )
-            );
+            let initValue = item.init;
+            if (typeof item.init === "function") { initValue = item.init(); }
+            const joint = isJointAtom(item.init);
+            if (joint) { initValue = getOutObservable(joint[0])[joint[1]]; }
+            Global.Store.get(CacheKey)!.set( item.name, new AtomState( initValue ) );
         })(RelationConfig);
 
 /**
@@ -59,6 +68,7 @@ const AtomHandle =
             const atom = Global.Store.get(CacheKey)!.get(item.name)!;
             atom.in$
                 .pipe(
+                    filter(item => !isJointAtom(item)),
                     switchMap(transformResultToObservable),
                     handleUndefined(
                         transformFilterNilOptionToBoolean(
@@ -67,6 +77,7 @@ const AtomHandle =
                             config?.filterNil
                         )
                     ),
+                    switchMap(transformResultToObservable),
                     map(item.handle || identity),
                     switchMap(transformResultToObservable),
                     handleUndefined(
@@ -76,7 +87,8 @@ const AtomHandle =
                             config?.filterNil
                         )
                     ),
-                    handleError(`捕获到 ${item.name} handle 中报错`)
+                    handleError(`捕获到 ${item.name} handle 中报错`),
+
                 )
                 .subscribe(atom.mid$);
         })(RelationConfig);
@@ -104,6 +116,7 @@ const HandDepend =
                         item.depend?.combineType || CombineType.ANY_CHANGE,
                         dependAtomsOut$
                     ),
+                    // TODO 需要检测是否存在依赖项，有依赖项才使用 handle 进行处理
                     map(item?.depend?.handle || identity),
                     switchMap(transformResultToObservable),
                     handleUndefined(
@@ -133,9 +146,19 @@ const HandDepend =
                             config?.filterNil
                         )
                     ),
-                    handleLogger(CacheKey, item.name, config?.logger)
+                    map(item.interceptor || identity ),
+                    switchMap(transformResultToObservable),
+                    handleUndefined(
+                        transformFilterNilOptionToBoolean(
+                            FilterNilStage.OutBefore,
+                            item.filterNil ??
+                            config?.filterNil
+                        )
+                    ),
+                    handleError(`捕获到 ${item.name} interceptor 中报错`),
+                    handleLogger(CacheKey, item.name, config?.logger),
                 )
-                .subscribe(atom.out$);
+                .subscribe( atom.out$ );
         })(RelationConfig);
 
 /**
@@ -162,6 +185,11 @@ export const ReGen = (
     RelationConfig: IConfigItem[],
     config?: ReGenConfig
 ) => {
+
+    CheckParams(CacheKey, RelationConfig, "library");
+    if (RelationConfig.length === 0) {
+        return () => ({});
+    }
 
     if (!Global.Store.has(CacheKey)) {
         Global.Store.set(CacheKey, new Map<string, AtomState>());

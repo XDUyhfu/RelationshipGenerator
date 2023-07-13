@@ -1,20 +1,25 @@
-import { IConfigItem } from "@yhfu/re-gen";
-import { Button, Input } from "@arco-design/web-react";
-import "@arco-design/web-react/dist/css/arco.css";
+import {
+    IConfigItem,
+    setValue
+} from "@yhfu/re-gen";
+import {
+    Input,
+    Select
+} from "@arco-design/web-react";
 import { delay, map, of } from "rxjs";
-import { useState } from "react";
-import { updateReValue, ReComponent } from "./utils";
-import { useReValues } from "./hook";
 import { ReContainer } from "./components/re-container";
 import { ReField } from "./components/re-field";
+import { TestComponent } from "./TestComponent";
+import { CacheKey } from "./context";
 
 const RelationConfig: IConfigItem[] = [
     { name: "input1" },
-    { name: "input2" },
+    { name: "input2", init: "input2" },
     {
         name: "input3",
+        init: "123",
         handle(val) {
-            updateReValue("range", [val]);
+            setValue(CacheKey,"range", [val]);
             return val;
         },
     },
@@ -25,7 +30,7 @@ const RelationConfig: IConfigItem[] = [
         init: false,
         handle: (val) =>
             of(val).pipe(
-                delay(10000),
+                delay(5000),
                 map(() => true)
             ),
     },
@@ -37,47 +42,26 @@ const RelationConfig: IConfigItem[] = [
             handle([range, input1]) {
                 return [...range, input1];
             },
-        },
+        }
     },
 ];
 
-ReComponent(RelationConfig);
-
 function App() {
-    const [vis, setVis] = useState(false);
-
     return (
-        <ReContainer>
+        <ReContainer config={RelationConfig} layout={"vertical"}>
             <ReField
                 name="input1"
-                defaultValue={"123"}
                 re-range={"range"}
-                re-inject-onChange={"show"}
-            >
-                <Input
-                    value={"123"}
-                    onChange={(inject, val) => {
-                        console.log(inject, val);
-                    }}
-                />
-            </ReField>
-            <ReField name="input2" defaultValue={"123"}>
-                <Input />
-            </ReField>
-            <ReField name="input3" defaultValue={"123"}>
-                <Input />
-            </ReField>
-            <ReField name="input4" visible={vis} defaultValue={"show"}>
-                <Input />
-            </ReField>
-            <Button
-                type="primary"
-                onClick={() => {
-                    setVis(true);
-                }}
-            >
-                show me
-            </Button>
+                // re-inject-onChange={"show"}
+                // onChange={() => {
+                //     console.log( getValue( CacheKey, "show" ) );
+                // }}
+                element={Input}
+                label={"input1"}
+                style={{width: 300}}
+            />
+            <ReField name={"input2"} re-vv={"input1"} element={TestComponent} label={"input2"} style={{width: 300}} />
+            <ReField name="input4" label={"input2"} element={Select} elementProps={{options: [{label: "label", value: "value"}]}} />
         </ReContainer>
     );
 }

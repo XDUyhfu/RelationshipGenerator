@@ -30,17 +30,18 @@ export interface IConfigItem {
     name: string;
     init?: IConfigItemInit;
     handle?: (arg: any) => ReturnResult;
-    distinct?: IDistinct;
-    reduce?: {
-        handle: (pre: any, val: any) => any;
-        init: any;
-    };
-    filterNil?: FilterNilStage | boolean;
     depend?: {
         names: string[];
         handle: (args: any) => ReturnResult;
         combineType?: CombineType;
     };
+    reduce?: {
+        handle: (pre: any, val: any) => ReturnResult;
+        init: any;
+    };
+    distinct?: IDistinct;
+    interceptor?: (arg: any) => ReturnResult;
+    filterNil?: FilterNilStage | boolean;
 }
 
 export type AtomsType = Record<string, AnyBehaviorSubject>;

@@ -1,22 +1,35 @@
 // 这是一个测试的配置文件，主要用来测试生成的代码
 // 主要用来制定数据之间的关系
 
+import {
+    BehaviorSubject,
+    delay,
+    filter,
+    from,
+    interval,
+    map,
+    of,
+    switchMap,
+    toArray
+} from "rxjs";
 import { IConfigItem } from "../../../packages/Re-Gen/src";
-import { filter, from, map, of, toArray } from "rxjs";
 
 export const RelationConfig: IConfigItem[] = [
     {
         name: "area",
-        // init: of("CN"),
+        init: new BehaviorSubject("CN").pipe(
+            delay(1000),
+            switchMap(() => interval(1000)),
+        ),
+        // init: "CN",
         handle(val) {
             return of(val);
         },
     },
     {
         name: "region",
-        // init: [],
-        handle: (val: string[] = []) =>
-            from(val).pipe(
+        init: ["ni", "hello"],
+        handle: (val: string[] = []) => from(val).pipe(
                 filter(Boolean),
                 map((item) => item?.toLocaleUpperCase()),
                 toArray()

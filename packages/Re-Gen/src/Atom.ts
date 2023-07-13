@@ -11,13 +11,13 @@ export class AtomState<T = any> {
     mid$: ReplaySubject<T>;
     out$: BehaviorSubject<T>;
 
-    constructor(init: any) {
+    constructor(init: T) {
         this.in$ = new BehaviorSubject(init);
         this.mid$ = new ReplaySubject(0);
+        // TODO 能否换成 ReplaySubject 呢
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        // 对初始值为 Observable 的进行过滤，防止使用过程中报错
-        this.out$ = new BehaviorSubject( null );
+        this.out$ = new BehaviorSubject(null);
     }
 }
 

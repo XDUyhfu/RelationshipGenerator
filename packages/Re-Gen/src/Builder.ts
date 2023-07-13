@@ -68,8 +68,7 @@ const AtomHandle =
             const atom = Global.Store.get(CacheKey)!.get(item.name)!;
             atom.in$
                 .pipe(
-                    //  filter(item=> !isObservable(item)),
-                filter(item => !isJointAtom(item)),
+                    filter(item => !isJointAtom(item)),
                     switchMap(transformResultToObservable),
                     handleUndefined(
                         transformFilterNilOptionToBoolean(

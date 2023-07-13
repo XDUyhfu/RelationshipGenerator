@@ -16,8 +16,6 @@ function App() {
     const { result } = useReGen(RequestKey, RequestConfig);
     // const { value } = useReGen(SecondCacheKey, SecondConfig);
 
-    // console.log(result);
-
     return (
         <div>
             {JSON.stringify(result)}

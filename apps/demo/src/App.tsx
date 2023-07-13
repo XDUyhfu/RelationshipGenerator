@@ -1,6 +1,10 @@
 import { useReGen } from "../../../packages/Re-Gen/src/index";
 import { RelationConfig } from "./config";
-import { Button, Select } from "antd";
+import {
+    Button,
+    Select
+} from "antd";
+
 function App() {
     const {
         area,
@@ -10,7 +14,7 @@ function App() {
         testMoreDepend,
         testMoreMoreDepend,
         ReGenValue: {setValue}
-    } = useReGen("CACHE_KEY", RelationConfig, {logger: true});
+    } = useReGen("CACHE_KEY", RelationConfig, { logger: true });
 
     return (
         <div>
@@ -88,13 +92,6 @@ function App() {
             >
                 获取最新值
             </Button>
-
-            {/*<br />*/}
-            {/*<br />*/}
-            {/*<div>{JSON.stringify(confirm)}</div>*/}
-            {/*<Button type="primary" onClick={confirmCallback}>*/}
-            {/*    confirm*/}
-            {/*</Button>*/}
         </div>
     );
 }

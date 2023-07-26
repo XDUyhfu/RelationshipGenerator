@@ -44,9 +44,6 @@ export const RequestConfig: IConfigItem[] = [
             if (val) {
                 return axios.get(`https://api.github.com/users/${val?.param1 ?? "XDUyhfu"}`);
             }
-        },
-        interceptor(v) {
-            return v?.data;
         }
     },
 ];

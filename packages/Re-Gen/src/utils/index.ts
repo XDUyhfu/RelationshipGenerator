@@ -15,6 +15,7 @@ import {
     FilterNilDefaultConfig,
     FilterNilStage,
     ReGenPrefix,
+    Delimiter,
 } from "../config";
 import {
     complement,
@@ -194,5 +195,29 @@ export const isJointAtom = (joint: any) => {
     return false;
 };
 
-// 预留一个方法 之后可能会支持其他的输入
-export const generateOneDimensionRelationConfig = (RelationConfig: IRelationConfig): IConfigItem[] => Array.isArray(RelationConfig) ? RelationConfig.flat() : RelationConfig;
+const generateNameWithCacheKey = (CacheKey: string | symbol, name: string) => `${String(CacheKey)}${Delimiter}${name}`;
+
+/**
+ * 合并多个数组为一个数组
+ * @param CacheKey
+ * @param RelationConfig
+ */
+const recordToArrayType = (CacheKey: string, RelationConfig: Record<string, IConfigItem[]> | Record<string, IConfigItem[][]>): IConfigItem[] => {
+    if (!Global.RelationConfig.has(CacheKey)) {
+        const config: IConfigItem[] = [];
+        RelationConfig && Object.keys(RelationConfig).forEach(RecordKey => {
+            const configs = RelationConfig[RecordKey].flat();
+            configs.forEach((c: IConfigItem) => {
+                c.name = generateNameWithCacheKey(RecordKey, c.name);
+                if (c.depend?.names){ c.depend.names = c.depend.names.map(name => generateNameWithCacheKey(RecordKey, name)); }
+                config.push(c);
+            });
+        });
+        return config;
+    } else {
+        return Global.RelationConfig.get(CacheKey)!;
+    }
+};
+
+export const generateOneDimensionRelationConfig = (CacheKey: string, RelationConfig: IRelationConfig): IConfigItem[] =>
+    Array.isArray(RelationConfig) ? RelationConfig.flat() : recordToArrayType(CacheKey, RelationConfig);

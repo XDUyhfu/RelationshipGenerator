@@ -1,5 +1,5 @@
 import { useReGen } from "../../../packages/Re-Gen/src/index";
-import { RelationConfig } from "./config";
+import { RelationConfig, RelationConfig2 } from "./config";
 import {
     Button,
     Select
@@ -7,14 +7,12 @@ import {
 
 function App() {
     const {
-        area,
-        region,
-        showRegion,
-        RegionList,
-        testMoreDepend,
-        testMoreMoreDepend,
+        RelationConfig: {area,region,showRegion,RegionList,testMoreDepend},
         ReGenValue: {setValue}
-    } = useReGen("CACHE_KEY", RelationConfig, { logger: true });
+    } = useReGen("CACHE_KEY", {
+        RelationConfig,
+        RelationConfig2
+    }, { logger: true });
 
     return (
         <div>
@@ -24,7 +22,7 @@ function App() {
             <div>RegionListValue: {JSON.stringify(RegionList)}</div>
             <div>testMoreDependValue: {JSON.stringify(testMoreDepend)}</div>
             <div>
-                testMoreMoreDependValue: {JSON.stringify(testMoreMoreDepend)}
+
             </div>
 
             <br />

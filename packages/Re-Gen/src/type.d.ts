@@ -71,4 +71,5 @@ export interface ReGenConfig {
 }
 
 export type IAtomInOut = (name: string) => {[p: `${string}In$`]: BehaviorSubject<any>, [p: `${string}Out$`]: BehaviorSubject<any>}
-export type IRelationConfig = IConfigItem[] | IConfigItem[][]
+// 后两种方式一般情况下是不会使用到的，主要当你要将多个 Config 封装到一起的时候，可能会用到这种方式
+export type IRelationConfig = IConfigItem[] | IConfigItem[][] | Record<string, IConfigItem[]> | Record<string, IConfigItem[][]>

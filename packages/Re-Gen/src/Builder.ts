@@ -216,7 +216,7 @@ export const ReGen = (
     config?: ReGenConfig
 ): IAtomInOut => {
 
-    const OneDimensionRelationConfig = generateOneDimensionRelationConfig(RelationConfig);
+    const OneDimensionRelationConfig = generateOneDimensionRelationConfig(CacheKey, RelationConfig);
 
     CheckParams(CacheKey, OneDimensionRelationConfig, "library");
     if (RelationConfig.length === 0) {

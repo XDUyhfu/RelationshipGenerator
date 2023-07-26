@@ -17,6 +17,7 @@
 // }
 
 export const ReGenPrefix = "$$@ReGenPrefix";
+export const Delimiter = ":$$:";
 
 export enum FilterNilStage {
 	InBefore = "InBefore",

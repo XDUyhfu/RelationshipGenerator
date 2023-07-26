@@ -40,7 +40,13 @@ export interface IConfigItem {
         init: any;
     };
     distinct?: IDistinct;
-    interceptor?: (arg: any) => ReturnResult;
+    // 如果正常使用该库的话，应该不会使用到该配置项
+    // 但是在使用该库封装一些组件之类的时候，或许会有很作用
+    // 例如：插入用户的逻辑
+    interceptor?: {
+        before?: ( arg: any ) => ReturnResult;
+        after?: ( arg: any ) => ReturnResult;
+    };
     filterNil?: FilterNilStage | boolean;
 }
 

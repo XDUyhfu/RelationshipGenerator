@@ -19,10 +19,11 @@
 export const ReGenPrefix = "$$@ReGenPrefix";
 
 export enum FilterNilStage {
+	InBefore = "InBefore",
 	In = "In",
 	HandleAfter = "HandleAfter",
 	DependAfter = "DependAfter",
-	OutBefore = "OutBefore",
+	OutAfter = "OutAfter",
 	Out = "Out",
 	All = "All",
 	Default = "Default"

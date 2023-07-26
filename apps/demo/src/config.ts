@@ -23,8 +23,19 @@ export const RelationConfig: IConfigItem[] = [
         ),
         // init: "CN",
         handle(val) {
+            console.log("handle");
             return new BehaviorSubject(val);
         },
+        interceptor: {
+            before: (val) => {
+                        console.log("before");
+                            return `${val}123`;
+                        },
+                        after: (value) => {
+                console.log("after");
+                return `${value}-456`;
+            }
+}
     },
     {
         name: "region",

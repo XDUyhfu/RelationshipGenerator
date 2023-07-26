@@ -92,6 +92,16 @@ const AtomHandle =
                     switchMap(transformResultToObservable),
                     handleUndefined(
                         transformFilterNilOptionToBoolean(
+                            FilterNilStage.InBefore,
+                            item.filterNil ??
+                            config?.filterNil
+                        )
+                    ),
+                    map(item?.interceptor?.before || identity ),
+                    handleError(`捕获到 ${item.name} item.interceptor.before 中报错`),
+                    switchMap(transformResultToObservable),
+                    handleUndefined(
+                        transformFilterNilOptionToBoolean(
                             FilterNilStage.In,
                             item.filterNil ??
                             config?.filterNil
@@ -166,16 +176,16 @@ const HandDepend =
                             config?.filterNil
                         )
                     ),
-                    map(item.interceptor || identity ),
+                    map(item?.interceptor?.after || identity ),
                     switchMap(transformResultToObservable),
                     handleUndefined(
                         transformFilterNilOptionToBoolean(
-                            FilterNilStage.OutBefore,
+                            FilterNilStage.OutAfter,
                             item.filterNil ??
                             config?.filterNil
                         )
                     ),
-                    handleError(`捕获到 ${item.name} interceptor 中报错`),
+                    handleError(`捕获到 ${item.name} item.interceptor.after 中报错`),
                     handleLogger(CacheKey, item.name, config?.logger),
                 )
                 .subscribe( atom.out$ );

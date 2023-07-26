@@ -7,7 +7,6 @@ import axios from "axios";
 
 export const ParamsKey = "ParamsKey";
 export const RequestKey = "RequestKey";
-export const HandleRequstKey = "HandleRequstKey";
 
 export const ParamsConfig: IConfigItem[] = [
     {

@@ -12,8 +12,9 @@ import {
 
 
 function App() {
-    const { button, ReGenValue: { setValue: setParamsValue } } = useReGen(ParamsKey, ParamsConfig);
     const { result } = useReGen(RequestKey, RequestConfig);
+    const { button, ReGenValue: { setValue: setParamsValue } } = useReGen(ParamsKey, ParamsConfig);
+
     // const { value } = useReGen(SecondCacheKey, SecondConfig);
 
     return (

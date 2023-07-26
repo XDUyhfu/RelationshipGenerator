@@ -7,6 +7,7 @@ import {
     ReGenConfig,
     PluckValueType,
     PlainResult,
+    IRelationConfig,
 } from "../type";
 import {
     DistinctDefaultValue,
@@ -192,3 +193,6 @@ export const isJointAtom = (joint: any) => {
 
     return false;
 };
+
+// 预留一个方法 之后可能会支持其他的输入
+export const generateOneDimensionRelationConfig = (RelationConfig: IRelationConfig): IConfigItem[] => Array.isArray(RelationConfig) ? RelationConfig.flat() : RelationConfig;

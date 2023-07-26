@@ -65,3 +65,4 @@ export interface ReGenConfig {
 }
 
 export type IAtomInOut = (name: string) => {[p: `${string}In$`]: BehaviorSubject<any>, [p: `${string}Out$`]: BehaviorSubject<any>}
+export type IRelationConfig = IConfigItem[] | IConfigItem[][]

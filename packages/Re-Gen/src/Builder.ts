@@ -4,7 +4,8 @@ import {
     map,
     switchMap,
     scan,
-    filter
+    filter,
+    BehaviorSubject,
 } from "rxjs";
 import {
     AtomInOut,
@@ -20,18 +21,21 @@ import {
     OpenLogger,
     PluckValue,
     CheckParams,
-    isJointAtom
+    isJointAtom,
+    generateOneDimensionRelationConfig
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
 import {
     IAtomInOut,
+    IRelationConfig,
     ReGenConfig
 } from "./type";
 
 import {
     CombineType,
     FilterNilStage,
+    ReGenPrefix,
 } from "./config";
 import {
     handleCombine,
@@ -51,11 +55,24 @@ const ConfigToAtomStore =
     (CacheKey: string) => (RelationConfig: IConfigItem[]) =>
         // 里面用到的 forEach 来自 ramda，它会将传入的参数返回
         forEach((item: IConfigItem) => {
+            const jointName = `${ReGenPrefix}:${CacheKey}:${item.name}`;
             let initValue = item.init;
             if (typeof item.init === "function") { initValue = item.init(); }
             const joint = isJointAtom(item.init);
-            if (joint) { initValue = getOutObservable(joint[0])[joint[1]]; }
-            Global.Store.get(CacheKey)!.set( item.name, new AtomState( initValue ) );
+            let observable = joint ? getOutObservable(joint[0])[joint[1]] : null;
+            if (!observable && Array.isArray(joint)) {
+                observable = new BehaviorSubject(null);
+                if (Global.AtomBridge.has(item.init as string)) {
+                    Global.AtomBridge.set(item.init as string, [...Global.AtomBridge.get(item.init as string)!, observable]);
+                } else {
+                    Global.AtomBridge.set(item.init as string, [observable]);
+                }
+            }
+            const atom = new AtomState( joint ? observable : initValue );
+            if (Global.AtomBridge.has(jointName)) {
+                Global.AtomBridge.get(jointName)!.forEach(observable => atom.out$.subscribe(observable));
+            }
+            Global.Store.get(CacheKey)!.set( item.name, atom);
         })(RelationConfig);
 
 /**
@@ -185,19 +202,21 @@ const BuilderRelation = (
 
 export const ReGen = (
     CacheKey: string,
-    RelationConfig: IConfigItem[],
+    RelationConfig: IRelationConfig,
     config?: ReGenConfig
 ): IAtomInOut => {
 
-    CheckParams(CacheKey, RelationConfig, "library");
+    const OneDimensionRelationConfig = generateOneDimensionRelationConfig(RelationConfig);
+
+    CheckParams(CacheKey, OneDimensionRelationConfig, "library");
     if (RelationConfig.length === 0) {
         return (() => ({}));
     }
 
     if (!Global.Store.has(CacheKey)) {
         Global.Store.set(CacheKey, new Map<string, AtomState>());
-        Global.RelationConfig.set(CacheKey, PluckValue(RelationConfig));
-        BuilderRelation(CacheKey, RelationConfig, config).subscribe();
+        Global.RelationConfig.set(CacheKey, PluckValue(OneDimensionRelationConfig));
+        BuilderRelation(CacheKey, OneDimensionRelationConfig, config).subscribe();
     }
     return AtomInOut(CacheKey);
 };

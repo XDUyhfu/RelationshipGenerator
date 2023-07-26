@@ -129,7 +129,13 @@ export const CheckCacheKey = (CacheKey: string) => {
     return true;
 };
 
-// 检查 ReGen 函数参数
+/**
+ * 检查 ReGen 函数参数
+ * @param CacheKey
+ * @param RelationConfig
+ * @param entry
+ * @constructor
+ */
 const CheckReGenParams = (CacheKey: string, RelationConfig: IConfigItem[], entry: "hook" | "library") => {
     // 对 JudgeRepetition 的补充
     // 判断条件：
@@ -186,5 +192,3 @@ export const isJointAtom = (joint: any) => {
 
     return false;
 };
-
-

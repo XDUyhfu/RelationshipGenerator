@@ -4,8 +4,7 @@ import {
     map,
     switchMap,
     scan,
-    filter,
-    BehaviorSubject
+    filter
 } from "rxjs";
 import {
     AtomInOut,
@@ -25,7 +24,10 @@ import {
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
-import { ReGenConfig } from "./type";
+import {
+    IAtomInOut,
+    ReGenConfig
+} from "./type";
 
 import {
     CombineType,
@@ -185,11 +187,11 @@ export const ReGen = (
     CacheKey: string,
     RelationConfig: IConfigItem[],
     config?: ReGenConfig
-) => {
+): IAtomInOut => {
 
     CheckParams(CacheKey, RelationConfig, "library");
     if (RelationConfig.length === 0) {
-        return (() => ({})) as (name: string) => {[p: `${string}In$`]: BehaviorSubject<any>, [p: `${string}Out$`]: BehaviorSubject<any>};
+        return (() => ({}));
     }
 
     if (!Global.Store.has(CacheKey)) {

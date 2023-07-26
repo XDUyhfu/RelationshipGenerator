@@ -64,3 +64,4 @@ export interface ReGenConfig {
     distinct?: boolean;
 }
 
+export type IAtomInOut = (name: string) => {[p: `${string}In$`]: BehaviorSubject<any>, [p: `${string}Out$`]: BehaviorSubject<any>}

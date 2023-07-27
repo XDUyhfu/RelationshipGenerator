@@ -1,68 +1,70 @@
 import {
+    FilterNilStage,
     IConfigItem,
     setValue
 } from "@yhfu/re-gen";
+import { Select } from "@arco-design/web-react";
 import {
-    Input,
-    Select
-} from "@arco-design/web-react";
-import { delay, map, of } from "rxjs";
-import { ReContainer } from "./components/re-container";
+    delay,
+    map,
+    of,
+    tap
+} from "rxjs";
+import { ReForm } from "./components/re-form";
 import { ReField } from "./components/re-field";
-import { TestComponent } from "./TestComponent";
 import { CacheKey } from "./context";
 
 const RelationConfig: IConfigItem[] = [
-    { name: "input1" },
-    { name: "input2", init: "input2" },
     {
-        name: "input3",
-        init: "123",
-        handle(val) {
-            setValue(CacheKey,"range", [val]);
-            return val;
-        },
-    },
-    { name: "input4" },
-    { name: "input5" },
-    {
-        name: "show",
-        init: false,
-        handle: (val) =>
-            of(val).pipe(
-                delay(5000),
-                map(() => true)
-            ),
+        name: "typeList",
+        handle: () => of(0).pipe(
+                delay(2000),
+                map(() => ["类型type1", "类型type2", "类型type3"])
+            )
     },
     {
-        name: "range",
-        init: [],
+        name: "namesList",
+        // filterNil: FilterNilStage.HandleAfter,
+        // 这里不能开启过滤的原因是因为 withLatestFrom 的特性决定的
         depend: {
-            names: ["input1"],
-            handle([range, input1]) {
-                return [...range, input1];
-            },
+            names: ["typeListValue"],
+            handle: ([nameList, type]) => {
+                console.log([nameList, type]);
+                return of(0).pipe(
+                    tap(() => { console.log(type); }),
+                    delay(3000),
+                    map(() => ["名字name1", "名字name2", "名字name3", Date.now().toString()]),
+                );
+            }
         }
     },
+    {
+        name: "typeListValue",
+        filterNil: FilterNilStage.In,
+        handle: async (val) => of(val).pipe(
+                delay(2000),
+                tap(() => {
+                    setValue(CacheKey, "namesListValue", "");
+                })
+            )
+    },
+    {name: "namesListValue",},
+    {name: "infoListWithNameValue"}
 ];
 
 function App() {
     return (
-        <ReContainer config={RelationConfig} layout={"vertical"}>
-            <ReField
-                name="input1"
-                re-range={"range"}
-                // re-inject-onChange={"show"}
-                // onChange={() => {
-                //     console.log( getValue( CacheKey, "show" ) );
-                // }}
-                element={Input}
-                label={"input1"}
-                style={{width: 300}}
-            />
-            <ReField name={"input2"} re-vv={"input1"} element={TestComponent} label={"input2"} style={{width: 300}} />
-            <ReField name="input4" label={"input2"} element={Select} elementProps={{options: [{label: "label", value: "value"}]}} />
-        </ReContainer>
+        <ReForm config={RelationConfig} layout="vertical" initialValues={
+            {
+                namesListValue: "名字name2",
+                typeListValue: "类型type2",
+            }
+        }>
+            <ReField name="typeListValue" re-options="typeList" element={Select} label="typeList" style={{width: 300}} />
+            <ReField name="namesListValue" re-options="namesList" element={Select} label="namesList" style={{width: 300}} />
+            {/*<ReField name="infoListWithNameValue" re-options="infoListWithName" element={Select} label="infoListWithName" style={{width: 300}}/>*/}
+            {/*<ReField name="has" label="has" />*/}
+        </ReForm>
     );
 }
 

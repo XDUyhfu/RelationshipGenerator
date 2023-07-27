@@ -1,6 +1,7 @@
 export type {
     IConfigItem,
-    ReGenConfig
+    ReGenConfig,
+    IRelationConfig
 } from "./type";
 
 export { FilterNilStage, CombineType, ReGenPrefix } from "./config";

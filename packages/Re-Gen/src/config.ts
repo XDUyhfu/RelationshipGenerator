@@ -23,6 +23,7 @@ export enum FilterNilStage {
 	InBefore = "InBefore",
 	In = "In",
 	HandleAfter = "HandleAfter",
+	DependBefore = "DependBefore",
 	DependAfter = "DependAfter",
 	OutAfter = "OutAfter",
 	Out = "Out",

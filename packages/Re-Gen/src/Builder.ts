@@ -142,6 +142,13 @@ const HandDepend =
             atom.mid$
                 .pipe(
                     switchMap(transformResultToObservable),
+                    handleUndefined(
+                        transformFilterNilOptionToBoolean(
+                            FilterNilStage.DependBefore,
+                            item.filterNil ??
+                            config?.filterNil
+                        )
+                    ),
                     handleCombine(
                         item.depend?.combineType || CombineType.ANY_CHANGE,
                         dependAtomsOut$

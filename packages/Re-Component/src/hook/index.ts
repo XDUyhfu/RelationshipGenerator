@@ -1,5 +1,6 @@
 import { BehaviorSubject } from "rxjs";
 import {
+	useContext,
 	useEffect,
 	useState
 } from "react";
@@ -8,7 +9,10 @@ import {
 	getOutObservable,
 	setValue
 } from "@yhfu/re-gen";
-import { CacheKey } from "../context";
+import {
+	CacheKey,
+	ReFormContext
+} from "../context";
 
 export const useRestProps = ( props: Record<string, any> ) => {
     // const propsWithoutReInject = {} as Record<string, any>;
@@ -88,4 +92,14 @@ export const useReValue = (name: string) => {
 		}
 	}, []);
 	return [val, setter];
+};
+
+export const useInitValue = (name: string) => {
+	const valueObservable = getOutObservable(CacheKey, name);
+	const initValue = useContext(ReFormContext)?.[name];
+	useEffect(() => {
+		if (initValue) {
+			valueObservable.next(initValue);
+		}
+	}, []);
 };

@@ -7,6 +7,7 @@ import {
     isPlainResult,
     isJointAtom,
     generateOneDimensionRelationConfig,
+    generateNameInHook,
 } from "../../utils";
 import {
     IConfigItemInit,
@@ -83,18 +84,32 @@ export const useReGen = (CacheKey: string, RelationConfig: IRelationConfig, conf
         };
     }, {} as IResultAtomsValue);
 
+    const getRecordValue = (RecordKey: string) => ({
+        ReGenValue: {
+            getValue: ( name?: string ) => getValue( CacheKey, generateNameInHook(RecordKey, name) ),
+            setValue: ( name: string, value?: any ) => {
+                setValue( CacheKey, generateNameInHook(RecordKey, name)!, value );
+            }
+        },
+        ReGenObservable: {
+            getInObservable: ( name?: string ) => getInObservable(CacheKey, generateNameInHook(RecordKey, name)),
+            getOutObservable: ( name?: string ) => getOutObservable(CacheKey, generateNameInHook(RecordKey, name))
+        }
+    });
+
     if (!Array.isArray(RelationConfig)) {
         const result: Record<string, any> = {};
         Object.keys(RelationConfig).forEach(RecordKey => {
-            result[RecordKey] = {};
+            result[RecordKey] = { ...getRecordValue(RecordKey) };
             Object.keys(AtomsValue).forEach(valueName => {
-                if (valueName.startsWith(RecordKey)) {
-                    const key = valueName.split(Delimiter)[1];
+                const names = valueName.split(Delimiter);
+                if (RecordKey === names[0]) {
+                    const key = names[1];
                     result[RecordKey][key] = AtomsValue[valueName];
                 }
             });
         });
-        return {...result, ...reValue} as unknown as IResultAtomsValue;
+        return { ...result } as unknown as IResultAtomsValue;
     }
 
     return { AtomsValue, ...reValue } as unknown as IResultAtomsValue;

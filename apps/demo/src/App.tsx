@@ -6,10 +6,7 @@ import {
 } from "antd";
 
 function App() {
-    const {
-        RelationConfig: {area,region,showRegion,RegionList,testMoreDepend},
-        ReGenValue: {setValue}
-    } = useReGen("CACHE_KEY", {
+    const {RelationConfig: {area,region,showRegion,RegionList,testMoreDepend,ReGenValue: {setValue}}} = useReGen("CACHE_KEY", {
         RelationConfig,
         RelationConfig2
     }, { logger: true });

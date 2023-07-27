@@ -18,24 +18,12 @@ export const RelationConfig: IConfigItem[] = [
     {
         name: "area",
         init: new BehaviorSubject("CN").pipe(
-            delay(1000),
+            delay(3000),
             switchMap(() => interval(1000)),
         ),
-        // init: "CN",
         handle(val) {
-            console.log("handle");
             return new BehaviorSubject(val);
         },
-        interceptor: {
-            before: (val) => {
-                        console.log("before");
-                            return `${val}123`;
-                        },
-                        after: (value) => {
-                console.log("after");
-                return `${value}-456`;
-            }
-}
     },
     {
         name: "region",
@@ -54,7 +42,7 @@ export const RelationConfig: IConfigItem[] = [
             names: ["area"],
             handle([, area]: [show: boolean, area: BehaviorSubject<any>]) {
                 if (area?.getValue() === "CN") {
-                    console.log("run area");
+                    // console.log("run area");
                     return true;
                 }
                 return false;
@@ -147,18 +135,18 @@ export const RelationConfig2: IConfigItem[] = [
         ),
         // init: "CN",
         handle(val) {
-            console.log("handle");
+            // console.log("handle");
             return new BehaviorSubject(val);
         },
         interceptor: {
-            before: (val) => {
-                console.log("before");
-                return `${val}123`;
-            },
-            after: (value) => {
-                console.log("after");
-                return `${value}-456`;
-            }
+            before: (val) =>
+                // console.log("before");
+                 `${val}123`
+            ,
+            after: (value) =>
+                // console.log("after");
+                 `${value}-456`
+
         }
     },
 ];

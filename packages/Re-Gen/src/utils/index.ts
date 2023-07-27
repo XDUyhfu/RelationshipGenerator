@@ -195,8 +195,13 @@ export const isJointAtom = (joint: any) => {
     return false;
 };
 
-const generateNameWithCacheKey = (CacheKey: string | symbol, name: string) => `${String(CacheKey)}${Delimiter}${name}`;
-
+const generateNameWithCacheKey = (RecordKey: string | symbol, name: string) => `${String(RecordKey)}${Delimiter}${name}`;
+export const generateNameInHook = (RecordKey: string | symbol, name?: string, ) => {
+    if (RecordKey && name) {
+        return generateNameWithCacheKey(RecordKey, name);
+    }
+    return name;
+};
 /**
  * 合并多个数组为一个数组
  * @param CacheKey

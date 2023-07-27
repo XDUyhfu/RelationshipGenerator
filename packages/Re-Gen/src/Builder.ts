@@ -155,6 +155,7 @@ const HandDepend =
                     ),
                     // TODO 需要检测是否存在依赖项，有依赖项才使用 handle 进行处理
                     map(item?.depend?.handle || identity),
+                    handleError(`捕获到 ${item.name} depend.handle 中报错`),
                     switchMap(transformResultToObservable),
                     handleUndefined(
                         transformFilterNilOptionToBoolean(
@@ -163,7 +164,6 @@ const HandDepend =
                             config?.filterNil
                         )
                     ),
-                    handleError(`捕获到 ${item.name} depend.handle 中报错`),
                     scan(
                         item?.reduce?.handle || defaultReduceFunction,
                         item.reduce?.init
@@ -202,19 +202,18 @@ const HandDepend =
  * 构建的整体流程
  * @param CacheKey
  * @param RelationConfig
- * @param options
+ * @param config
  * @constructor
  */
 const BuilderRelation = (
     CacheKey: string,
     RelationConfig: IConfigItem[],
-    options?: ReGenConfig
+    config?: ReGenConfig
 ) =>
     of(RelationConfig).pipe(
-        map(OpenLogger(CacheKey, options)),
         map(ConfigToAtomStore(CacheKey)),
-        map(AtomHandle(CacheKey, options)),
-        map(HandDepend(CacheKey, options)),
+        map(AtomHandle(CacheKey, config)),
+        map(HandDepend(CacheKey, config)),
     );
 
 export const ReGen = (
@@ -226,6 +225,7 @@ export const ReGen = (
     const OneDimensionRelationConfig = generateOneDimensionRelationConfig(CacheKey, RelationConfig);
 
     CheckParams(CacheKey, OneDimensionRelationConfig, "library");
+    OpenLogger(CacheKey, config);
     if (RelationConfig.length === 0) {
         return (() => ({}));
     }

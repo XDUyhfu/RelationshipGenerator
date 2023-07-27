@@ -90,8 +90,7 @@ export const transformDistinctOptionToBoolean: (
 };
 
 export const OpenLogger =
-    (CacheKey: string, config?: ReGenConfig) =>
-    (RelationConfig: IConfigItem[]) => {
+    (CacheKey: string, config?: ReGenConfig) => {
         if (!Global.LoggerWatcher.has(CacheKey) && !!config?.logger) {
             Global.LoggerWatcher.set(
                 CacheKey,
@@ -105,7 +104,6 @@ export const OpenLogger =
                 )
             );
         }
-        return RelationConfig;
     };
 
 export const PluckValue = (config: IConfigItem[]): PluckValueType[] =>

@@ -28,14 +28,11 @@ const RelationConfig: IConfigItem[] = [
         // 这里不能开启过滤的原因是因为 withLatestFrom 的特性决定的
         depend: {
             names: ["typeListValue"],
-            handle: ([nameList, type]) => {
-                console.log([nameList, type]);
-                return of(0).pipe(
+            handle: ([nameList, type]) => of(0).pipe(
                     tap(() => { console.log(type); }),
                     delay(3000),
                     map(() => ["名字name1", "名字name2", "名字name3", Date.now().toString()]),
-                );
-            }
+                )
         }
     },
     {

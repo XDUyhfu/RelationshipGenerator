@@ -1,7 +1,7 @@
 import { Observable, ObservableInput } from "rxjs";
 import { FilterNilStage, CombineType } from "./config";
 
-type PlainResult =
+export type PlainResult =
     | Record<string, any>
     | number
     | string
@@ -11,9 +11,9 @@ type PlainResult =
 
 type RxResult = ObservableInput<any>;
 
-type ReturnResult = PlainResult | RxResult;
+export type ReturnResult = PlainResult | RxResult;
 
-type IDistinct<T = any, K = any> =
+export type IDistinct<T = any, K = any> =
     | boolean
     | {
           comparator: (previous: K, current: K) => boolean;
@@ -32,7 +32,7 @@ export interface IConfigItem {
     handle?: (arg: any) => ReturnResult;
     depend?: {
         names: string[];
-        handle: (args: any) => ReturnResult;
+        handle: (current: any, isChange: Record<string, boolean>, beforeAndCurrent: [any, any]) => ReturnResult;
         combineType?: CombineType;
     };
     reduce?: {

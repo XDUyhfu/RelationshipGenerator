@@ -140,5 +140,5 @@ export function useReGen(CacheKey: string, RelationConfig: IRelationConfig, conf
         return { ...result } as unknown as IResultRecordAtomsValue;
     }
 
-    return { AtomsValue, ...getReValue(CacheKey) } as unknown as IResultAtomsValue;
+    return { ...AtomsValue, ...getReValue(CacheKey) } as unknown as IResultAtomsValue;
 }

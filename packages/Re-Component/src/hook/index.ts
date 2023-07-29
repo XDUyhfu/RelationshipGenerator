@@ -99,7 +99,7 @@ export const useInitValue = (name: string) => {
 	const initValue = useContext(ReFormContext)?.[name];
 	useEffect(() => {
 		if (initValue) {
-			valueObservable.next(initValue);
+			valueObservable?.next(initValue);
 		}
 	}, []);
 };

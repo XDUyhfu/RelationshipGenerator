@@ -174,6 +174,8 @@ export const CheckParams = (CacheKey: string, RelationConfig: IConfigItem[], ent
     DependencyDetection(RelationConfig);
 };
 
+export const generateJointName = (CacheKey: string, name: string) => `${ReGenPrefix}:${CacheKey}:${name}`;
+
 /**
  * 正确的格式是: prefix:CacheKey:name
  * @param joint
@@ -224,3 +226,4 @@ const recordToArrayType = (CacheKey: string, RelationConfig: Record<string, ICon
 
 export const generateOneDimensionRelationConfig = (CacheKey: string, RelationConfig: IRelationConfig): IConfigItem[] =>
     Array.isArray(RelationConfig) ? RelationConfig.flat() : recordToArrayType(CacheKey, RelationConfig);
+

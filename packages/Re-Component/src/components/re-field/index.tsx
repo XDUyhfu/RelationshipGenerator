@@ -42,12 +42,18 @@ export const ReField = (props: Omit<FormItemProps, "field" | "initialValue" | "d
     const [reValue, setReValue] = useReValue(name);
     const [reProps, withoutReProps] = useRestProps(rest);
     const isShow = useVisible(visible);
+    let finalValue;
+    try{
+        finalValue = element ? (value ?? reValue) : JSON.stringify(value ?? reValue);
+    } catch ( e ) {
+        console.error("value 无法被序列化显示");
+    }
 
     return isShow ? (
         <Form.Item {...withoutReProps}>
             {
                 createElement( element ?? DefaultComponent, {
-                    value: element ? (value ?? reValue) : JSON.stringify(value ?? reValue),  // 这个地方得判断是否传入完全了 value 和 onChange
+                    value: finalValue,  // 这个地方得判断是否传入完全了 value 和 onChange
                     onChange: ( ...args: any[] ) => {
                         onChange?.( ...args );
                         !value && setReValue( ...args );

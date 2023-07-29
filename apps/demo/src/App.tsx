@@ -7,14 +7,19 @@ import {
 
 function App() {
     const {
-            RelationConfig: {
-                area,region,showRegion,RegionList,testMoreDepend,
-            ReGenValue: {setValue}
-        }
-} = useReGen("CACHE_KEY", {
+        area,region,showRegion,RegionList,testMoreDepend,
+        ReGenValue: {setValue}
+        //     RelationConfig: {
+        //         area,region,showRegion,RegionList,testMoreDepend,
+        //     ReGenValue: {setValue}
+        // }
+} = useReGen("CACHE_KEY",
+    //     {
+    //     RelationConfig,
+    //     RelationConfig2
+    // },
         RelationConfig,
-        RelationConfig2
-    }, { logger: true });
+        { logger: true });
 
     return (
         <div>
@@ -86,9 +91,9 @@ function App() {
             <br />
             <Button
                 type="primary"
-                onClick={() => {
-                    // console.log(GetAtomValues("CACHE_KEY"));
-                }}
+                onClick={
+                    () => setValue("showRegion", Date.now())
+                }
             >
                 获取最新值
             </Button>

@@ -1,19 +1,25 @@
 import { IDistinct } from "./type";
 import {
     BehaviorSubject,
+    bufferCount,
     catchError,
     combineLatestWith,
     distinctUntilChanged,
     EMPTY,
     filter,
     identity,
+    map,
     Observable,
+    tap,
     withLatestFrom,
     zipWith,
 } from "rxjs";
 import {
+    compose,
     equals,
-    is
+    is,
+    isNil,
+    not,
 } from "ramda";
 import { CombineType } from "./config";
 import { Global } from "./store";
@@ -21,7 +27,7 @@ import { Global } from "./store";
 export const handleUndefined: (
     filterNil: boolean
 ) => (source: Observable<any>) => Observable<any> = (filterNil) => (source) =>
-    filterNil ? source.pipe(filter(Boolean)) : source;
+    filterNil ? source.pipe(filter(compose(not, isNil))) : source;
 
 export const handleDistinct =
     (
@@ -63,6 +69,23 @@ export const handleCombine =
                     ? source.pipe(zipWith(...depends))
                     : source.pipe(combineLatestWith(...depends))
             : source;
+
+export const handleCombineWithBuffer = (CacheKey: string, name: string, dependNamesWithSelf: string[]): ((source: Observable<any>) => Observable<any>) => (source) =>
+    Global.Buffer.get(CacheKey)!.has(name) ? source.pipe(
+        tap(combineValue => Global.Buffer.get(CacheKey)!.get(name)!.next(combineValue)),
+        zipWith(
+            Global.Buffer.get(CacheKey)!.get(name)!.pipe(
+                bufferCount(2,1)
+            ),
+        ),
+        map(([current, beforeAndCurrent]) => {
+            const isChange: Record<string, boolean> = {};
+            dependNamesWithSelf?.forEach((name, index)=> {
+                isChange[name] = not(equals(beforeAndCurrent?.[0]?.[index], beforeAndCurrent?.[1]?.[index]));
+            });
+            return [current, isChange, beforeAndCurrent];
+        })
+    ) : source;
 
 
 export const handleError =

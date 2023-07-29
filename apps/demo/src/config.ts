@@ -1,6 +1,3 @@
-// 这是一个测试的配置文件，主要用来测试生成的代码
-// 主要用来制定数据之间的关系
-
 import {
     BehaviorSubject,
     delay,
@@ -8,18 +5,20 @@ import {
     from,
     interval,
     map,
-
     switchMap,
     toArray
 } from "rxjs";
-import { IConfigItem } from "../../../packages/Re-Gen/src";
+import {
+    CombineType,
+    IConfigItem
+} from "../../../packages/Re-Gen/src";
 
 export const RelationConfig: IConfigItem[] = [
     {
         name: "area",
         init: new BehaviorSubject("CN").pipe(
             delay(3000),
-            switchMap(() => interval(1000)),
+            switchMap(() => interval(3000)),
         ),
         handle(val) {
             return new BehaviorSubject(val);
@@ -40,8 +39,10 @@ export const RelationConfig: IConfigItem[] = [
         filterNil: true,
         depend: {
             names: ["area"],
-            handle([, area]: [show: boolean, area: BehaviorSubject<any>]) {
-                if (area?.getValue() === "CN") {
+            // combineType: CombineType.SELF_CHANGE,
+            handle(aa: [show: boolean, area:string], isChange, beforeAndCurrent, ) {
+                console.log(aa, isChange, beforeAndCurrent);
+                if (aa === "CN") {
                     // console.log("run area");
                     return true;
                 }

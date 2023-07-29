@@ -6,6 +6,7 @@ import {
     scan,
     filter,
     BehaviorSubject,
+    ReplaySubject
 } from "rxjs";
 import {
     AtomInOut,
@@ -39,6 +40,7 @@ import {
 } from "./config";
 import {
     handleCombine,
+    handleCombineWithBuffer,
     handleDistinct,
     handleError,
     handleLogger,
@@ -139,6 +141,17 @@ const HandDepend =
             const dependAtomsOut$ = dependNames.map(
                 (name) => Global.Store.get(CacheKey)!.get(name)!.out$
             );
+
+            // 使用额外的 BehaviorSubject 存储数据进行判断
+            if (item.depend) {
+                if (!Global.Buffer.get(CacheKey)!.has(item.name)) {
+                    const replay = new ReplaySubject<any[]>(2);
+                    Global.Buffer.get(CacheKey)!.set(item.name, replay);
+                    // 存储一个初始值 []
+                    replay.next([]);
+                }
+            }
+
             atom.mid$
                 .pipe(
                     switchMap(transformResultToObservable),
@@ -153,8 +166,8 @@ const HandDepend =
                         item.depend?.combineType || CombineType.ANY_CHANGE,
                         dependAtomsOut$
                     ),
-                    // TODO 需要检测是否存在依赖项，有依赖项才使用 handle 进行处理
-                    map(item?.depend?.handle || identity),
+                    handleCombineWithBuffer(CacheKey, item.name, [item.name, ...getDependNames(item)]),
+                    map(item?.depend?.handle ? (value) => item?.depend?.handle(value?.[0], value?.[1], value?.[2]) : identity),
                     handleError(`捕获到 ${item.name} depend.handle 中报错`),
                     switchMap(transformResultToObservable),
                     handleUndefined(
@@ -233,6 +246,7 @@ export const ReGen = (
     if (!Global.Store.has(CacheKey)) {
         Global.Store.set(CacheKey, new Map<string, AtomState>());
         Global.RelationConfig.set(CacheKey, PluckValue(OneDimensionRelationConfig));
+        Global.Buffer.set(CacheKey, new Map<string, ReplaySubject<any[]>>());
         BuilderRelation(CacheKey, OneDimensionRelationConfig, config).subscribe();
     }
     return AtomInOut(CacheKey);

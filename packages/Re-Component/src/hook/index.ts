@@ -93,13 +93,3 @@ export const useReValue = (name: string) => {
 	}, []);
 	return [val, setter];
 };
-
-export const useInitValue = (name: string) => {
-	const valueObservable = getOutObservable(CacheKey, name);
-	const initValue = useContext(ReFormContext)?.[name];
-	useEffect(() => {
-		if (initValue) {
-			valueObservable?.next(initValue);
-		}
-	}, []);
-};

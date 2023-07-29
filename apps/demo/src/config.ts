@@ -30,7 +30,6 @@ export const RelationConfig: IConfigItem[] = [
         handle: (val: string[] = []) => from(val).pipe(
                 filter(Boolean),
                 map((item) => item?.toLocaleUpperCase()),
-                toArray()
             ),
     },
     {
@@ -41,9 +40,7 @@ export const RelationConfig: IConfigItem[] = [
             names: ["area"],
             // combineType: CombineType.SELF_CHANGE,
             handle(aa: [show: boolean, area:string], isChange, beforeAndCurrent, ) {
-                console.log(aa, isChange, beforeAndCurrent);
-                if (aa === "CN") {
-                    // console.log("run area");
+                if (aa?.[1] === "CN") {
                     return true;
                 }
                 return false;

@@ -68,6 +68,7 @@ export interface ReGenConfig {
      */
     filterNil?: FilterNilStage | boolean;
     distinct?: boolean;
+    init?: Record<string, any>
 }
 
 export type IAtomInOut = (name: string) => {[p: `${string}In$`]: BehaviorSubject<any>, [p: `${string}Out$`]: BehaviorSubject<any>}

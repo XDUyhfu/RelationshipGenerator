@@ -7,19 +7,15 @@ import {
 
 function App() {
     const {
-        area,region,showRegion,RegionList,testMoreDepend,
-        ReGenValue: {setValue}
-        //     RelationConfig: {
-        //         area,region,showRegion,RegionList,testMoreDepend,
-        //     ReGenValue: {setValue}
-        // }
+            RelationConfig: {
+                area,region,showRegion,RegionList,testMoreDepend,
+            ReGenValue: {setValue}
+        }
 } = useReGen("CACHE_KEY",
-    //     {
-    //     RelationConfig,
-    //     RelationConfig2
-    // },
+        {
         RelationConfig,
-        { logger: true });
+        RelationConfig2
+    },{ logger: true });
 
     return (
         <div>

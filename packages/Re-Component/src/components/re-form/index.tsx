@@ -14,7 +14,7 @@ interface IReForm {
 
 export const ReForm: FC<Omit<FormProps, "initialValues"> & IReForm> = (props) => {
     const {config, children, initialValues, ...rest} = props;
-    ReGen(CacheKey, config, { logger: true });
+    ReGen(CacheKey, config, { logger: true, init: initialValues });
     return <ReFormContext.Provider value={initialValues ?? {}}>
         <Form {...rest}>{children}</Form>
     </ReFormContext.Provider>;

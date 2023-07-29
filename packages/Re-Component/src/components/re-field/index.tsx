@@ -4,7 +4,6 @@ import React, {
     ReactElement,
 } from "react";
 import {
-    useInitValue,
     useRestProps,
     useReValue,
     useVisible
@@ -38,7 +37,6 @@ export const ReField = (props: Omit<FormItemProps, "field" | "initialValue" | "d
         ...rest
     } = props;
 
-    useInitValue(name);
     const [reValue, setReValue] = useReValue(name);
     const [reProps, withoutReProps] = useRestProps(rest);
     const isShow = useVisible(visible);

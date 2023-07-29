@@ -132,7 +132,7 @@ const AtomHandle =
  * @param config
  * @constructor
  */
-const HandDepend =
+const HandleDepend =
     (CacheKey: string, config?: ReGenConfig) =>
     (RelationConfig: IConfigItem[]) =>
         forEach((item: IConfigItem) => {
@@ -211,6 +211,17 @@ const HandDepend =
                 .subscribe( atom.out$ );
         })(RelationConfig);
 
+const HandleInitValue =
+    (CacheKey: string, config?: ReGenConfig) =>
+        (RelationConfig: IConfigItem[]) => forEach((item: IConfigItem) => {
+            if (!config?.init) { return; }
+            const initValue = config.init?.[item.name];
+            if (initValue) {
+                const outObservable = getOutObservable(CacheKey, item.name);
+                outObservable?.next(initValue);
+            }
+        })(RelationConfig);
+
 /**
  * 构建的整体流程
  * @param CacheKey
@@ -226,7 +237,8 @@ const BuilderRelation = (
     of(RelationConfig).pipe(
         map(ConfigToAtomStore(CacheKey)),
         map(AtomHandle(CacheKey, config)),
-        map(HandDepend(CacheKey, config)),
+        map(HandleDepend(CacheKey, config)),
+        map(HandleInitValue(CacheKey, config))
     );
 
 export const ReGen = (

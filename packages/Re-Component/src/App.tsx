@@ -26,8 +26,6 @@ import { CacheKey } from "./context";
 
 
 const RelationConfig: IConfigItem[] = [
-    {name: "Domain",},
-    {name: "App"},
     {
         name: "typeList",
         handle: () => of(0).pipe(
@@ -47,7 +45,6 @@ const RelationConfig: IConfigItem[] = [
                 )
         }
     },
-    {name: "type",},
     {
         name: "name",
         depend: {

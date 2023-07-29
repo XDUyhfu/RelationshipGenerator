@@ -1,20 +1,10 @@
 import { BehaviorSubject } from "rxjs";
-import {
-	useContext,
-	useEffect,
-	useState
-} from "react";
+import { useContext, useEffect, useState } from "react";
 
-import {
-	getOutObservable,
-	setValue
-} from "@yhfu/re-gen";
-import {
-	CacheKey,
-	ReFormContext
-} from "../context";
+import { getOutObservable, setValue } from "@yhfu/re-gen";
+import { CacheKey, ReFormContext } from "../context";
 
-export const useRestProps = ( props: Record<string, any> ) => {
+export const useRestProps = (props: Record<string, any>) => {
     // const propsWithoutReInject = {} as Record<string, any>;
     // Object.keys(props).map((item) => {
     //     if (item.startsWith("re-inject-")) {
@@ -41,7 +31,7 @@ export const useRestProps = ( props: Record<string, any> ) => {
     const propsStartsWithRe = {} as Record<string, any>;
     Object.keys(props).map((item) => {
         if (item.startsWith("re-")) {
-			propsStartsWithRe[`${item.slice(3)}`] = useReValue(
+            propsStartsWithRe[`${item.slice(3)}`] = useReValue(
                 (props as Record<string, string>)[item]
             )[0];
         }
@@ -49,9 +39,9 @@ export const useRestProps = ( props: Record<string, any> ) => {
     const propsStartsWithoutRe = {} as Record<string, any>;
     Object.keys(props).map((item) => {
         if (!item.startsWith("re-")) {
-			propsStartsWithoutRe[item] = (
-                props as Record<string, string>
-            )[item];
+            propsStartsWithoutRe[item] = (props as Record<string, string>)[
+                item
+            ];
         }
     });
     return [propsStartsWithRe, propsStartsWithoutRe];
@@ -62,34 +52,33 @@ export const useRestProps = ( props: Record<string, any> ) => {
  * @param visible
  */
 export const useVisible = (visible: boolean | string) => {
-	let visibleObservable: boolean | null | BehaviorSubject<any> = typeof visible === "string" ? null : visible;
-	if (typeof visible === "string") {
-		visibleObservable = getOutObservable(CacheKey, visible);
-	}
-	// if (isNil(visibleObservable)) {
-	// 	throw new Error("传入的 visible 不正确");
-	// }
-	const [vis, setVis] = useState(visibleObservable);
-	useEffect(() => {
-		if (typeof visibleObservable === "boolean") {
-			setVis(visibleObservable);
-		} else {
-			if (visibleObservable) {
-				visibleObservable.subscribe(setVis);
-			}
-		}
-	}, []);
-	return vis;
+    let visibleObservable: boolean | null | BehaviorSubject<any> =
+        typeof visible === "string" ? null : visible;
+    if (typeof visible === "string") {
+        visibleObservable = getOutObservable(CacheKey, visible);
+    }
+
+    const [vis, setVis] = useState(visibleObservable);
+    useEffect(() => {
+        if (typeof visibleObservable === "boolean") {
+            setVis(visibleObservable);
+        } else {
+            if (visibleObservable) {
+                visibleObservable.subscribe(setVis);
+            }
+        }
+    }, []);
+    return vis;
 };
 
 export const useReValue = (name: string) => {
-	const [val, setVal] = useState<any>();
-	const valueObservable = getOutObservable(CacheKey, name);
-	const setter = setValue(CacheKey, name);
-	useEffect(() => {
-		if (valueObservable) {
-			valueObservable.subscribe(setVal);
-		}
-	}, []);
-	return [val, setter];
+    const [val, setVal] = useState<any>();
+    const valueObservable = getOutObservable(CacheKey, name);
+    const setter = setValue(CacheKey, name);
+    useEffect(() => {
+        if (valueObservable) {
+            valueObservable.subscribe(setVal);
+        }
+    }, []);
+    return [val, setter];
 };

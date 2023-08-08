@@ -1,4 +1,4 @@
-import { IDistinct } from "./type";
+import { IConfigItem, IDistinct, ReGenConfig } from "./type";
 import {
     BehaviorSubject,
     bufferCount,
@@ -14,20 +14,29 @@ import {
     withLatestFrom,
     zipWith,
 } from "rxjs";
-import {
-    compose,
-    equals,
-    is,
-    isNil,
-    not,
-} from "ramda";
-import { CombineType } from "./config";
+import { compose, equals, is, isNil, not } from "ramda";
+import { CombineType, FilterNilStage } from "./config";
+import { transformFilterNilOptionToBoolean } from "./utils";
 import { Global } from "./store";
 
-export const handleUndefined: (
+const handleUndefined: (
     filterNil: boolean
 ) => (source: Observable<any>) => Observable<any> = (filterNil) => (source) =>
     filterNil ? source.pipe(filter(compose(not, isNil))) : source;
+
+export const handleUndefinedWithStage: (
+    item: IConfigItem,
+    config?: ReGenConfig
+) => (stage: FilterNilStage) => (source: Observable<any>) => Observable<any> =
+    (item, config) => (stage) => (source) =>
+        source.pipe(
+            handleUndefined(
+                transformFilterNilOptionToBoolean(
+                    stage,
+                    item.filterNil ?? config?.filterNil
+                )
+            )
+        );
 
 export const handleDistinct =
     (
@@ -66,27 +75,41 @@ export const handleCombine =
             ? type === CombineType.SELF_CHANGE
                 ? source.pipe(withLatestFrom(...depends))
                 : type === CombineType.EVERY_CHANGE
-                    ? source.pipe(zipWith(...depends))
-                    : source.pipe(combineLatestWith(...depends))
+                ? source.pipe(zipWith(...depends))
+                : source.pipe(combineLatestWith(...depends))
             : source;
 
-export const handleCombineWithBuffer = (CacheKey: string, name: string, dependNamesWithSelf: string[]): ((source: Observable<any>) => Observable<any>) => (source) =>
-    Global.Buffer.get(CacheKey)!.has(name) ? source.pipe(
-        tap(combineValue => Global.Buffer.get(CacheKey)!.get(name)!.next(combineValue)),
-        zipWith(
-            Global.Buffer.get(CacheKey)!.get(name)!.pipe(
-                bufferCount(2,1)
-            ),
-        ),
-        map(([current, beforeAndCurrent]) => {
-            const isChange: Record<string, boolean> = {};
-            dependNamesWithSelf?.forEach((name, index)=> {
-                isChange[name] = not(equals(beforeAndCurrent?.[0]?.[index], beforeAndCurrent?.[1]?.[index]));
-            });
-            return [current, isChange, beforeAndCurrent];
-        })
-    ) : source;
-
+export const handleCombineWithBuffer =
+    (
+        CacheKey: string,
+        name: string,
+        dependNamesWithSelf: string[]
+    ): ((source: Observable<any>) => Observable<any>) =>
+    (source) =>
+        Global.Buffer.get(CacheKey)!.has(name)
+            ? source.pipe(
+                  tap((combineValue) =>
+                      Global.Buffer.get(CacheKey)!.get(name)!.next(combineValue)
+                  ),
+                  zipWith(
+                      Global.Buffer.get(CacheKey)!
+                          .get(name)!
+                          .pipe(bufferCount(2, 1))
+                  ),
+                  map(([current, beforeAndCurrent]) => {
+                      const isChange: Record<string, boolean> = {};
+                      dependNamesWithSelf?.forEach((name, index) => {
+                          isChange[name] = not(
+                              equals(
+                                  beforeAndCurrent?.[0]?.[index],
+                                  beforeAndCurrent?.[1]?.[index]
+                              )
+                          );
+                      });
+                      return [current, isChange, beforeAndCurrent];
+                  })
+              )
+            : source;
 
 export const handleError =
     (message: string): ((source: Observable<any>) => Observable<any>) =>

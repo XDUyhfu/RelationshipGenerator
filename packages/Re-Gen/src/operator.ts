@@ -10,6 +10,7 @@ import {
     identity,
     map,
     Observable,
+    ReplaySubject,
     tap,
     withLatestFrom,
     zipWith,
@@ -79,7 +80,7 @@ export const handleCombine =
                 : source.pipe(combineLatestWith(...depends))
             : source;
 
-export const handleCombineWithBuffer =
+const handleCombineWithBuffer =
     (
         CacheKey: string,
         name: string,
@@ -110,6 +111,26 @@ export const handleCombineWithBuffer =
                   })
               )
             : source;
+
+export const handleDependValueChange = (
+    CacheKey: string,
+    item: IConfigItem,
+    dependsName: string[]
+) => {
+    // 使用额外的 BehaviorSubject 存储数据进行判断
+    if (item.depend) {
+        if (!Global.Buffer.get(CacheKey)!.has(item.name)) {
+            const replay = new ReplaySubject<any[]>(2);
+            Global.Buffer.get(CacheKey)!.set(item.name, replay);
+            // 存储一个初始值 [] 作为初始值
+            replay.next([]);
+        }
+    }
+    return handleCombineWithBuffer(CacheKey, item.name, [
+        item.name,
+        ...dependsName,
+    ]);
+};
 
 export const handleError =
     (message: string): ((source: Observable<any>) => Observable<any>) =>

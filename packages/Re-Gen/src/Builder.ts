@@ -6,7 +6,6 @@ import {
     scan,
     filter,
     BehaviorSubject,
-    ReplaySubject,
 } from "rxjs";
 import { AtomInOut, AtomState, getOutObservable } from "./Atom";
 import {
@@ -15,10 +14,11 @@ import {
     transformResultToObservable,
     transformDistinctOptionToBoolean,
     OpenLogger,
-    PluckValue,
     CheckParams,
     isJointAtom,
-    generateOneDimensionRelationConfig,
+    flatRelationConfig,
+    isValidRelationConfig,
+    isInit,
 } from "./utils";
 import type { IConfigItem } from "./type";
 import { forEach } from "ramda";
@@ -27,13 +27,13 @@ import { IAtomInOut, IRelationConfig, ReGenConfig } from "./type";
 import { CombineType, FilterNilStage, ReGenPrefix } from "./config";
 import {
     handleCombine,
-    handleCombineWithBuffer,
+    handleDependValueChange,
     handleDistinct,
     handleError,
     handleLogger,
     handleUndefinedWithStage,
 } from "./operator";
-import { Global } from "./store";
+import { Global, InitGlobalValue } from "./store";
 
 /**
  * 该方法将每个配置项构建为一个 AtomState 并进行存储
@@ -121,16 +121,11 @@ const HandleDepend =
             const dependAtomsOut$ = dependNames.map(
                 (name) => Global.Store.get(CacheKey)!.get(name)!.out$
             );
-
-            // 使用额外的 BehaviorSubject 存储数据进行判断
-            if (item.depend) {
-                if (!Global.Buffer.get(CacheKey)!.has(item.name)) {
-                    const replay = new ReplaySubject<any[]>(2);
-                    Global.Buffer.get(CacheKey)!.set(item.name, replay);
-                    // 存储一个初始值 []
-                    replay.next([]);
-                }
-            }
+            const handleValueChange = handleDependValueChange(
+                CacheKey,
+                item,
+                dependNames
+            );
 
             atom.mid$
                 .pipe(
@@ -140,19 +135,12 @@ const HandleDepend =
                         item.depend?.combineType || CombineType.ANY_CHANGE,
                         dependAtomsOut$
                     ),
-                    handleCombineWithBuffer(CacheKey, item.name, [
-                        item.name,
-                        ...getDependNames(item),
-                    ]),
+                    handleValueChange,
                     map(
-                        item?.depend?.handle
-                            ? (value) =>
-                                  item?.depend?.handle(
-                                      value?.[0],
-                                      value?.[1],
-                                      value?.[2]
-                                  )
-                            : identity
+                        // 这里的类型不正确 在有 depend 的时候是一个tuple，没有的时候是 any
+                        (value: [any, Record<string, boolean>, [any, any]]) =>
+                            // current isChange beforeAndCurrent
+                            item?.depend?.handle?.(...value) ?? identity(value)
                     ),
                     handleError(`捕获到 ${item.name} depend.handle 中报错`),
                     switchMap(transformResultToObservable),
@@ -202,46 +190,32 @@ const HandleInitValue =
  * @param config
  * @constructor
  */
-const BuilderRelation = (
+const BuildRelation = (
     CacheKey: string,
     RelationConfig: IConfigItem[],
     config?: ReGenConfig
-) =>
-    of(RelationConfig).pipe(
-        map(ConfigToAtomStore(CacheKey)),
-        map(AtomHandle(CacheKey, config)),
-        map(HandleDepend(CacheKey, config)),
-        map(HandleInitValue(CacheKey, config))
-    );
+) => {
+    if (isInit(CacheKey) && isValidRelationConfig(RelationConfig)) {
+        InitGlobalValue(CacheKey, RelationConfig);
+        of(RelationConfig)
+            .pipe(
+                map(ConfigToAtomStore(CacheKey)),
+                map(AtomHandle(CacheKey, config)),
+                map(HandleDepend(CacheKey, config)),
+                map(HandleInitValue(CacheKey, config))
+            )
+            .subscribe();
+    }
+};
 
 export const ReGen = (
     CacheKey: string,
     RelationConfig: IRelationConfig,
     config?: ReGenConfig
 ): IAtomInOut => {
-    const OneDimensionRelationConfig = generateOneDimensionRelationConfig(
-        CacheKey,
-        RelationConfig
-    );
-
-    CheckParams(CacheKey, OneDimensionRelationConfig, "library");
+    const flatConfig = flatRelationConfig(CacheKey, RelationConfig);
+    CheckParams(CacheKey, flatConfig, "library");
     OpenLogger(CacheKey, config);
-    if (RelationConfig.length === 0) {
-        return () => ({});
-    }
-
-    if (!Global.Store.has(CacheKey)) {
-        Global.Store.set(CacheKey, new Map<string, AtomState>());
-        Global.RelationConfig.set(
-            CacheKey,
-            PluckValue(OneDimensionRelationConfig)
-        );
-        Global.Buffer.set(CacheKey, new Map<string, ReplaySubject<any[]>>());
-        BuilderRelation(
-            CacheKey,
-            OneDimensionRelationConfig,
-            config
-        ).subscribe();
-    }
-    return AtomInOut(CacheKey);
+    BuildRelation(CacheKey, flatConfig, config);
+    return AtomInOut(CacheKey, flatConfig);
 };

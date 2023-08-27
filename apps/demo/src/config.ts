@@ -6,19 +6,15 @@ import {
     interval,
     map,
     switchMap,
-    toArray
 } from "rxjs";
-import {
-    CombineType,
-    IConfigItem
-} from "../../../packages/Re-Gen/src";
+import { IConfigItem } from "../../../packages/Re-Gen/src";
 
 export const RelationConfig: IConfigItem[] = [
     {
         name: "area",
         init: new BehaviorSubject("CN").pipe(
             delay(3000),
-            switchMap(() => interval(3000)),
+            switchMap(() => interval(3000))
         ),
         handle(val) {
             return new BehaviorSubject(val);
@@ -27,9 +23,10 @@ export const RelationConfig: IConfigItem[] = [
     {
         name: "region",
         init: ["ni", "hello"],
-        handle: (val: string[] = []) => from(val).pipe(
+        handle: (val: string[] = []) =>
+            from(val).pipe(
                 filter(Boolean),
-                map((item) => item?.toLocaleUpperCase()),
+                map((item) => item?.toLocaleUpperCase())
             ),
     },
     {
@@ -39,7 +36,12 @@ export const RelationConfig: IConfigItem[] = [
         depend: {
             names: ["area"],
             // combineType: CombineType.SELF_CHANGE,
-            handle(aa: [show: boolean, area:string], isChange, beforeAndCurrent, ) {
+            handle(
+                aa: [show: boolean, area: string],
+                isChange,
+                beforeAndCurrent
+            ) {
+                console.log(isChange);
                 if (aa?.[1] === "CN") {
                     return true;
                 }
@@ -129,7 +131,7 @@ export const RelationConfig2: IConfigItem[] = [
         name: "area",
         init: new BehaviorSubject("CN").pipe(
             delay(1000),
-            switchMap(() => interval(1000)),
+            switchMap(() => interval(1000))
         ),
         // init: "CN",
         handle(val) {
@@ -139,12 +141,10 @@ export const RelationConfig2: IConfigItem[] = [
         interceptor: {
             before: (val) =>
                 // console.log("before");
-                 `${val}123`
-            ,
+                `${val}123`,
             after: (value) =>
                 // console.log("after");
-                 `${value}-456`
-
-        }
+                `${value}-456`,
+        },
     },
 ];

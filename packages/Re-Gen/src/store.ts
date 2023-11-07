@@ -1,29 +1,21 @@
-import { BehaviorSubject, OperatorFunction, ReplaySubject } from "rxjs";
-import { IConfigItem, PluckValueType } from "./type";
-import { AtomState } from "./Atom";
-import { isInit, isValidRelationConfig, PluckValue } from "./utils";
+import type { BehaviorSubject, ReplaySubject } from "rxjs";
+import type { OperatorFunction } from "rxjs";
+import type { AtomState } from "./Atom";
 
 export const Global = {
     Store: new Map<string, Map<string, AtomState>>(),
-    RelationConfig: new Map<string, PluckValueType[]>(),
     AtomBridge: new Map<string, BehaviorSubject<any>[]>(),
-    Buffer: new Map<string, Map<string, ReplaySubject<any[]>>>(),
+    OutBridge: new Map<string, ReplaySubject<any>>(),
     LoggerWatcher: new Map<
         string,
         <T>(
             marbleName: string,
-            selector?: ((value: T) => any) | undefined
+            selector?: ((value: T) => any) | undefined,
         ) => OperatorFunction<T, T>
     >(),
+    LoggerWatcherCache: new Map<string, boolean>(),
 };
 
-export const InitGlobalValue = (
-    CacheKey: string,
-    RelationConfig: IConfigItem[]
-) => {
-    if (isInit(CacheKey) && isValidRelationConfig(RelationConfig)) {
-        Global.Store.set(CacheKey, new Map<string, AtomState>());
-        Global.RelationConfig.set(CacheKey, PluckValue(RelationConfig));
-        Global.Buffer.set(CacheKey, new Map<string, ReplaySubject<any[]>>());
-    }
+export const InitGlobal = (CacheKey: string) => {
+    Global.Store.set(CacheKey, new Map<string, AtomState>());
 };

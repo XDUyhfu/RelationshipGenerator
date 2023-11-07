@@ -1,1 +1,5 @@
+*.test.(j|t)sx?
+build_*/
+coverage
+node_modules/
 .eslintrc.cjs

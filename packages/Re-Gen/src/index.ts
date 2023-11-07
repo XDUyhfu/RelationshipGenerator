@@ -1,11 +1,30 @@
 export type {
     IConfigItem,
     ReGenConfig,
-    IRelationConfig
+    IRelationConfig,
+    IConfigItemInit,
 } from "./type";
 
-export { FilterNilStage, CombineType, ReGenPrefix } from "./config";
-export { useReGen } from "./hook/react";
+export {
+    FilterNilStage,
+    CombineType,
+    ReGenPrefix,
+    DefaultValue,
+} from "./config";
 export { ReGen } from "./Builder";
-export { setValue, getValue, getInObservable, getOutObservable } from "./Atom";
-export { generateJointName } from "./utils";
+export {
+    setValue,
+    getValue,
+    getInObservable,
+    getOutObservable,
+    destroyStore,
+} from "./Atom";
+export {
+    JointState,
+    PluckName,
+    CheckParams,
+    isPlainResult,
+    isJointState,
+    generateNameInHook,
+    flatRelationConfig,
+} from "./utils";

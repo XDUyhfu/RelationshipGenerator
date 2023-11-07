@@ -1,25 +1,32 @@
-import { isObservable } from "rxjs";
-import { ObservableInput, of } from "rxjs";
-import {
+import { BehaviorSubject, isObservable, of } from "rxjs";
+import type { ObservableInput } from "rxjs";
+import type {
     IConfigItem,
     IDistinct,
     ReturnResult,
     ReGenConfig,
-    PluckValueType,
     PlainResult,
     IRelationConfig,
 } from "../type";
+import { FilterNilStage, DefaultValue } from "../config";
 import {
-    DistinctDefaultValue,
-    LoggerDurationDefaultValue,
-    FilterNilDefaultConfig,
-    FilterNilStage,
-    ReGenPrefix,
-    Delimiter,
-} from "../config";
-import { complement, forEach, is, isEmpty, isNil, not } from "ramda";
+    complement,
+    compose,
+    cond,
+    flatten,
+    forEach,
+    is,
+    isEmpty,
+    isNil,
+    map,
+    mapObjIndexed,
+    modifyPath,
+    not,
+    values,
+} from "ramda";
 import { getGroup } from "rxjs-watcher";
 import { Global } from "../store";
+import { AtomState, getOutObservable } from "../Atom.ts";
 
 export const isArray = (value: any): value is Array<any> =>
     Array.isArray(value);
@@ -40,7 +47,14 @@ export const isPlainResult = (result: ReturnResult): result is PlainResult =>
 const isNotObservable = (value: any) =>
     isPlainResult(value) || isObject(value) || isFunction(value);
 
-export const getDependNames = (item: IConfigItem) => item.depend?.names || [];
+export const getDependNames = (item: IConfigItem) =>
+    item.depend?.names || ([] as string[]);
+
+export const getDependNamesWithSelf = (item: IConfigItem) => [
+    item.name,
+    ...getDependNames(item),
+];
+
 export const defaultReduceFunction = (_: any, val: any) => val;
 
 /**
@@ -48,7 +62,7 @@ export const defaultReduceFunction = (_: any, val: any) => val;
  * @param result
  */
 export const transformResultToObservable = (
-    result: ReturnResult
+    result: ReturnResult,
 ): ObservableInput<any> =>
     isNotObservable(result) ? of(result) : (result as ObservableInput<any>);
 
@@ -60,14 +74,14 @@ export const transformResultToObservable = (
  */
 export const transformFilterNilOptionToBoolean: (
     stage: FilterNilStage,
-    nilOption?: FilterNilStage | boolean
+    nilOption?: FilterNilStage | boolean,
 ) => boolean = (stage, nilOption) => {
     if (stage === nilOption || nilOption === FilterNilStage.All || nilOption) {
         return true;
     }
     // 如果没有传入过滤空值的相关配置，则采用默认的处理方式
-    if (isNil(nilOption) && FilterNilDefaultConfig.Stage.includes(stage)) {
-        return FilterNilDefaultConfig.Value;
+    if (isNil(nilOption) && DefaultValue.FilterNil.Stage.includes(stage)) {
+        return DefaultValue.FilterNil.Value;
     }
     // 如果传入的 nilOption 为 false，也会返回false
     return false;
@@ -75,12 +89,12 @@ export const transformFilterNilOptionToBoolean: (
 
 export const transformDistinctOptionToBoolean: (
     globalDistinct: boolean | undefined,
-    itemDistinct: IDistinct<any, any>
+    itemDistinct: IDistinct<any, any>,
 ) => boolean | IDistinct<any, any> = (global, item) => {
     if (typeof item === "boolean" || typeof item === "object") {
         return item;
     }
-    return global ?? DistinctDefaultValue;
+    return global ?? DefaultValue.Distinct;
 };
 
 export const OpenLogger = (CacheKey: string, config?: ReGenConfig) => {
@@ -90,20 +104,16 @@ export const OpenLogger = (CacheKey: string, config?: ReGenConfig) => {
             getGroup(
                 `${CacheKey} Watcher Group`,
                 typeof config?.logger === "boolean"
-                    ? LoggerDurationDefaultValue
+                    ? DefaultValue.LoggerDuration
                     : typeof config?.logger === "number"
                     ? config.logger
-                    : config.logger?.duration
-            )
+                    : config.logger?.duration,
+            ),
         );
     }
 };
-
-export const PluckValue = (config: IConfigItem[]): PluckValueType[] =>
-    config.map((item) => ({ init: item?.init, name: item?.name }));
 export const PluckName = (config: IConfigItem[]): string[] =>
     config.map((item) => item.name);
-const isNotEmpty = complement(isEmpty);
 
 const JudgeRepetition = (RelationConfig: IConfigItem[]) =>
     forEach((item: IConfigItem) => {
@@ -115,6 +125,8 @@ const JudgeRepetition = (RelationConfig: IConfigItem[]) =>
             throw new Error(`${item.name}: 重复的 name 属性`);
         }
     })(RelationConfig);
+
+const isNotEmpty = complement(isEmpty);
 
 export const CheckCacheKey = (CacheKey: string) => {
     if (not(is(String, CacheKey) && isNotEmpty(CacheKey))) {
@@ -133,7 +145,7 @@ export const CheckCacheKey = (CacheKey: string) => {
 const CheckReGenParams = (
     CacheKey: string,
     RelationConfig: IConfigItem[],
-    entry: "hook" | "library"
+    entry: "hook" | "library",
 ) => {
     // 对 JudgeRepetition 的补充
     // 判断条件：
@@ -151,6 +163,11 @@ const CheckReGenParams = (
     }
 };
 
+/**
+ * 不能依赖自己 不能依赖不存在的 atom
+ * @param RelationConfig
+ * @constructor
+ */
 export const DependencyDetection = (RelationConfig: IConfigItem[]) =>
     forEach((item: IConfigItem) => {
         const dependNames = getDependNames(item);
@@ -167,26 +184,30 @@ export const DependencyDetection = (RelationConfig: IConfigItem[]) =>
 export const CheckParams = (
     CacheKey: string,
     RelationConfig: IConfigItem[],
-    entry: "hook" | "library"
+    entry: "hook" | "library",
 ) => {
-    // 参数检查在 hook 中，配置项不能为空，在使用函数时可以为空，如果为空将不会对 CacheKey 进行存储
+    if (!isInit(CacheKey)) return;
+    // 参数检查在 hook 中，配置项不能为空
+    // 作为库使用时可以为空，如果为空将不会对 CacheKey 进行存储
     CheckReGenParams(CacheKey, RelationConfig, entry);
     // 下面这两个判断是不论什么场景都需要进行判断的
     JudgeRepetition(RelationConfig);
     DependencyDetection(RelationConfig);
 };
 
-export const generateJointName = (CacheKey: string, name: string) =>
-    `${ReGenPrefix}:${CacheKey}:${name}`;
+export const JointState = (CacheKey: string, name: string) =>
+    `${DefaultValue.Prefix}:${CacheKey}:${name}`;
 
 /**
  * 正确的格式是: prefix:CacheKey:name
  * @param joint
  */
-export const isJointAtom = (joint: any) => {
+export const isJointState = (joint: any) => {
     if (is(String, joint)) {
-        if (joint.startsWith(`${ReGenPrefix}:`)) {
-            const rest = joint.replace(`${ReGenPrefix}:`, "").split(":");
+        if (joint.startsWith(`${DefaultValue.Prefix}:`)) {
+            const rest = joint
+                .replace(`${DefaultValue.Prefix}:`, "")
+                .split(":");
             if (rest.length === 2) {
                 if (rest[0].length > 0 && rest[1].length > 0) {
                     return rest;
@@ -198,57 +219,102 @@ export const isJointAtom = (joint: any) => {
     return false;
 };
 
-const generateNameWithCacheKey = (RecordKey: string | symbol, name: string) =>
-    `${String(RecordKey)}${Delimiter}${name}`;
+const generateNameWithCacheKeyWithCurry =
+    (RecordKey: string | symbol) => (name: string) =>
+        `${String(RecordKey)}${DefaultValue.Delimiter}${name}`;
+
 export const generateNameInHook = (
     RecordKey: string | symbol,
-    name?: string
+    name?: string,
 ) => {
     if (RecordKey && name) {
-        return generateNameWithCacheKey(RecordKey, name);
+        return generateNameWithCacheKeyWithCurry(RecordKey)(name);
     }
     return name;
 };
 /**
  * 合并多个数组为一个数组
- * @param CacheKey
  * @param RelationConfig
  */
-const recordToArrayType = (
-    CacheKey: string,
+export const recordToArrayType = (
     RelationConfig:
         | Record<string, IConfigItem[]>
-        | Record<string, IConfigItem[][]>
-): IConfigItem[] => {
-    if (!Global.RelationConfig.has(CacheKey)) {
-        const config: IConfigItem[] = [];
-        RelationConfig &&
-            Object.keys(RelationConfig).forEach((RecordKey) => {
-                const configs = RelationConfig[RecordKey].flat();
-                configs.forEach((c: IConfigItem) => {
-                    c.name = generateNameWithCacheKey(RecordKey, c.name);
-                    if (c.depend?.names) {
-                        c.depend.names = c.depend.names.map((name) =>
-                            generateNameWithCacheKey(RecordKey, name)
-                        );
-                    }
-                    config.push(c);
-                });
-            });
-        return config;
-    } else {
-        return Global.RelationConfig.get(CacheKey)!;
-    }
-};
+        | Record<string, IConfigItem[][]>,
+): IConfigItem[] =>
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    compose(
+        flatten,
+        values,
+        mapObjIndexed((_, RecordKey, obj) =>
+            map(
+                (c: IConfigItem) =>
+                    modifyPath<IConfigItem>(
+                        ["depend", "names"],
+                        map(generateNameWithCacheKeyWithCurry(RecordKey)),
+                        modifyPath(
+                            ["name"],
+                            generateNameWithCacheKeyWithCurry(RecordKey),
+                            c,
+                        ),
+                    ),
+                obj![RecordKey] as IConfigItem[],
+            ),
+        ),
+        map<IConfigItem[] | IConfigItem[][], IConfigItem[]>(flatten),
+    )(RelationConfig);
 
 export const flatRelationConfig = (
-    CacheKey: string,
-    RelationConfig: IRelationConfig
+    RelationConfig: IRelationConfig,
 ): IConfigItem[] =>
-    Array.isArray(RelationConfig)
-        ? RelationConfig.flat()
-        : recordToArrayType(CacheKey, RelationConfig);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    cond([
+        [is(Array), flatten],
+        [is(Object), recordToArrayType],
+    ])(RelationConfig);
 
 export const isValidRelationConfig = (RelationConfig: IConfigItem[]) =>
     RelationConfig?.length > 0;
 export const isInit = (CacheKey: string) => !Global.Store.has(CacheKey);
+
+/**
+ * 通过 init 判断其是否是依赖于其他的 atom
+ * 如果依赖于其他的 atom，在他的依赖没有生成之前，会产生一个中间状态的subject，之后通过订阅的方式将其进行链接 -- atom -- subject -- atom --
+ *
+ * @param CacheKey
+ * @param item
+ */
+export const generateAndSaveAtom = (CacheKey: string, item: IConfigItem) => {
+    const joint = isJointState(item.init);
+    // 如果 observable 有值，说明其依赖已经生成
+    let observable = joint ? getOutObservable(joint[0])[joint[1]] : null;
+    // 该 atom 需要链接到其他状态，但是那个 atom 还没有生成的时候，先产生一个中间bridge的 subject
+    if (!observable && Array.isArray(joint)) {
+        observable = new BehaviorSubject(null);
+        // 此时的 item.init 为 a:$$:b 类型
+        Global.AtomBridge.set(item.init as string, [
+            ...(Global.AtomBridge.get(item.init as string) ?? []),
+            observable,
+        ]);
+    }
+    const initValue = typeof item.init === "function" ? item.init() : item.init;
+    const atom = new AtomState(joint ? observable : initValue, CacheKey, item);
+    // 存储为全局变量
+    Global.Store.get(CacheKey)!.set(item.name, atom);
+};
+
+/**
+ *  当一个 atom 生成的时候，就获取依赖于它的 subject ，然后通过 subscribe 的方式将其进行链接
+ * @param CacheKey
+ * @param item
+ */
+export const subscribeDependAtom = (CacheKey: string, item: IConfigItem) => {
+    const jointName = JointState(CacheKey, item.name);
+    const atom = Global.Store.get(CacheKey)!.get(item.name)!;
+    if (Global.AtomBridge.has(jointName)) {
+        Global.AtomBridge.get(jointName)!.forEach((observable) =>
+            atom.out$.subscribe(observable),
+        );
+    }
+};

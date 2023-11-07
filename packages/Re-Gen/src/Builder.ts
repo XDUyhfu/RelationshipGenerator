@@ -1,39 +1,46 @@
 import {
-    identity,
-    of,
-    map,
-    switchMap,
-    scan,
+    asyncScheduler,
     filter,
-    BehaviorSubject,
+    map,
+    of,
+    scan,
+    subscribeOn,
+    takeUntil,
+    tap,
 } from "rxjs";
-import { AtomInOut, AtomState, getOutObservable } from "./Atom";
+import { AtomInOut, getOutObservable } from "./Atom";
 import {
-    defaultReduceFunction,
-    getDependNames,
-    transformResultToObservable,
-    transformDistinctOptionToBoolean,
-    OpenLogger,
     CheckParams,
-    isJointAtom,
+    defaultReduceFunction,
     flatRelationConfig,
+    getDependNames,
+    generateAndSaveAtom,
     isValidRelationConfig,
+    OpenLogger,
+    transformDistinctOptionToBoolean,
+    subscribeDependAtom,
+    isJointState,
     isInit,
 } from "./utils";
-import type { IConfigItem } from "./type";
+import type {
+    IAtomInOut,
+    IConfigItem,
+    IRelationConfig,
+    ReGenConfig,
+} from "./type";
 import { forEach } from "ramda";
-import { IAtomInOut, IRelationConfig, ReGenConfig } from "./type";
 
-import { CombineType, FilterNilStage, ReGenPrefix } from "./config";
+import { CombineType, FilterNilStage } from "./config";
 import {
     handleCombine,
     handleDependValueChange,
     handleDistinct,
     handleError,
     handleLogger,
-    handleUndefinedWithStage,
+    handleTransformValue,
+    WithTimestamp,
 } from "./operator";
-import { Global, InitGlobalValue } from "./store";
+import { Global, InitGlobal } from "./store";
 
 /**
  * 该方法将每个配置项构建为一个 AtomState 并进行存储
@@ -44,33 +51,9 @@ const ConfigToAtomStore =
     (CacheKey: string) => (RelationConfig: IConfigItem[]) =>
         // 里面用到的 forEach 来自 ramda，它会将传入的参数返回
         forEach((item: IConfigItem) => {
-            const jointName = `${ReGenPrefix}:${CacheKey}:${item.name}`;
-            let initValue = item.init;
-            if (typeof item.init === "function") {
-                initValue = item.init();
-            }
-            const joint = isJointAtom(item.init);
-            let observable = joint
-                ? getOutObservable(joint[0])[joint[1]]
-                : null;
-            if (!observable && Array.isArray(joint)) {
-                observable = new BehaviorSubject(null);
-                if (Global.AtomBridge.has(item.init as string)) {
-                    Global.AtomBridge.set(item.init as string, [
-                        ...Global.AtomBridge.get(item.init as string)!,
-                        observable,
-                    ]);
-                } else {
-                    Global.AtomBridge.set(item.init as string, [observable]);
-                }
-            }
-            const atom = new AtomState(joint ? observable : initValue);
-            if (Global.AtomBridge.has(jointName)) {
-                Global.AtomBridge.get(jointName)!.forEach((observable) =>
-                    atom.out$.subscribe(observable)
-                );
-            }
-            Global.Store.get(CacheKey)!.set(item.name, atom);
+            generateAndSaveAtom(CacheKey, item);
+            // 如果是需要 depend atom 的话，需要进行订阅
+            subscribeDependAtom(CacheKey, item);
         })(RelationConfig);
 
 /**
@@ -84,23 +67,14 @@ const AtomHandle =
     (RelationConfig: IConfigItem[]) =>
         forEach((item: IConfigItem) => {
             const atom = Global.Store.get(CacheKey)!.get(item.name)!;
-            const handleUndefined = handleUndefinedWithStage(item, config);
+            const transformValue = handleTransformValue(item, config);
             atom.in$
                 .pipe(
-                    filter((item) => !isJointAtom(item)),
-                    switchMap(transformResultToObservable),
-                    handleUndefined(FilterNilStage.InBefore),
-                    map(item?.interceptor?.before || identity),
-                    handleError(
-                        `捕获到 ${item.name} item.interceptor.before 中报错`
-                    ),
-                    switchMap(transformResultToObservable),
-                    handleUndefined(FilterNilStage.In),
-                    switchMap(transformResultToObservable),
-                    map(item.handle || identity),
-                    switchMap(transformResultToObservable),
-                    handleUndefined(FilterNilStage.HandleAfter),
-                    handleError(`捕获到 ${item.name} handle 中报错`)
+                    filter((item) => !isJointState(item)),
+                    transformValue(FilterNilStage.InBefore),
+                    transformValue(FilterNilStage.In),
+                    transformValue(FilterNilStage.HandleAfter),
+                    takeUntil(atom.destroy$),
                 )
                 .subscribe(atom.mid$);
         })(RelationConfig);
@@ -116,55 +90,38 @@ const HandleDepend =
     (RelationConfig: IConfigItem[]) =>
         forEach((item: IConfigItem) => {
             const atom = Global.Store.get(CacheKey)!.get(item.name)!;
-            const dependNames = getDependNames(item);
-            const handleUndefined = handleUndefinedWithStage(item, config);
-            const dependAtomsOut$ = dependNames.map(
-                (name) => Global.Store.get(CacheKey)!.get(name)!.out$
+            const dependAtomsOut$ = getDependNames(item).map(
+                (name) => Global.Store.get(CacheKey)!.get(name)!.out$,
             );
-            const handleValueChange = handleDependValueChange(
-                CacheKey,
-                item,
-                dependNames
-            );
+            const transformValue = handleTransformValue(item, config);
 
             atom.mid$
                 .pipe(
-                    switchMap(transformResultToObservable),
-                    handleUndefined(FilterNilStage.DependBefore),
+                    transformValue(FilterNilStage.DependBefore),
                     handleCombine(
                         item.depend?.combineType || CombineType.ANY_CHANGE,
-                        dependAtomsOut$
+                        dependAtomsOut$,
                     ),
-                    handleValueChange,
-                    map(
-                        // 这里的类型不正确 在有 depend 的时候是一个tuple，没有的时候是 any
-                        (value: [any, Record<string, boolean>, [any, any]]) =>
-                            // current isChange beforeAndCurrent
-                            item?.depend?.handle?.(...value) ?? identity(value)
-                    ),
-                    handleError(`捕获到 ${item.name} depend.handle 中报错`),
-                    switchMap(transformResultToObservable),
-                    handleUndefined(FilterNilStage.DependAfter),
+                    handleDependValueChange(CacheKey, item),
+                    transformValue(FilterNilStage.DependAfter),
                     scan(
                         item?.reduce?.handle || defaultReduceFunction,
-                        item.reduce?.init
+                        item.reduce?.init,
                     ),
-                    switchMap(transformResultToObservable),
-                    handleError(`捕获到 ${item.name} reduce 中报错`),
+                    transformValue(FilterNilStage.Out),
+                    transformValue(FilterNilStage.OutAfter),
+                    WithTimestamp(item.timestamp ?? config?.timestamp),
                     handleDistinct(
                         transformDistinctOptionToBoolean(
                             config?.distinct,
-                            item.distinct
-                        )
+                            item.distinct,
+                        ),
                     ),
-                    handleUndefined(FilterNilStage.Out),
-                    map(item?.interceptor?.after || identity),
-                    switchMap(transformResultToObservable),
-                    handleUndefined(FilterNilStage.OutAfter),
                     handleError(
-                        `捕获到 ${item.name} item.interceptor.after 中报错`
+                        `捕获到 ${item.name} item.interceptor.after 中报错`,
                     ),
-                    handleLogger(CacheKey, item.name, config?.logger)
+                    handleLogger(CacheKey, item.name, config?.logger),
+                    takeUntil(atom.destroy$),
                 )
                 .subscribe(atom.out$);
         })(RelationConfig);
@@ -193,29 +150,29 @@ const HandleInitValue =
 const BuildRelation = (
     CacheKey: string,
     RelationConfig: IConfigItem[],
-    config?: ReGenConfig
-) => {
-    if (isInit(CacheKey) && isValidRelationConfig(RelationConfig)) {
-        InitGlobalValue(CacheKey, RelationConfig);
-        of(RelationConfig)
-            .pipe(
-                map(ConfigToAtomStore(CacheKey)),
-                map(AtomHandle(CacheKey, config)),
-                map(HandleDepend(CacheKey, config)),
-                map(HandleInitValue(CacheKey, config))
-            )
-            .subscribe();
-    }
-};
+    config?: ReGenConfig,
+) =>
+    isInit(CacheKey) &&
+    isValidRelationConfig(RelationConfig) &&
+    of(RelationConfig)
+        .pipe(
+            subscribeOn(asyncScheduler),
+            tap(() => OpenLogger(CacheKey, config)),
+            tap(() => InitGlobal(CacheKey)),
+            map(ConfigToAtomStore(CacheKey)),
+            map(AtomHandle(CacheKey, config)),
+            map(HandleDepend(CacheKey, config)),
+            map(HandleInitValue(CacheKey, config)),
+        )
+        .subscribe();
 
 export const ReGen = (
     CacheKey: string,
     RelationConfig: IRelationConfig,
-    config?: ReGenConfig
+    config?: ReGenConfig,
 ): IAtomInOut => {
-    const flatConfig = flatRelationConfig(CacheKey, RelationConfig);
+    const flatConfig = flatRelationConfig(RelationConfig);
     CheckParams(CacheKey, flatConfig, "library");
-    OpenLogger(CacheKey, config);
     BuildRelation(CacheKey, flatConfig, config);
-    return AtomInOut(CacheKey, flatConfig);
+    return AtomInOut(CacheKey);
 };

@@ -1,7 +1,7 @@
 {
   "name": "@yhfu/re-gen",
   "private": false,
-  "version": "0.3.5",
+  "version": "0.4.0",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -25,21 +25,16 @@
     "./dist"
   ],
   "scripts": {
-    "build": "unbuild",
-    "stub": "unbuild --stub"
+    "build": "vite build"
   },
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
-    "@types/ramda": "^0.28.20",
-    "typescript": "^5.1.6",
-    "unbuild": "^1.1.1"
+    "@types/ramda": "^0.29.7"
   },
   "dependencies": {
-    "@types/react": "^18.0.28",
-    "ramda": "^0.28.0",
-    "react": "^18.2.0",
+    "ramda": "^0.29.1",
     "rxjs": "^7.8.0",
     "rxjs-hooks": "0.8.0-alpha.0",
     "rxjs-watcher": "^1.2.1"

@@ -1,6 +1,6 @@
-import { IConfigItem, IDistinct, ReGenConfig } from "./type";
+import type { IConfigItem, IDistinct, ReGenConfig } from "./type";
+import type { BehaviorSubject, Observable } from "rxjs";
 import {
-    BehaviorSubject,
     bufferCount,
     catchError,
     combineLatestWith,
@@ -9,39 +9,45 @@ import {
     filter,
     identity,
     map,
-    Observable,
-    ReplaySubject,
+    switchMap,
     tap,
+    timestamp,
     withLatestFrom,
     zipWith,
 } from "rxjs";
 import { compose, equals, is, isNil, not } from "ramda";
-import { CombineType, FilterNilStage } from "./config";
-import { transformFilterNilOptionToBoolean } from "./utils";
+import { FilterNilStage } from "./config";
+import { CombineType } from "./config";
+import {
+    getDependNamesWithSelf,
+    JointState,
+    transformFilterNilOptionToBoolean,
+    transformResultToObservable,
+} from "./utils";
 import { Global } from "./store";
+import type { OperatorReturnType } from "./type";
 
-const handleUndefined: (
-    filterNil: boolean
-) => (source: Observable<any>) => Observable<any> = (filterNil) => (source) =>
-    filterNil ? source.pipe(filter(compose(not, isNil))) : source;
+const handleUndefined: (filterNil: boolean) => OperatorReturnType =
+    (filterNil) => (source) =>
+        filterNil ? source.pipe(filter(compose(not, isNil))) : source;
 
 export const handleUndefinedWithStage: (
     item: IConfigItem,
-    config?: ReGenConfig
-) => (stage: FilterNilStage) => (source: Observable<any>) => Observable<any> =
+    config?: ReGenConfig,
+) => (stage: FilterNilStage) => OperatorReturnType =
     (item, config) => (stage) => (source) =>
         source.pipe(
             handleUndefined(
                 transformFilterNilOptionToBoolean(
                     stage,
-                    item.filterNil ?? config?.filterNil
-                )
-            )
+                    item.filterNil ?? config?.filterNil,
+                ),
+            ),
         );
 
 export const handleDistinct =
     (
-        distinct: IDistinct<any, any>
+        distinct: IDistinct<any, any>,
     ): ((source: Observable<any>) => Observable<any>) =>
     (source) => {
         if (is(Boolean, distinct)) {
@@ -52,8 +58,8 @@ export const handleDistinct =
             return source.pipe(
                 distinctUntilChanged(
                     distinct.comparator,
-                    distinct.keySelector || identity
-                )
+                    distinct.keySelector || identity,
+                ),
             );
         } else {
             return source;
@@ -67,10 +73,7 @@ export const handleDistinct =
  * @param depends
  */
 export const handleCombine =
-    (
-        type: CombineType,
-        depends: BehaviorSubject<any>[]
-    ): ((source: Observable<any>) => Observable<any>) =>
+    (type: CombineType, depends: BehaviorSubject<any>[]): OperatorReturnType =>
     (source) =>
         depends.length > 0
             ? type === CombineType.SELF_CHANGE
@@ -80,71 +83,121 @@ export const handleCombine =
                 : source.pipe(combineLatestWith(...depends))
             : source;
 
-const handleCombineWithBuffer =
-    (
-        CacheKey: string,
-        name: string,
-        dependNamesWithSelf: string[]
-    ): ((source: Observable<any>) => Observable<any>) =>
-    (source) =>
-        Global.Buffer.get(CacheKey)!.has(name)
+export const handleDependValueChange =
+    (CacheKey: string, item: IConfigItem): OperatorReturnType =>
+    (source) => {
+        const atom = Global.Store.get(CacheKey)!.get(item.name)!;
+        return atom.replay$
             ? source.pipe(
-                  tap((combineValue) =>
-                      Global.Buffer.get(CacheKey)!.get(name)!.next(combineValue)
-                  ),
-                  zipWith(
-                      Global.Buffer.get(CacheKey)!
-                          .get(name)!
-                          .pipe(bufferCount(2, 1))
-                  ),
+                  // 将新的值传入buffer
+                  tap((combineValue) => atom.replay$!.next(combineValue)),
+                  zipWith(atom.replay$!.pipe(bufferCount(2, 1))),
                   map(([current, beforeAndCurrent]) => {
                       const isChange: Record<string, boolean> = {};
-                      dependNamesWithSelf?.forEach((name, index) => {
+                      getDependNamesWithSelf(item).forEach((name, index) => {
                           isChange[name] = not(
-                              equals(
-                                  beforeAndCurrent?.[0]?.[index],
-                                  beforeAndCurrent?.[1]?.[index]
-                              )
+                              beforeAndCurrent?.[0]?.[index]?.timestamp
+                                  ? equals(
+                                        beforeAndCurrent?.[0]?.[index]
+                                            ?.timestamp,
+                                        beforeAndCurrent?.[1]?.[index]
+                                            ?.timestamp,
+                                    )
+                                  : equals(
+                                        beforeAndCurrent?.[0]?.[index] ?? null,
+                                        beforeAndCurrent?.[1]?.[index] ?? null,
+                                    ),
                           );
                       });
                       return [current, isChange, beforeAndCurrent];
-                  })
+                  }),
               )
             : source;
-
-export const handleDependValueChange = (
-    CacheKey: string,
-    item: IConfigItem,
-    dependsName: string[]
-) => {
-    // 使用额外的 BehaviorSubject 存储数据进行判断
-    if (item.depend) {
-        if (!Global.Buffer.get(CacheKey)!.has(item.name)) {
-            const replay = new ReplaySubject<any[]>(2);
-            Global.Buffer.get(CacheKey)!.set(item.name, replay);
-            // 存储一个初始值 [] 作为初始值
-            replay.next([]);
-        }
-    }
-    return handleCombineWithBuffer(CacheKey, item.name, [
-        item.name,
-        ...dependsName,
-    ]);
-};
+    };
 
 export const handleError =
-    (message: string): ((source: Observable<any>) => Observable<any>) =>
+    (message: string): OperatorReturnType =>
     (source) =>
         source.pipe(
             catchError((e) => {
                 console.error(message, e);
                 return EMPTY;
-            })
+            }),
         );
 
 export const handleLogger = (
     CacheKey: string,
     name: string,
-    open?: { duration?: number } | boolean | number
-): ((source: Observable<any>) => Observable<any>) =>
-    open ? Global.LoggerWatcher.get(CacheKey)!(`${name}`) : identity;
+    open?: { duration?: number } | boolean | number,
+): OperatorReturnType => {
+    if (!Global.LoggerWatcherCache.has(JointState(CacheKey, name)) && open) {
+        Global.LoggerWatcherCache.set(JointState(CacheKey, name), true);
+        return Global.LoggerWatcher.get(CacheKey)!(`${name}`);
+    }
+    return identity;
+};
+
+export const WithTimestamp =
+    (withTimestamp?: boolean): OperatorReturnType =>
+    (source) =>
+        withTimestamp ? source.pipe(timestamp()) : source;
+
+/**
+ * 不同阶段读取的 project 函数
+ * @param item
+ * @param stage
+ */
+const getProjectWithStage = (item: IConfigItem, stage: FilterNilStage) =>
+    ({
+        [FilterNilStage.InBefore]: identity,
+        [FilterNilStage.In]: item?.interceptor?.before || identity,
+        [FilterNilStage.HandleAfter]: item.handle || identity,
+        [FilterNilStage.DependBefore]: identity,
+        [FilterNilStage.DependAfter]: (
+            value: [any, Record<string, boolean>, [any, any]],
+        ) =>
+            // current isChange beforeAndCurrent
+            item?.depend?.handle?.(...value) ?? identity(value),
+        [FilterNilStage.OutAfter]: item?.interceptor?.after || identity,
+        [FilterNilStage.Out]: identity,
+        [FilterNilStage.All]: identity,
+        [FilterNilStage.Default]: identity,
+    })[stage] as (...args: any[]) => any;
+
+/**
+ * 不同阶段的错误信息
+ * @param name
+ * @param stage
+ * @constructor
+ */
+const ErrorMessage = (name: string, stage: FilterNilStage) =>
+    ({
+        [FilterNilStage.InBefore]: "",
+        [FilterNilStage.In]: `捕获到 ${name} item.interceptor.before 中报错`,
+        [FilterNilStage.HandleAfter]: `捕获到 ${name} handle 中报错`,
+        [FilterNilStage.DependBefore]: "",
+        [FilterNilStage.DependAfter]: `捕获到 ${name} depend.handle 中报错`,
+        [FilterNilStage.OutAfter]: "",
+        [FilterNilStage.Out]: `捕获到 ${name} reduce 中报错`,
+        [FilterNilStage.All]: "",
+        [FilterNilStage.Default]: "",
+    })[stage];
+
+export const handleTransformValue =
+    (item: IConfigItem, config?: ReGenConfig) =>
+    (stage: FilterNilStage): OperatorReturnType =>
+    (source) =>
+        getProjectWithStage(item, stage)
+            ? source.pipe(
+                  // 首先需要将传入的值转换成能够处理的类型 -- 主要考虑对初始值的转化
+                  switchMap(transformResultToObservable),
+                  // project
+                  map(getProjectWithStage(item, stage)),
+                  // 捕获错误
+                  handleError(ErrorMessage(item.name, stage)),
+                  // 处理空值
+                  handleUndefinedWithStage(item, config)(stage),
+                  // 最后将值转化成之后能处理的类型
+                  switchMap(transformResultToObservable),
+              )
+            : source;

@@ -4,7 +4,6 @@ import type {
     IConfigItem,
     IDistinct,
     ReturnResult,
-    ReGenConfig,
     PlainResult,
     IRelationConfig,
 } from "../type";
@@ -24,7 +23,6 @@ import {
     not,
     values,
 } from "ramda";
-import { getGroup } from "rxjs-watcher";
 import { Global } from "../store";
 import { AtomState, getOutObservable } from "../Atom.ts";
 
@@ -97,21 +95,6 @@ export const transformDistinctOptionToBoolean: (
     return global ?? DefaultValue.Distinct;
 };
 
-export const OpenLogger = (CacheKey: string, config?: ReGenConfig) => {
-    if (!Global.LoggerWatcher.has(CacheKey) && !!config?.logger) {
-        Global.LoggerWatcher.set(
-            CacheKey,
-            getGroup(
-                `${CacheKey} Watcher Group`,
-                typeof config?.logger === "boolean"
-                    ? DefaultValue.LoggerDuration
-                    : typeof config?.logger === "number"
-                    ? config.logger
-                    : config.logger?.duration,
-            ),
-        );
-    }
-};
 export const PluckName = (config: IConfigItem[]): string[] =>
     config.map((item) => item.name);
 

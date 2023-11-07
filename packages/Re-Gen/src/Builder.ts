@@ -16,7 +16,6 @@ import {
     getDependNames,
     generateAndSaveAtom,
     isValidRelationConfig,
-    OpenLogger,
     transformDistinctOptionToBoolean,
     subscribeDependAtom,
     isJointState,
@@ -36,7 +35,6 @@ import {
     handleDependValueChange,
     handleDistinct,
     handleError,
-    handleLogger,
     handleTransformValue,
     WithTimestamp,
 } from "./operator";
@@ -120,7 +118,6 @@ const HandleDepend =
                     handleError(
                         `捕获到 ${item.name} item.interceptor.after 中报错`,
                     ),
-                    handleLogger(CacheKey, item.name, config?.logger),
                     takeUntil(atom.destroy$),
                 )
                 .subscribe(atom.out$);
@@ -157,7 +154,6 @@ const BuildRelation = (
     of(RelationConfig)
         .pipe(
             subscribeOn(asyncScheduler),
-            tap(() => OpenLogger(CacheKey, config)),
             tap(() => InitGlobal(CacheKey)),
             map(ConfigToAtomStore(CacheKey)),
             map(AtomHandle(CacheKey, config)),

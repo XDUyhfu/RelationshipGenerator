@@ -35,7 +35,6 @@ export enum CombineType {
 
 export const DefaultValue = {
     Distinct: false,
-    LoggerDuration: 300,
     FilterNil: {
         // 如果用户没有传入过滤空值的阶段的话，则使用默认值
         Option: FilterNilStage.Default,

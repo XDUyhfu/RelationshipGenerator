@@ -79,11 +79,6 @@ export type PluckValueType = {
 
 export interface ReGenConfig {
     /**
-     * 是否开启logger
-     * - 日志持续的时间或者使用默认时间
-     */
-    logger?: { duration?: number } | boolean | number;
-    /**
      * 默认为 Default 配置
      */
     filterNil?: FilterNilStage | boolean;

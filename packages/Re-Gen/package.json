@@ -36,8 +36,7 @@
   "dependencies": {
     "ramda": "^0.29.1",
     "rxjs": "^7.8.0",
-    "rxjs-hooks": "0.8.0-alpha.0",
-    "rxjs-watcher": "^1.2.1"
+    "rxjs-hooks": "0.8.0-alpha.0"
   },
   "repository": {
     "url": "https://github.com/XDUyhfu/RelationshipGenerator"

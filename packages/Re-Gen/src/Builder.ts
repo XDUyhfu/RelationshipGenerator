@@ -6,7 +6,6 @@ import {
     scan,
     subscribeOn,
     takeUntil,
-    tap,
 } from "rxjs";
 import { AtomInOut, getOutObservable } from "./Atom";
 import {
@@ -15,11 +14,10 @@ import {
     flatRelationConfig,
     getDependNames,
     generateAndSaveAtom,
-    isValidRelationConfig,
     transformDistinctOptionToBoolean,
     subscribeDependAtom,
     isJointState,
-    isInit,
+    checkAndInitConfig,
 } from "./utils";
 import type {
     IAtomInOut,
@@ -38,7 +36,7 @@ import {
     handleTransformValue,
     WithTimestamp,
 } from "./operator";
-import { Global, InitGlobal } from "./store";
+import { Global } from "./store";
 
 /**
  * 该方法将每个配置项构建为一个 AtomState 并进行存储
@@ -149,12 +147,10 @@ const BuildRelation = (
     RelationConfig: IConfigItem[],
     config?: ReGenConfig,
 ) =>
-    isInit(CacheKey) &&
-    isValidRelationConfig(RelationConfig) &&
+    checkAndInitConfig(CacheKey, RelationConfig) &&
     of(RelationConfig)
         .pipe(
             subscribeOn(asyncScheduler),
-            tap(() => InitGlobal(CacheKey)),
             map(ConfigToAtomStore(CacheKey)),
             map(AtomHandle(CacheKey, config)),
             map(HandleDepend(CacheKey, config)),

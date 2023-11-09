@@ -7,7 +7,7 @@ export class AtomBridge {
 
     private constructor() {}
 
-    static getInstance() {
+    static Instance() {
         if (this.instance) return this.instance;
         this.instance = new AtomBridge();
         return this.instance;

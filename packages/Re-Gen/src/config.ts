@@ -45,6 +45,7 @@ export const DefaultValue = {
     },
     Delimiter: ":$$:",
     Prefix: "$$@ReGenPrefix",
+    Suffix: "$$@ReGenSuffix",
 };
 
 export const ReGenPrefix = DefaultValue.Prefix;

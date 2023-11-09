@@ -23,7 +23,7 @@ import {
     not,
     values,
 } from "ramda";
-import { Global } from "../store";
+import { Global, InitGlobal } from "../store";
 import { AtomState, getOutObservable } from "../Atom.ts";
 
 export const isArray = (value: any): value is Array<any> =>
@@ -257,9 +257,19 @@ export const flatRelationConfig = (
         [is(Object), recordToArrayType],
     ])(RelationConfig);
 
-export const isValidRelationConfig = (RelationConfig: IConfigItem[]) =>
+const isValidRelationConfig = (RelationConfig: IConfigItem[]) =>
     RelationConfig?.length > 0;
-export const isInit = (CacheKey: string) => !Global.Store.has(CacheKey);
+const isInit = (CacheKey: string) => !Global.Store.has(CacheKey);
+export const checkAndInitConfig = (
+    CacheKey: string,
+    RelationConfig: IConfigItem[],
+) => {
+    if (isInit(CacheKey) && isValidRelationConfig(RelationConfig)) {
+        InitGlobal(CacheKey);
+        return true;
+    }
+    return false;
+};
 
 /**
  * 通过 init 判断其是否是依赖于其他的 atom
@@ -301,3 +311,5 @@ export const subscribeDependAtom = (CacheKey: string, item: IConfigItem) => {
         );
     }
 };
+
+export { AtomBridge } from "./AtomBridge.ts";

@@ -5,6 +5,7 @@ export const Global = {
     Store: new Map<string, Map<string, AtomState>>(),
     AtomBridge: new Map<string, BehaviorSubject<any>[]>(),
     OutBridge: new Map<string, ReplaySubject<any>>(),
+    InBridge: new Map<string, ReplaySubject<any>>(),
 };
 
 export const InitGlobal = (CacheKey: string) => {

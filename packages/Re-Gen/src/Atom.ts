@@ -24,7 +24,11 @@ export class AtomState {
         if (!Global.OutBridge.has(JointName)) {
             Global.OutBridge.set(JointName, new ReplaySubject(0));
         }
+        if (!Global.InBridge.has(JointName)) {
+            Global.InBridge.set(JointName, new ReplaySubject());
+        }
         this.out$.subscribe(Global.OutBridge.get(JointName)!);
+        Global.OutBridge.get(JointName)!.subscribe(this.in$);
 
         // 如果有依赖的话，记录变化前后的数据
         if (item.depend) {
@@ -54,10 +58,15 @@ export const AtomInOut = (CacheKey: string) => (name: string) => {
     if (!Global.OutBridge.has(JointName)) {
         Global.OutBridge.set(JointName, new ReplaySubject(0));
     }
+    if (!Global.InBridge.has(JointName)) {
+        Global.InBridge.set(JointName, new ReplaySubject());
+    }
     return {
         [`${name}Out$`]: Global.OutBridge.get(JointName)!,
+        [`${name}In$`]: Global.InBridge.get(JointName)!,
     } as {
         [x: `${string}Out$`]: ReplaySubject<any>;
+        [y: `${string}In$`]: ReplaySubject<any>;
     };
 };
 

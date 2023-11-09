@@ -91,7 +91,8 @@ export interface ReGenConfig {
 }
 
 export type IAtomInOut = (name: string) => {
-    [p: `${string}Out$`]: ReplaySubject<any>;
+    [x: `${string}Out$`]: ReplaySubject<any>;
+    [y: `${string}In$`]: ReplaySubject<any>;
 };
 
 /**

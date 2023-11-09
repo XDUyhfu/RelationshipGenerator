@@ -5,7 +5,7 @@ import { isNil } from "ramda";
 import { JointState } from "./utils";
 
 export class AtomState {
-    in$: BehaviorSubject<any>;
+    in$: ReplaySubject<any>;
     mid$: ReplaySubject<any>;
     out$: BehaviorSubject<any>;
 
@@ -13,7 +13,7 @@ export class AtomState {
     destroy$: ReplaySubject<any>;
 
     constructor(init: any, CacheKey: string, item: IConfigItem) {
-        this.in$ = new BehaviorSubject(init);
+        this.in$ = new ReplaySubject(0);
         this.mid$ = new ReplaySubject(0);
         this.out$ = new BehaviorSubject(null);
 
@@ -29,6 +29,10 @@ export class AtomState {
         }
         this.out$.subscribe(Global.OutBridge.get(JointName)!);
         Global.OutBridge.get(JointName)!.subscribe(this.in$);
+
+        if (init) {
+            Global.OutBridge.get(JointName)!.next(init);
+        }
 
         // 如果有依赖的话，记录变化前后的数据
         if (item.depend) {
@@ -102,8 +106,8 @@ const GetAtomOutObservableByName = (
 
 const GetAtomInObservables = (
     CacheKey: string,
-): Record<string, BehaviorSubject<any>> => {
-    const result = {} as AtomsType;
+): Record<string, ReplaySubject<any>> => {
+    const result = {} as Record<string, ReplaySubject<any>>;
     if (Global.Store.has(CacheKey)) {
         const entries = Global.Store.get(CacheKey)!.entries();
         for (const [key, value] of entries) {
@@ -116,7 +120,7 @@ const GetAtomInObservables = (
 const GetAtomInObservableByName = (
     CacheKey: string,
     name: string,
-): BehaviorSubject<any> => GetAtomInObservables(CacheKey)[name];
+): ReplaySubject<any> => GetAtomInObservables(CacheKey)[name];
 
 const SetAtomValueByName = (CacheKey: string) => (name: string, value: any) =>
     GetAtomInObservables(CacheKey)?.[name]?.next(value);
@@ -146,11 +150,11 @@ export function getOutObservable(CacheKey: string, name?: string) {
 
 export function getInObservable(
     CacheKey: string,
-): Record<string, BehaviorSubject<any>>;
+): Record<string, ReplaySubject<any>>;
 export function getInObservable(
     CacheKey: string,
     name?: string,
-): BehaviorSubject<any>;
+): ReplaySubject<any>;
 export function getInObservable(CacheKey: string, name?: string) {
     if (name) {
         return GetAtomInObservableByName(CacheKey, name);

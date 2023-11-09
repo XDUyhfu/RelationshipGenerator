@@ -31,9 +31,9 @@ export class AtomState {
         }
         Global.InBridge.get(JointName)!.subscribe(this.in$);
 
-        // if (init) {
-        //     this.in$.next(init);
-        // }
+        if (init) {
+            this.in$.next(init);
+        }
 
         // 如果有依赖的话，记录变化前后的数据
         if (item.depend) {

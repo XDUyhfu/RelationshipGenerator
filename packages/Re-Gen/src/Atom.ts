@@ -24,14 +24,16 @@ export class AtomState {
         if (!Global.OutBridge.has(JointName)) {
             Global.OutBridge.set(JointName, new ReplaySubject(0));
         }
+        this.out$.subscribe(Global.OutBridge.get(JointName)!);
+
         if (!Global.InBridge.has(JointName)) {
             Global.InBridge.set(JointName, new ReplaySubject());
         }
-        this.out$.subscribe(Global.OutBridge.get(JointName)!);
         Global.InBridge.get(JointName)!.subscribe(this.in$);
-        if (init) {
-            Global.InBridge.get(JointName)!.next(init);
-        }
+
+        // if (init) {
+        //     this.in$.next(init);
+        // }
 
         // 如果有依赖的话，记录变化前后的数据
         if (item.depend) {

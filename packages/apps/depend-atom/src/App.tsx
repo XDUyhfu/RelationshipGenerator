@@ -1,8 +1,9 @@
-import { useReGen } from "../../../Re-Gen/src/hooks/react";
-import { ParamsConfig, ParamsKey } from "./config";
+import { useReGen } from "../../../Re-Gen/src/hooks/react/index";
+import { ParamsConfig, ParamsKey, RequestConfig, RequestKey } from "./config";
 import { Button, Select } from "antd";
 
 function App() {
+    const { result } = useReGen(RequestKey, RequestConfig);
     const {
         param1,
         ReGenValue: { setValue: setParamsValue },
@@ -10,6 +11,7 @@ function App() {
 
     return (
         <div>
+            {JSON.stringify(result?.data?.result?.login)}
             <br />
             <Select
                 style={{ width: 200 }}

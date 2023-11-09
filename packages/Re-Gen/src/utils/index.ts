@@ -1,5 +1,5 @@
-import { BehaviorSubject, isObservable, of } from "rxjs";
-import type { ObservableInput } from "rxjs";
+import { isObservable, of, ReplaySubject } from "rxjs";
+import type { ObservableInput, BehaviorSubject } from "rxjs";
 import type {
     IConfigItem,
     IDistinct,
@@ -277,10 +277,12 @@ export const checkInitConfig = (
 export const generateAndSaveAtom = (CacheKey: string, item: IConfigItem) => {
     const joint = isJointState(item.init);
     // 如果 observable 有值，说明其依赖已经生成
-    let observable = joint ? getOutObservable(joint[0])[joint[1]] : null;
+    let observable: BehaviorSubject<any> | ReplaySubject<any> | null = joint
+        ? getOutObservable(joint[0])[joint[1]]
+        : null;
     // 该 atom 需要链接到其他状态，但是那个 atom 还没有生成的时候，先产生一个中间bridge的 subject
     if (!observable && Array.isArray(joint)) {
-        observable = new BehaviorSubject(null);
+        observable = new ReplaySubject(0);
         // 此时的 item.init 为 a:$$:b 类型
         Global.AtomBridge.set(item.init as string, [
             ...(Global.AtomBridge.get(item.init as string) ?? []),

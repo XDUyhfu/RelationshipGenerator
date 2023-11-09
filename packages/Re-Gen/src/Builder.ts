@@ -17,7 +17,7 @@ import {
     transformDistinctOptionToBoolean,
     subscribeDependAtom,
     isJointState,
-    checkAndInitConfig,
+    checkInitConfig,
 } from "./utils";
 import type {
     IAtomInOut,
@@ -147,7 +147,7 @@ const BuildRelation = (
     RelationConfig: IConfigItem[],
     config?: ReGenConfig,
 ) =>
-    checkAndInitConfig(CacheKey, RelationConfig) &&
+    checkInitConfig(CacheKey, RelationConfig) &&
     of(RelationConfig)
         .pipe(
             subscribeOn(asyncScheduler),

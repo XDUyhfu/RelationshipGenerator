@@ -260,15 +260,11 @@ export const flatRelationConfig = (
 const isValidRelationConfig = (RelationConfig: IConfigItem[]) =>
     RelationConfig?.length > 0;
 const isInit = (CacheKey: string) => !Global.Store.has(CacheKey);
-export const checkAndInitConfig = (
+export const checkInitConfig = (
     CacheKey: string,
     RelationConfig: IConfigItem[],
 ) => {
-    if (isInit(CacheKey) && isValidRelationConfig(RelationConfig)) {
-        InitGlobal(CacheKey);
-        return true;
-    }
-    return false;
+    return isInit(CacheKey) && isValidRelationConfig(RelationConfig);
 };
 
 /**
@@ -294,6 +290,7 @@ export const generateAndSaveAtom = (CacheKey: string, item: IConfigItem) => {
     const initValue = typeof item.init === "function" ? item.init() : item.init;
     const atom = new AtomState(joint ? observable : initValue, CacheKey, item);
     // 存储为全局变量
+    if (!Global.Store.has(CacheKey)) InitGlobal(CacheKey);
     Global.Store.get(CacheKey)!.set(item.name, atom);
 };
 

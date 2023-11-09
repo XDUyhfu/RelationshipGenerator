@@ -28,10 +28,9 @@ export class AtomState {
             Global.InBridge.set(JointName, new ReplaySubject());
         }
         this.out$.subscribe(Global.OutBridge.get(JointName)!);
-        Global.OutBridge.get(JointName)!.subscribe(this.in$);
-
+        Global.InBridge.get(JointName)!.subscribe(this.in$);
         if (init) {
-            Global.OutBridge.get(JointName)!.next(init);
+            Global.InBridge.get(JointName)!.next(init);
         }
 
         // 如果有依赖的话，记录变化前后的数据

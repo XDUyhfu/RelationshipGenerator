@@ -68,8 +68,8 @@ export const AtomInOut = (CacheKey: string) => (name: string) => {
     };
 };
 
-const GetCurrentAtomValues = (cacheKey: string): Record<string, any> => {
-    const observables = GetAtomOutObservables(cacheKey);
+const GetCurrentAtomValues = (CacheKey: string): Record<string, any> => {
+    const observables = GetAtomOutObservables(CacheKey);
     const result = {} as Record<string, any>;
     Object.keys(observables).forEach((key) => {
         result[key] = observables[key].getValue();

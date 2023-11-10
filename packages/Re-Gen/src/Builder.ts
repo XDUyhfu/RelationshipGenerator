@@ -150,6 +150,7 @@ const BuildRelation = (
         map(HandleDepend(CacheKey, config)),
         map(HandleInitValue(CacheKey)),
     );
+
 export const ReGen = (
     CacheKey: string,
     RelationConfig: IRelationConfig,

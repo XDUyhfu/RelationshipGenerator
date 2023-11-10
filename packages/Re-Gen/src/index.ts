@@ -28,3 +28,4 @@ export {
     generateNameInHook,
     flatRelationConfig,
 } from "./utils";
+export { Global } from "./store.ts";

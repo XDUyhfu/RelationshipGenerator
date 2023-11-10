@@ -12,7 +12,7 @@ export class AtomState {
     replay$: ReplaySubject<any[]> | null = null;
     destroy$: ReplaySubject<any>;
 
-    constructor(init: any, CacheKey: string, item: IConfigItem) {
+    constructor(CacheKey: string, item: IConfigItem) {
         this.in$ = new ReplaySubject(0);
         this.mid$ = new ReplaySubject(0);
         this.out$ = new BehaviorSubject(null);
@@ -24,15 +24,8 @@ export class AtomState {
         if (!Global.OutBridge.has(JointName)) {
             Global.OutBridge.set(JointName, new ReplaySubject(0));
         }
-        this.out$.subscribe(Global.OutBridge.get(JointName)!);
-
         if (!Global.InBridge.has(JointName)) {
-            Global.InBridge.set(JointName, new ReplaySubject());
-        }
-        Global.InBridge.get(JointName)!.subscribe(this.in$);
-
-        if (init) {
-            this.in$.next(init);
+            Global.InBridge.set(JointName, new ReplaySubject(0));
         }
 
         // 如果有依赖的话，记录变化前后的数据
@@ -64,7 +57,7 @@ export const AtomInOut = (CacheKey: string) => (name: string) => {
         Global.OutBridge.set(JointName, new ReplaySubject(0));
     }
     if (!Global.InBridge.has(JointName)) {
-        Global.InBridge.set(JointName, new ReplaySubject());
+        Global.InBridge.set(JointName, new ReplaySubject(0));
     }
     return {
         [`${name}Out$`]: Global.OutBridge.get(JointName)!,

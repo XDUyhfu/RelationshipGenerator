@@ -7,7 +7,7 @@ import {
     subscribeOn,
     takeUntil,
 } from "rxjs";
-import { AtomInOut, getOutObservable } from "./Atom";
+import { AtomInOut } from "./Atom";
 import {
     CheckParams,
     defaultReduceFunction,
@@ -18,6 +18,7 @@ import {
     subscribeDependAtom,
     isJointState,
     checkInitConfig,
+    JointState,
 } from "./utils";
 import type {
     IAtomInOut,
@@ -121,19 +122,13 @@ const HandleDepend =
                 .subscribe(atom.out$);
         })(RelationConfig);
 
-const HandleInitValue =
-    (CacheKey: string, config?: ReGenConfig) =>
-    (RelationConfig: IConfigItem[]) =>
-        forEach((item: IConfigItem) => {
-            if (!config?.init) {
-                return;
-            }
-            const initValue = config.init?.[item.name];
-            if (initValue) {
-                const outObservable = getOutObservable(CacheKey, item.name);
-                outObservable?.next(initValue);
-            }
-        })(RelationConfig);
+const HandleInitValue = (CacheKey: string) => (RelationConfig: IConfigItem[]) =>
+    forEach((item: IConfigItem) => {
+        const JointName = JointState(CacheKey, item.name);
+        const atom = Global.Store.get(CacheKey)!.get(item.name)!;
+        atom.out$.subscribe(Global.OutBridge.get(JointName)!);
+        atom.in$.next(Global.InitValue.get(JointName)!);
+    })(RelationConfig);
 
 /**
  * 构建的整体流程
@@ -154,7 +149,7 @@ const BuildRelation = (
             map(ConfigToAtomStore(CacheKey)),
             map(AtomHandle(CacheKey, config)),
             map(HandleDepend(CacheKey, config)),
-            map(HandleInitValue(CacheKey, config)),
+            map(HandleInitValue(CacheKey)),
         )
         .subscribe();
 

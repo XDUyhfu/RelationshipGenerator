@@ -9,6 +9,7 @@ export const Global = {
     >(),
     OutBridge: new Map<string, ReplaySubject<any>>(),
     InBridge: new Map<string, ReplaySubject<any>>(),
+    InitValue: new Map<string, any>(),
 };
 
 export const InitGlobal = (CacheKey: string) => {

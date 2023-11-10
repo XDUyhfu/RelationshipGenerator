@@ -1,13 +1,13 @@
-import type { IConfigItem } from '@yhfu/re-gen';
-import type { BehaviorSubject } from 'rxjs';
+import type { IConfigItem } from "../../type";
+import type { BehaviorSubject } from "rxjs";
 
 type FlatConfigList<
-    ConfigList extends readonly IConfigItem[] | IConfigItem[][]
+    ConfigList extends readonly IConfigItem[] | IConfigItem[][],
 > = ConfigList extends readonly IConfigItem[]
     ? ConfigList
     : ConfigList extends [
           infer First extends readonly IConfigItem[],
-          ...infer Rest extends IConfigItem[][]
+          ...infer Rest extends IConfigItem[][],
       ]
     ? [...First, ...FlatConfigList<Rest>]
     : [];
@@ -15,13 +15,13 @@ type FlatConfigList<
 type ConfigListNames<ConfigList extends readonly IConfigItem[]> =
     ConfigList extends readonly [
         infer Item extends IConfigItem,
-        ...infer Rest extends IConfigItem[]
+        ...infer Rest extends IConfigItem[],
     ]
-        ? Item['name'] | ConfigListNames<Rest>
+        ? Item["name"] | ConfigListNames<Rest>
         : never;
 
 type IResultAtomsValue<
-    ConfigList extends readonly IConfigItem[] | IConfigItem[][] = []
+    ConfigList extends readonly IConfigItem[] | IConfigItem[][] = [],
 > = {
     [Key in ConfigListNames<FlatConfigList<ConfigList>>]: unknown;
 } & {
@@ -51,7 +51,7 @@ type IResultRecordAtomsValue<
     RecordConfigItem extends Record<
         string,
         IConfigItem[] | IConfigItem[][]
-    > = NonNullable<unknown>
+    > = NonNullable<unknown>,
 > = {
     [K in keyof RecordConfigItem]: {
         [y: `${string}`]: any;

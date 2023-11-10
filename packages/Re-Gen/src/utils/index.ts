@@ -290,10 +290,14 @@ export const generateAndSaveAtom = (CacheKey: string, item: IConfigItem) => {
         ]);
     }
     const initValue = typeof item.init === "function" ? item.init() : item.init;
-    const atom = new AtomState(joint ? observable : initValue, CacheKey, item);
+    const atom = new AtomState(CacheKey, item);
     // 存储为全局变量
     if (!Global.Store.has(CacheKey)) InitGlobal(CacheKey);
     Global.Store.get(CacheKey)!.set(item.name, atom);
+    Global.InitValue.set(
+        JointState(CacheKey, item.name),
+        joint ? observable : initValue,
+    );
 };
 
 /**
@@ -310,5 +314,3 @@ export const subscribeDependAtom = (CacheKey: string, item: IConfigItem) => {
         );
     }
 };
-
-export { AtomBridge } from "./AtomBridge.ts";

@@ -1,13 +1,12 @@
 import { BehaviorSubject, ReplaySubject } from "rxjs";
-import type { AtomsType, IConfigItem } from "./type";
+import type { IConfigItem } from "./type";
 import { Global } from "./store";
 import { isNil } from "ramda";
-import { JointState } from "./utils";
 
 export class AtomState {
     in$: ReplaySubject<any>;
     mid$: ReplaySubject<any>;
-    out$: BehaviorSubject<any>;
+    out$: ReplaySubject<any>;
 
     replay$: ReplaySubject<any[]> | null = null;
     destroy$: ReplaySubject<any>;
@@ -15,18 +14,33 @@ export class AtomState {
     constructor(CacheKey: string, item: IConfigItem) {
         this.in$ = new ReplaySubject(0);
         this.mid$ = new ReplaySubject(0);
-        this.out$ = new BehaviorSubject(null);
+        this.out$ = new ReplaySubject(0);
 
         // 销毁时使用的
         this.destroy$ = new ReplaySubject(0);
 
-        const JointName = JointState(CacheKey, item.name);
-        if (!Global.OutBridge.has(JointName)) {
-            Global.OutBridge.set(JointName, new ReplaySubject(0));
+        if (!Global.OutBridge.has(CacheKey)) {
+            Global.OutBridge.set(CacheKey, new Map());
         }
-        if (!Global.InBridge.has(JointName)) {
-            Global.InBridge.set(JointName, new ReplaySubject(0));
+        if (!Global.OutBridge.get(CacheKey)!.has(item.name)) {
+            Global.OutBridge.get(CacheKey)!.set(
+                item.name,
+                new BehaviorSubject(null),
+            );
         }
+
+        // this.out$.subscribe(Global.OutBridge.get(CacheKey)!.get(item.name)!);
+
+        if (!Global.InBridge.has(CacheKey)) {
+            Global.InBridge.set(CacheKey, new Map());
+        }
+        if (!Global.InBridge.get(CacheKey)!.has(item.name)) {
+            Global.InBridge.get(CacheKey)!.set(item.name, new ReplaySubject(0));
+        }
+        // const JointName = JointState(CacheKey, item.name);
+        // Global.InBridge.get(CacheKey)!
+        //     .get(item.name)!
+        //     .subscribe(Global.InitValue.get(JointName)!);
 
         // 如果有依赖的话，记录变化前后的数据
         if (item.depend) {
@@ -52,18 +66,25 @@ export class AtomState {
  * @constructor
  */
 export const AtomInOut = (CacheKey: string) => (name: string) => {
-    const JointName = JointState(CacheKey, name);
-    if (!Global.OutBridge.has(JointName)) {
-        Global.OutBridge.set(JointName, new ReplaySubject(0));
+    if (!Global.OutBridge.has(CacheKey)) {
+        Global.OutBridge.set(CacheKey, new Map());
     }
-    if (!Global.InBridge.has(JointName)) {
-        Global.InBridge.set(JointName, new ReplaySubject(0));
+    if (!Global.OutBridge.get(CacheKey)!.has(name)) {
+        Global.OutBridge.get(CacheKey)!.set(name, new BehaviorSubject(null));
     }
+
+    if (!Global.InBridge.has(CacheKey)) {
+        Global.InBridge.set(CacheKey, new Map());
+    }
+    if (!Global.InBridge.get(CacheKey)!.has(name)) {
+        Global.InBridge.get(CacheKey)!.set(name, new ReplaySubject(0));
+    }
+
     return {
-        [`${name}Out$`]: Global.OutBridge.get(JointName)!,
-        [`${name}In$`]: Global.InBridge.get(JointName)!,
+        [`${name}Out$`]: Global.OutBridge.get(CacheKey)!.get(name),
+        [`${name}In$`]: Global.InBridge.get(CacheKey)!.get(name),
     } as {
-        [x: `${string}Out$`]: ReplaySubject<any>;
+        [x: `${string}Out$`]: BehaviorSubject<any>;
         [y: `${string}In$`]: ReplaySubject<any>;
     };
 };
@@ -83,11 +104,11 @@ const GetCurrentAtomValueByName = (CacheKey: string, name: string) =>
 const GetAtomOutObservables = (
     CacheKey: string,
 ): Record<string, BehaviorSubject<any>> => {
-    const result = {} as AtomsType;
-    if (Global.Store.has(CacheKey)) {
-        const entries = Global.Store.get(CacheKey)!.entries();
+    const result = {} as Record<string, BehaviorSubject<any>>;
+    if (Global.OutBridge.has(CacheKey)) {
+        const entries = Global.OutBridge.get(CacheKey)!.entries();
         for (const [key, value] of entries) {
-            result[key] = value.out$;
+            result[key] = value;
         }
     }
     return result;
@@ -102,10 +123,10 @@ const GetAtomInObservables = (
     CacheKey: string,
 ): Record<string, ReplaySubject<any>> => {
     const result = {} as Record<string, ReplaySubject<any>>;
-    if (Global.Store.has(CacheKey)) {
-        const entries = Global.Store.get(CacheKey)!.entries();
+    if (Global.InBridge.has(CacheKey)) {
+        const entries = Global.InBridge.get(CacheKey)!.entries();
         for (const [key, value] of entries) {
-            result[key] = value.in$;
+            result[key] = value;
         }
     }
     return result;
@@ -176,7 +197,8 @@ function destroyAtom(CacheKey: string, name: string) {
 export function destroyStore(CacheKey: string) {
     Global.Store.get(CacheKey)?.forEach((_, name) => {
         destroyAtom(CacheKey, name);
-        Global.OutBridge.delete(JointState(CacheKey, name));
+        Global.OutBridge.delete(CacheKey);
+        Global.InBridge.delete(CacheKey);
     });
     Global.Store.delete(CacheKey);
 }

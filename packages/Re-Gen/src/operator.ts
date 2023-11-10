@@ -1,5 +1,5 @@
 import type { IConfigItem, IDistinct, ReGenConfig } from "./type";
-import type { BehaviorSubject, Observable } from "rxjs";
+import type { Observable, ReplaySubject } from "rxjs";
 import {
     bufferCount,
     catchError,
@@ -72,7 +72,7 @@ export const handleDistinct =
  * @param depends
  */
 export const handleCombine =
-    (type: CombineType, depends: BehaviorSubject<any>[]): OperatorReturnType =>
+    (type: CombineType, depends: ReplaySubject<any>[]): OperatorReturnType =>
     (source) =>
         depends.length > 0
             ? type === CombineType.SELF_CHANGE

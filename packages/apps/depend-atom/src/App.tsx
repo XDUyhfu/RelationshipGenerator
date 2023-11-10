@@ -1,8 +1,6 @@
 import { useReGen } from "../../../Re-Gen/src/hooks/react/index";
 import { ParamsConfig, ParamsKey, RequestConfig, RequestKey } from "./config";
 import { Button, Select } from "antd";
-import { Global } from "../../../Re-Gen/src/";
-import { JointState } from "../../../Re-Gen/src";
 
 function App() {
     const { result } = useReGen(RequestKey, RequestConfig);
@@ -10,10 +8,6 @@ function App() {
         param1,
         ReGenValue: { setValue: setParamsValue },
     } = useReGen(ParamsKey, ParamsConfig as any);
-
-    setTimeout(() => {
-        Global.InBridge.get(JointState(RequestKey, "result"))?.next({});
-    }, 3000);
 
     return (
         <div>

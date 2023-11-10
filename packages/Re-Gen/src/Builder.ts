@@ -126,8 +126,12 @@ const HandleInitValue = (CacheKey: string) => (RelationConfig: IConfigItem[]) =>
     forEach((item: IConfigItem) => {
         const JointName = JointState(CacheKey, item.name);
         const atom = Global.Store.get(CacheKey)!.get(item.name)!;
-        atom.out$.subscribe(Global.OutBridge.get(JointName)!);
-        atom.in$.next(Global.InitValue.get(JointName)!);
+        atom.out$.subscribe(Global.OutBridge.get(CacheKey)!.get(item.name)!);
+        Global.InBridge.get(CacheKey)!.get(item.name)!.subscribe(atom.in$);
+
+        Global.InBridge.get(CacheKey)!
+            .get(item.name)!
+            .next(Global.InitValue.get(JointName));
     })(RelationConfig);
 
 /**

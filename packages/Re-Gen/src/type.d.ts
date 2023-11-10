@@ -91,7 +91,7 @@ export interface ReGenConfig {
 }
 
 export type IAtomInOut = (name: string) => {
-    [x: `${string}Out$`]: ReplaySubject<any>;
+    [x: `${string}Out$`]: BehaviorSubject<any>;
     [y: `${string}In$`]: ReplaySubject<any>;
 };
 

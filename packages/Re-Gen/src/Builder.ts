@@ -128,7 +128,6 @@ const HandleInitValue = (CacheKey: string) => (RelationConfig: IConfigItem[]) =>
         const atom = Global.Store.get(CacheKey)!.get(item.name)!;
         atom.out$.subscribe(Global.OutBridge.get(CacheKey)!.get(item.name)!);
         Global.InBridge.get(CacheKey)!.get(item.name)!.subscribe(atom.in$);
-
         Global.InBridge.get(CacheKey)!
             .get(item.name)!
             .next(Global.InitValue.get(JointName));
@@ -146,17 +145,13 @@ const BuildRelation = (
     RelationConfig: IConfigItem[],
     config?: ReGenConfig,
 ) =>
-    checkInitConfig(CacheKey, RelationConfig) &&
-    of(RelationConfig)
-        .pipe(
-            subscribeOn(asyncScheduler),
-            map(ConfigToAtomStore(CacheKey)),
-            map(AtomHandle(CacheKey, config)),
-            map(HandleDepend(CacheKey, config)),
-            map(HandleInitValue(CacheKey)),
-        )
-        .subscribe();
-
+    of(RelationConfig).pipe(
+        subscribeOn(asyncScheduler),
+        map(ConfigToAtomStore(CacheKey)),
+        map(AtomHandle(CacheKey, config)),
+        map(HandleDepend(CacheKey, config)),
+        map(HandleInitValue(CacheKey)),
+    );
 export const ReGen = (
     CacheKey: string,
     RelationConfig: IRelationConfig,
@@ -164,6 +159,7 @@ export const ReGen = (
 ): IAtomInOut => {
     const flatConfig = flatRelationConfig(RelationConfig);
     CheckParams(CacheKey, flatConfig, "library");
-    BuildRelation(CacheKey, flatConfig, config);
+    if (checkInitConfig(CacheKey, flatConfig))
+        BuildRelation(CacheKey, flatConfig, config).subscribe();
     return AtomInOut(CacheKey);
 };

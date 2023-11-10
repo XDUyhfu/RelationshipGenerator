@@ -7,6 +7,10 @@ export const ParamsConfig = [
     {
         name: "param1",
         init: "param1",
+        handle(val: any) {
+            console.log(val);
+            return val;
+        },
     },
     {
         name: "param2",

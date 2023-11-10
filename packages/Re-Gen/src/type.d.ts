@@ -70,13 +70,6 @@ export interface IConfigItem<Name extends string = string> {
     timestamp?: boolean;
 }
 
-export type AtomsType = Record<string, BehaviorSubject<any>>;
-
-export type PluckValueType = {
-    name: string;
-    init: IConfigItemInit;
-};
-
 export interface ReGenConfig {
     /**
      * 默认为 Default 配置

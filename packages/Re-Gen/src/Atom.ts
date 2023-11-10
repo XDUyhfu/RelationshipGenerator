@@ -29,18 +29,12 @@ export class AtomState {
             );
         }
 
-        // this.out$.subscribe(Global.OutBridge.get(CacheKey)!.get(item.name)!);
-
         if (!Global.InBridge.has(CacheKey)) {
             Global.InBridge.set(CacheKey, new Map());
         }
         if (!Global.InBridge.get(CacheKey)!.has(item.name)) {
             Global.InBridge.get(CacheKey)!.set(item.name, new ReplaySubject(0));
         }
-        // const JointName = JointState(CacheKey, item.name);
-        // Global.InBridge.get(CacheKey)!
-        //     .get(item.name)!
-        //     .subscribe(Global.InitValue.get(JointName)!);
 
         // 如果有依赖的话，记录变化前后的数据
         if (item.depend) {

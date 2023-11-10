@@ -18,7 +18,6 @@ import {
     subscribeDependAtom,
     isJointState,
     checkInitConfig,
-    JointState,
 } from "./utils";
 import type {
     IAtomInOut,
@@ -124,13 +123,12 @@ const HandleDepend =
 
 const HandleInitValue = (CacheKey: string) => (RelationConfig: IConfigItem[]) =>
     forEach((item: IConfigItem) => {
-        const JointName = JointState(CacheKey, item.name);
         const atom = Global.Store.get(CacheKey)!.get(item.name)!;
         atom.out$.subscribe(Global.OutBridge.get(CacheKey)!.get(item.name)!);
         Global.InBridge.get(CacheKey)!.get(item.name)!.subscribe(atom.in$);
         Global.InBridge.get(CacheKey)!
             .get(item.name)!
-            .next(Global.InitValue.get(JointName));
+            .next(Global.InitValue.get(CacheKey)!.get(item.name));
     })(RelationConfig);
 
 /**

@@ -294,8 +294,13 @@ export const generateAndSaveAtom = (CacheKey: string, item: IConfigItem) => {
     // 存储为全局变量
     if (!Global.Store.has(CacheKey)) InitGlobal(CacheKey);
     Global.Store.get(CacheKey)!.set(item.name, atom);
-    Global.InitValue.set(
-        JointState(CacheKey, item.name),
+
+    if (!Global.InitValue.has(CacheKey)) {
+        Global.InitValue.set(CacheKey, new Map());
+    }
+
+    Global.InitValue.get(CacheKey)!.set(
+        item.name,
         joint ? observable : initValue,
     );
 };

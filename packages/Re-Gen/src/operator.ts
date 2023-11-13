@@ -1,6 +1,7 @@
 import type { IConfigItem, IDistinct, ReGenConfig } from "./type";
 import type { Observable, ReplaySubject } from "rxjs";
 import {
+    asyncScheduler,
     bufferCount,
     catchError,
     combineLatestWith,
@@ -9,6 +10,7 @@ import {
     filter,
     identity,
     map,
+    subscribeOn,
     switchMap,
     tap,
     timestamp,
@@ -16,7 +18,7 @@ import {
     zipWith,
 } from "rxjs";
 import { compose, equals, is, isNil, not } from "ramda";
-import { FilterNilStage } from "./config";
+import { DefaultValue, FilterNilStage } from "./config";
 import { CombineType } from "./config";
 import {
     getDependNamesWithSelf,
@@ -187,4 +189,11 @@ export const handleTransformValue =
                   // 最后将值转化成之后能处理的类型
                   switchMap(transformResultToObservable),
               )
+            : source;
+
+export const handleAsyncSubscribe =
+    (config?: ReGenConfig): OperatorReturnType =>
+    (source) =>
+        config?.async ?? DefaultValue.AsyncSubscribe
+            ? source.pipe(subscribeOn(asyncScheduler))
             : source;

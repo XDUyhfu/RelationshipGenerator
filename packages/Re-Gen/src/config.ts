@@ -43,6 +43,7 @@ export const DefaultValue = {
         // 默认过滤空值的阶段
         Stage: [FilterNilStage.In, FilterNilStage.Out],
     },
+    AsyncSubscribe: true,
     Delimiter: ":$$:",
     Prefix: "$$@ReGenPrefix",
     Suffix: "$$@ReGenSuffix",

@@ -1,12 +1,4 @@
-import {
-    asyncScheduler,
-    filter,
-    map,
-    of,
-    scan,
-    subscribeOn,
-    takeUntil,
-} from "rxjs";
+import { filter, map, of, scan, takeUntil } from "rxjs";
 import { AtomInOut } from "./Atom";
 import {
     CheckParams,
@@ -29,6 +21,7 @@ import { forEach } from "ramda";
 
 import { CombineType, FilterNilStage } from "./config";
 import {
+    handleAsyncSubscribe,
     handleCombine,
     handleDependValueChange,
     handleDistinct,
@@ -144,7 +137,7 @@ const BuildRelation = (
     config?: ReGenConfig,
 ) =>
     of(RelationConfig).pipe(
-        subscribeOn(asyncScheduler),
+        handleAsyncSubscribe(config),
         map(ConfigToAtomStore(CacheKey)),
         map(AtomHandle(CacheKey, config)),
         map(HandleDepend(CacheKey, config)),

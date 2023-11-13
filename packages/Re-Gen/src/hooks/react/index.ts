@@ -10,12 +10,10 @@ import {
     getValue,
     setValue,
     DefaultValue,
-    destroyStore,
 } from "../../index.ts";
 import type { IConfigItem, IRelationConfig, ReGenConfig } from "../../type";
 import type { IResultAtomsValue, IResultRecordAtomsValue } from "./type";
 import type { ReGenHookConfig } from "./type";
-import { useEffect } from "react";
 
 const getRecordValue = (CacheKey: string, RecordKey: string) => ({
     ReGenValue: {
@@ -64,13 +62,6 @@ export function useReGen(
     RelationConfig: IRelationConfig,
     config?: ReGenConfig & ReGenHookConfig,
 ): any {
-    useEffect(() => {
-        return () => {
-            if (config?.destroyOnExit ?? true) {
-                destroyStore(CacheKey);
-            }
-        };
-    }, []);
     const flatConfig = flatRelationConfig(RelationConfig);
     CheckParams(CacheKey, flatConfig, "hook");
     const AtomInOut = ReGen(CacheKey, flatConfig, config);

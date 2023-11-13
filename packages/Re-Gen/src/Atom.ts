@@ -157,17 +157,3 @@ export function setValue(CacheKey: string, name: string, value?: any) {
         SetAtomValueByName(CacheKey)(name, value);
     };
 }
-
-function destroyAtom(CacheKey: string, name: string) {
-    Global.Store.get(CacheKey)?.get(name)?.destroy();
-    Global.Store.get(CacheKey)?.delete(name);
-}
-
-export function destroyStore(CacheKey: string) {
-    Global.Store.get(CacheKey)?.forEach((_, name) => {
-        destroyAtom(CacheKey, name);
-        Global.OutBridge.delete(CacheKey);
-        Global.InBridge.delete(CacheKey);
-    });
-    Global.Store.delete(CacheKey);
-}

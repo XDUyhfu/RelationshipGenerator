@@ -12,13 +12,7 @@ export {
     DefaultValue,
 } from "./config";
 export { ReGen } from "./Builder";
-export {
-    setValue,
-    getValue,
-    getInObservable,
-    getOutObservable,
-    destroyStore,
-} from "./Atom";
+export { setValue, getValue, getInObservable, getOutObservable } from "./Atom";
 export {
     JointState,
     PluckName,

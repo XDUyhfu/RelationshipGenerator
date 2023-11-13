@@ -74,6 +74,7 @@ export function useReGen(
     const flatConfig = flatRelationConfig(RelationConfig);
     CheckParams(CacheKey, flatConfig, "hook");
     const AtomInOut = ReGen(CacheKey, flatConfig, config);
+
     const names = PluckName(flatConfig);
     // const initMap = flatConfig.reduce(
     //     (pre, item) => ({

@@ -18,19 +18,17 @@ export class AtomState {
 
         // 销毁时使用的
         this.destroy$ = new ReplaySubject(0);
-
-        if (!Global.OutBridge.has(CacheKey)) {
-            Global.OutBridge.set(CacheKey, new Map());
-        }
+        // if (!Global.OutBridge.has(CacheKey)) {
+        //     Global.OutBridge.set(CacheKey, new Map());
+        // }
+        // if (!Global.InBridge.has(CacheKey)) {
+        //     Global.InBridge.set(CacheKey, new Map());
+        // }
         if (!Global.OutBridge.get(CacheKey)!.has(item.name)) {
             Global.OutBridge.get(CacheKey)!.set(
                 item.name,
                 new BehaviorSubject(null),
             );
-        }
-
-        if (!Global.InBridge.has(CacheKey)) {
-            Global.InBridge.set(CacheKey, new Map());
         }
         if (!Global.InBridge.get(CacheKey)!.has(item.name)) {
             Global.InBridge.get(CacheKey)!.set(item.name, new ReplaySubject(0));
@@ -60,15 +58,8 @@ export class AtomState {
  * @constructor
  */
 export const AtomInOut = (CacheKey: string) => (name: string) => {
-    if (!Global.OutBridge.has(CacheKey)) {
-        Global.OutBridge.set(CacheKey, new Map());
-    }
     if (!Global.OutBridge.get(CacheKey)!.has(name)) {
         Global.OutBridge.get(CacheKey)!.set(name, new BehaviorSubject(null));
-    }
-
-    if (!Global.InBridge.has(CacheKey)) {
-        Global.InBridge.set(CacheKey, new Map());
     }
     if (!Global.InBridge.get(CacheKey)!.has(name)) {
         Global.InBridge.get(CacheKey)!.set(name, new ReplaySubject(0));
@@ -86,9 +77,10 @@ export const AtomInOut = (CacheKey: string) => (name: string) => {
 const GetCurrentAtomValues = (CacheKey: string): Record<string, any> => {
     const observables = GetAtomOutObservables(CacheKey);
     const result = {} as Record<string, any>;
-    Object.keys(observables).forEach((key) => {
-        result[key] = observables[key].getValue();
-    });
+    const entries = observables?.entries() ?? new Map().entries();
+    for (const [key, value] of entries) {
+        result[key] = value.getValue();
+    }
     return result;
 };
 
@@ -97,42 +89,25 @@ const GetCurrentAtomValueByName = (CacheKey: string, name: string) =>
 
 const GetAtomOutObservables = (
     CacheKey: string,
-): Record<string, BehaviorSubject<any>> => {
-    const result = {} as Record<string, BehaviorSubject<any>>;
-    if (Global.OutBridge.has(CacheKey)) {
-        const entries = Global.OutBridge.get(CacheKey)!.entries();
-        for (const [key, value] of entries) {
-            result[key] = value;
-        }
-    }
-    return result;
-};
+): Map<string, BehaviorSubject<any>> | undefined =>
+    Global.OutBridge.get(CacheKey);
 
 const GetAtomOutObservableByName = (
     CacheKey: string,
     name: string,
-): BehaviorSubject<any> => GetAtomOutObservables(CacheKey)[name];
+): BehaviorSubject<any> | undefined =>
+    GetAtomOutObservables(CacheKey)?.get(name);
 
 const GetAtomInObservables = (
     CacheKey: string,
-): Record<string, ReplaySubject<any>> => {
-    const result = {} as Record<string, ReplaySubject<any>>;
-    if (Global.InBridge.has(CacheKey)) {
-        const entries = Global.InBridge.get(CacheKey)!.entries();
-        for (const [key, value] of entries) {
-            result[key] = value;
-        }
-    }
-    return result;
-};
+): Map<string, ReplaySubject<any>> =>
+    Global.InBridge.get(CacheKey) ?? new Map();
 
-const GetAtomInObservableByName = (
-    CacheKey: string,
-    name: string,
-): ReplaySubject<any> => GetAtomInObservables(CacheKey)[name];
+const GetAtomInObservableByName = (CacheKey: string, name: string) =>
+    GetAtomInObservables(CacheKey).get(name);
 
 const SetAtomValueByName = (CacheKey: string) => (name: string, value: any) =>
-    GetAtomInObservables(CacheKey)?.[name]?.next(value);
+    GetAtomInObservables(CacheKey)?.get(name)?.next(value);
 
 export function getValue(CacheKey: string): Record<string, any>;
 export function getValue(CacheKey: string, name?: string): any;
@@ -145,7 +120,7 @@ export function getValue(CacheKey: string, name?: string) {
 
 export function getOutObservable(
     CacheKey: string,
-): Record<string, BehaviorSubject<any>>;
+): Map<string, BehaviorSubject<any>>;
 export function getOutObservable(
     CacheKey: string,
     name?: string,
@@ -159,7 +134,7 @@ export function getOutObservable(CacheKey: string, name?: string) {
 
 export function getInObservable(
     CacheKey: string,
-): Record<string, ReplaySubject<any>>;
+): Map<string, ReplaySubject<any>>;
 export function getInObservable(
     CacheKey: string,
     name?: string,

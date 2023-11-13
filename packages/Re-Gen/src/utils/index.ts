@@ -257,7 +257,7 @@ export const flatRelationConfig = (
         [is(Object), recordToArrayType],
     ])(RelationConfig);
 
-const isValidRelationConfig = (RelationConfig: IConfigItem[]) =>
+export const isValidRelationConfig = (RelationConfig: IConfigItem[]) =>
     RelationConfig?.length > 0;
 const isInit = (CacheKey: string) => !Global.Store.has(CacheKey);
 export const checkInitConfig = (
@@ -277,9 +277,11 @@ export const checkInitConfig = (
 export const generateAndSaveAtom = (CacheKey: string, item: IConfigItem) => {
     const joint = isJointState(item.init);
     // 如果 observable 有值，说明其依赖已经生成
-    let observable: BehaviorSubject<any> | ReplaySubject<any> | null = joint
-        ? getOutObservable(joint[0])[joint[1]]
-        : null;
+    let observable:
+        | BehaviorSubject<any>
+        | ReplaySubject<any>
+        | undefined
+        | null = joint ? getOutObservable(joint[0])?.get(joint[1]) : null;
     // 该 atom 需要链接到其他状态，但是那个 atom 还没有生成的时候，先产生一个中间bridge的 subject
     if (!observable && Array.isArray(joint)) {
         observable = new ReplaySubject(0);

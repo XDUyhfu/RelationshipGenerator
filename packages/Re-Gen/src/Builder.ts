@@ -17,7 +17,7 @@ import {
     transformDistinctOptionToBoolean,
     subscribeDependAtom,
     isJointState,
-    checkInitConfig,
+    isValidRelationConfig,
 } from "./utils";
 import type {
     IAtomInOut,
@@ -158,7 +158,14 @@ export const ReGen = (
 ): IAtomInOut => {
     const flatConfig = flatRelationConfig(RelationConfig);
     CheckParams(CacheKey, flatConfig, "library");
-    if (checkInitConfig(CacheKey, flatConfig))
+    if (
+        !Global.InBridge.has(CacheKey) &&
+        !Global.OutBridge.has(CacheKey) &&
+        isValidRelationConfig(flatConfig)
+    ) {
+        Global.InBridge.set(CacheKey, new Map());
+        Global.OutBridge.set(CacheKey, new Map());
         BuildRelation(CacheKey, flatConfig, config).subscribe();
+    }
     return AtomInOut(CacheKey);
 };
